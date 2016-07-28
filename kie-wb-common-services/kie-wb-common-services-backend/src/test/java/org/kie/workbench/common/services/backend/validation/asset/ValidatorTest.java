@@ -16,80 +16,113 @@
 
 package org.kie.workbench.common.services.backend.validation.asset;
 
-import org.drools.compiler.kie.builder.impl.MessageImpl;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+
+import org.guvnor.common.services.project.builder.service.BuildService;
 import org.guvnor.common.services.shared.message.Level;
 import org.guvnor.common.services.shared.validation.model.ValidationMessage;
+import org.guvnor.test.TestFileSystem;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kie.api.builder.KieBuilder;
-import org.kie.api.builder.Message;
+import org.kie.workbench.common.services.shared.project.KieProjectService;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.uberfire.backend.server.util.Paths;
+import org.uberfire.backend.vfs.Path;
 
-import static org.junit.Assert.*;
+import static junit.framework.TestCase.*;
+import static org.junit.Assert.assertTrue;
 
-
-@RunWith( MockitoJUnitRunner.class )
+@RunWith(MockitoJUnitRunner.class)
 public class ValidatorTest {
 
     @Mock
-    ValidatorFileSystemProvider validatorFileSystemProvider;
+    Path path;
 
-    @Mock
-    KieBuilder kieBuilder;
+    private TestFileSystem testFileSystem;
 
     private Validator validator;
 
     @Before
     public void setUp() throws Exception {
-        validator = new Validator( validatorFileSystemProvider ) {
-            @Override
-            protected KieBuilder makeKieBuilder() {
-                return kieBuilder;
-            }
-        };
+        testFileSystem = new TestFileSystem();
+        validator = new Validator( projectService(), buildService(), null );
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        testFileSystem.tearDown();
     }
 
     @Test
-    public void testGetKieBuilder() throws Exception {
-        assertEquals( kieBuilder,
-                      validator.getKieBuilder() );
+    public void testValidateWhenIsValid() throws Throwable {
+        Path path = path( "/GuvnorM2RepoDependencyExample1/src/main/resources/rule2.drl" );
+
+        List<ValidationMessage> errors = validator.validate( path );
+
+        assertTrue( errors.isEmpty() );
     }
 
     @Test
-    public void testMakeMessage() throws Exception {
-        final ValidationMessage validationMessage = validator.convertMessage( new MessageImpl( 0,
-                                                                                               Message.Level.ERROR,
-                                                                                               "/myProject/File.txt",
-                                                                                               "Text file not supported" ) );
+    public void testValidateWhenTheresNoProject() throws Exception {
+        Path path = path( "/META-INF/beans.xml" );
 
-        assertEquals( 0, validationMessage.getId() );
-        assertEquals( Level.ERROR, validationMessage.getLevel() );
-        assertEquals( "Text file not supported", validationMessage.getText() );
+        List<ValidationMessage> errors = validator.validate( path );
+
+        assertTrue( errors.isEmpty() );
     }
 
     @Test
-    public void testAddMessage1() throws Exception {
-        validator.addMessage( "",
-                              new MessageImpl( 0,
-                                               Message.Level.ERROR,
-                                               "/myProject/File.txt",
-                                               "Text file not supported" ) );
+    public void testAddMessageWhenMessageIsInvalid() throws Throwable {
+        Path path = path( "/GuvnorM2RepoDependencyExample1/src/main/resources/rule2.drl" );
+        ValidationMessage errorMessage = errorMessage( path( "/GuvnorM2RepoDependencyExample1/src/main/resources/rule1.drl" ) );
+
+        validator.addMessage( path, errorMessage );
 
         assertTrue( validator.validationMessages.isEmpty() );
 
     }
 
     @Test
-    public void testAddMessage2() throws Exception {
-        validator.addMessage( "",
-                              new MessageImpl( 0,
-                                               Message.Level.ERROR,
-                                               null,
-                                               "Text file not supported" ) );
+    public void testAddMessageWhenMessageIsValid() throws Throwable {
+        Path path = path( "/GuvnorM2RepoDependencyExample1/src/main/resources/rule2.drl" );
+        ValidationMessage errorMessage = errorMessage( path );
+
+        validator.addMessage( path, errorMessage );
 
         assertFalse( validator.validationMessages.isEmpty() );
 
+    }
+
+    @Test
+    public void testAddMessageWhenMessageIsBlank() throws Throwable {
+        Path path = path( "/GuvnorM2RepoDependencyExample1/src/main/resources/rule2.drl" );
+        ValidationMessage errorMessage = errorMessage( null );
+
+        validator.addMessage( path, errorMessage );
+
+        assertFalse( validator.validationMessages.isEmpty() );
+
+    }
+
+    private ValidationMessage errorMessage( Path path ) {
+        return new ValidationMessage( 0, Level.ERROR, path, 0, 0, null );
+    }
+
+    private Path path( final String resourceName ) throws URISyntaxException {
+        final URL urlToValidate = this.getClass().getResource( resourceName );
+        return Paths.convert( testFileSystem.fileSystemProvider.getPath( urlToValidate.toURI() ) );
+    }
+
+    private BuildService buildService() {
+        return testFileSystem.getReference( BuildService.class );
+    }
+
+    private KieProjectService projectService() {
+        return testFileSystem.getReference( KieProjectService.class );
     }
 }

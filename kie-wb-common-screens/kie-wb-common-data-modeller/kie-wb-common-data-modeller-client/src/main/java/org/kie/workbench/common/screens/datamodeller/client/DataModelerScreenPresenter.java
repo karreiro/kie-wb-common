@@ -22,6 +22,7 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.guvnor.common.services.shared.validation.model.ValidationMessage;
 import org.guvnor.messageconsole.events.PublishBaseEvent;
@@ -460,7 +461,8 @@ public class DataModelerScreenPresenter
         return new Command() {
             @Override
             public void execute() {
-
+                GWT.log( "===>" );
+                GWT.log( "===>" );
                 //at validation time we must do the same calculation as if we were about to save.
                 final DataObject[] modifiedDataObject = new DataObject[ 1 ];
                 if ( isDirty() ) {
@@ -480,6 +482,8 @@ public class DataModelerScreenPresenter
                 modelerService.call( new RemoteCallback<List<ValidationMessage>>() {
                     @Override
                     public void callback( final List<ValidationMessage> results ) {
+                        GWT.log( "-----------------------------" );
+                        GWT.log( results == null ? "NULLL" : results.toString() );
                         if ( results == null || results.isEmpty() ) {
                             notification.fire( new NotificationEvent( org.kie.workbench.common.widgets.client.resources.i18n.CommonConstants.INSTANCE.ItemValidatedSuccessfully(),
                                                                       NotificationEvent.NotificationType.SUCCESS ) );

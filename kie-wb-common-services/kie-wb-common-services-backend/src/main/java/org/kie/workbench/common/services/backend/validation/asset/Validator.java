@@ -16,126 +16,149 @@
 
 package org.kie.workbench.common.services.backend.validation.asset;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.guvnor.common.services.project.builder.model.BuildMessage;
+import org.guvnor.common.services.project.builder.model.BuildResults;
+import org.guvnor.common.services.project.builder.model.IncrementalBuildResults;
+import org.guvnor.common.services.project.builder.service.BuildService;
+import org.guvnor.common.services.project.model.Project;
+import org.guvnor.common.services.project.service.ProjectService;
 import org.guvnor.common.services.shared.message.Level;
 import org.guvnor.common.services.shared.validation.model.ValidationMessage;
 import org.kie.api.KieServices;
-import org.kie.api.builder.KieBuilder;
-import org.kie.api.builder.Message;
+import org.kie.api.io.Resource;
+import org.uberfire.backend.server.util.Paths;
+import org.uberfire.backend.vfs.Path;
+import org.uberfire.io.IOService;
 
 public class Validator {
 
-    //TODO internationalize error messages?.
-    private final static String ERROR_CLASS_NOT_FOUND = "Definition of class \"{0}\" was not found. Consequentially validation cannot be performed.\n" +
-            "Please check the necessary external dependencies for this project are configured correctly.";
+    protected List<ValidationMessage> validationMessages = new ArrayList<ValidationMessage>();
+    private final static String ERROR_CLASS_NOT_FOUND = "Definition of class \"{0}\" was not found. Consequentially validation cannot be performed.\nPlease check the necessary external dependencies for this project are configured correctly.";
 
-    private final ValidatorFileSystemProvider validatorFileSystemProvider;
+    private final IOService ioService;
 
-    protected final List<ValidationMessage> validationMessages = new ArrayList<ValidationMessage>();
+    private final ProjectService projectService;
+    private final BuildService buildService;
 
-    private final KieBuilder kieBuilder;
-
-    public Validator( final ValidatorFileSystemProvider validatorFileSystemProvider ) {
-        this.validatorFileSystemProvider = validatorFileSystemProvider;
-        this.kieBuilder = makeKieBuilder();
+    public Validator( final ProjectService projectService,
+                      final BuildService buildService,
+                      final IOService ioService ) {
+        this.projectService = projectService;
+        this.buildService = buildService;
+        this.ioService = ioService;
     }
 
-    protected KieBuilder makeKieBuilder() {
-        return KieServices.Factory.get().newKieBuilder( validatorFileSystemProvider.getFileSystem() );
+    public List<ValidationMessage> validate(  final Path resourcePath, final InputStream bla  ) {
+
+        BufferedInputStream stream = new BufferedInputStream( ioService.newInputStream( Paths.convert( resourcePath ) ) );
+        Resource resource = KieServices.Factory.get().getResources().newInputStreamResource( stream );
+
+//        ioService.write( Paths.convert( resourcePath ),  );
+//        KieServices.Factory.get().getResources().newInputStreamResource( new BufferedInputStream( resource )
+//        return validate( resource.ge );
+        return null;
     }
 
-    public List<ValidationMessage> validate() {
-        validatorFileSystemProvider.write();
+    public List<ValidationMessage> validate( Path resourcePath ) {
+        try {
+            validationMessages = new ArrayList<ValidationMessage>();
 
-        runValidation();
+            for ( final ValidationMessage message : buildIncrementally( resourcePath ) ) {
+                addMessage( resourcePath, message );
+            }
+
+        } catch ( NoProjectException e ) {
+            return new ArrayList<ValidationMessage>();
+        } catch ( NoClassDefFoundError e ) {
+            validationMessages.add( new ValidationMessage( Level.ERROR, MessageFormat.format( ERROR_CLASS_NOT_FOUND, e.getLocalizedMessage() ) ) );
+        } catch ( Throwable e ) {
+            validationMessages.add( new ValidationMessage( Level.ERROR, e.getLocalizedMessage() ) );
+        }
 
         return validationMessages;
     }
 
-    public KieBuilder getKieBuilder() {
-        return kieBuilder;
+    protected void addMessage( final Path path,
+                               final ValidationMessage message ) throws NoProjectException {
+        final String destinationURI = removeFileExtension( path.toURI() );
+        final String messageURI = messageURI( message );
+
+//        if ( messageURI == null || "".equals( messageURI ) || destinationURI.endsWith( messageURI ) ) {
+            validationMessages.add( message );
+//        }
     }
 
-    private void runValidation() {
+    private List<ValidationMessage> buildIncrementally( final Path resourcePath ) throws NoProjectException {
+        List<BuildMessage> buildMessages = new ArrayList<>();
+        List<BuildMessage> incrementalBuildMessages;
 
-        try {
-
-            final String destinationBasePath = getBasePath( validatorFileSystemProvider.getDestinationPath() );
-
-            for ( final Message message : getBuildMessages() ) {
-                addMessage( destinationBasePath,
-                            message );
-            }
-
-        } catch ( NoClassDefFoundError e ) {
-            validationMessages.add( makeErrorMessage( MessageFormat.format( ERROR_CLASS_NOT_FOUND,
-                                                                            e.getLocalizedMessage() ) ) );
-        } catch ( Throwable e ) {
-            validationMessages.add( makeErrorMessage( e.getLocalizedMessage() ) );
-        }
-    }
-
-    protected void addMessage( final String destinationBasePath,
-                               final Message message ) {
-        final String messageBasePath = getMessagePath( message );
-
-        if ( messageBasePath == null ||
-                "".equals( messageBasePath ) ||
-                destinationBasePath.endsWith( messageBasePath ) ) {
-            validationMessages.add( convertMessage( message ) );
-        }
-    }
-
-    private List<Message> getBuildMessages() {
-        return kieBuilder.buildAll().getResults().getMessages();
-    }
-
-    private String getMessagePath( final Message message ) {
-        return message.getPath() != null ? getBasePath( message.getPath() ) : null;
-    }
-
-    /*
-     * Strip the file extension as it cannot be relied upon when filtering KieBuilder messages.
-     * For example we write MyGuidedTemplate.template to KieFileSystem but KieBuilder returns
-     * Messages containing MyGuidedTemplate.drl
-     */
-    private String getBasePath( final String path ) {
-        if ( path != null && path.contains( "." ) ) {
-            return path.substring( 0,
-                                   path.lastIndexOf( "." ) );
-        }
-        return path;
-    }
-
-    private ValidationMessage makeErrorMessage( final String msg ) {
-        final ValidationMessage validationMessage = new ValidationMessage();
-        validationMessage.setLevel( Level.ERROR );
-        validationMessage.setText( msg );
-        return validationMessage;
-    }
-
-    protected ValidationMessage convertMessage( final Message message ) {
-        final ValidationMessage msg = new ValidationMessage();
-        switch ( message.getLevel() ) {
-            case ERROR:
-                msg.setLevel( Level.ERROR );
-                break;
-            case WARNING:
-                msg.setLevel( Level.WARNING );
-                break;
-            case INFO:
-                msg.setLevel( Level.INFO );
-                break;
+        if ( !buildService.isBuilt( project( resourcePath ) ) ) {
+            buildMessages = build( resourcePath ).getMessages();
         }
 
-        msg.setId( message.getId() );
-        msg.setLine( message.getLine() );
-        msg.setColumn( message.getColumn() );
-        msg.setText( message.getText() );
+        incrementalBuildMessages = updateTheBuild( resourcePath ).getAddedMessages();
 
-        return msg;
+        return formatResults( buildMessages, incrementalBuildMessages );
+    }
+
+    private List<ValidationMessage> formatResults( final List<BuildMessage> buildMessages,
+                                                   final List<BuildMessage> incrementalBuildMessages ) {
+        List<ValidationMessage> validationMessages = new ArrayList<>();
+
+        validationMessages.addAll( filterValidationMessages( buildMessages ) );
+        validationMessages.addAll( filterValidationMessages( incrementalBuildMessages ) );
+
+        return validationMessages;
+    }
+
+    private IncrementalBuildResults updateTheBuild( final Path resourcePath ) {
+        return buildService.updatePackageResource( resourcePath );
+    }
+
+    private BuildResults build( final Path resourcePath ) throws NoProjectException {
+        return buildService.build( project( resourcePath ) );
+    }
+
+    private Project project( final Path resourcePath ) throws NoProjectException {
+        Project project = projectService.resolveProject( resourcePath );
+
+        if ( project == null ) {
+            throw new NoProjectException();
+        }
+
+        return project;
+    }
+
+    private String messageURI( final ValidationMessage message ) {
+        return message.getPath() != null ? removeFileExtension( message.getPath().toURI() ) : null;
+    }
+
+    private String removeFileExtension( final String pathURI ) {
+        if ( pathURI != null && pathURI.contains( "." ) ) {
+            return pathURI.substring( 0, pathURI.lastIndexOf( "." ) );
+        }
+
+        return pathURI;
+    }
+
+    private List<ValidationMessage> filterValidationMessages( List<BuildMessage> messages ) {
+        return messages
+                .stream()
+                .filter( message -> message.getLevel() == Level.ERROR )
+                .map( message -> new ValidationMessage( message.getId(),
+                                                        message.getLevel(),
+                                                        message.getPath(),
+                                                        message.getLine(),
+                                                        message.getColumn(),
+                                                        ":))" + message.getText() ) )
+                .collect( Collectors.toList() );
     }
 }

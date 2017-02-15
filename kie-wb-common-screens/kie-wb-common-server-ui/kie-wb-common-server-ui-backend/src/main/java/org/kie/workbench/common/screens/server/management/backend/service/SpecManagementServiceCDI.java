@@ -108,13 +108,7 @@ public class SpecManagementServiceCDI extends RestSpecManagementServiceImpl impl
         return containerId + "-" + attemptNumber;
     }
 
-    private boolean isValidIdentifier( final String s ) {
-        for ( char c : s.toCharArray() ) {
-            if ( !( Character.isLetterOrDigit( c ) ||
-                    c == ':' || c == '-' || c == '.' ) ) {
-                return false;
-            }
-        }
-        return true;
+    private boolean isValidIdentifier( final String identifier ) {
+        return identifier != null && identifier.matches( "[A-Za-z0-9_\\-.:]+" );
     }
 }

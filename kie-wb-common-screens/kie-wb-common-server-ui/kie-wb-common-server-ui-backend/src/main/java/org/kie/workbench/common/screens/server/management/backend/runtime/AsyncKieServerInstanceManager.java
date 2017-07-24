@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -54,10 +55,6 @@ public class AsyncKieServerInstanceManager extends KieServerInstanceManager {
     private NotificationService notificationService;
     private Event<ContainerUpdateEvent> containerUpdateEvent;
 
-    protected void setExecutor(ExecutorService executor) {
-        this.executor = executor;
-    }
-
     public AsyncKieServerInstanceManager() {
     }
 
@@ -68,6 +65,10 @@ public class AsyncKieServerInstanceManager extends KieServerInstanceManager {
         this.notificationService = notificationService;
         this.containerUpdateEvent = containerUpdateEvent;
         this.executor = executorService;
+    }
+
+    protected void setExecutor(ExecutorService executor) {
+        this.executor = executor;
     }
 
     @Override
@@ -160,11 +161,13 @@ public class AsyncKieServerInstanceManager extends KieServerInstanceManager {
     @Override
     public List<Container> stopContainer(final ServerTemplate serverTemplate,
                                          final ContainerSpec containerSpec) {
+        final List<Container> containers = new ArrayList<>();
+
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                List<Container> containers = AsyncKieServerInstanceManager.super.stopContainer(serverTemplate,
-                                                                                               containerSpec);
+                containers.addAll(AsyncKieServerInstanceManager.super.stopContainer(serverTemplate,
+                                                                                    containerSpec));
                 notificationService.notify(serverTemplate,
                                            containerSpec,
                                            containers);
@@ -175,7 +178,15 @@ public class AsyncKieServerInstanceManager extends KieServerInstanceManager {
                                             STOP_CONTAINER);
             }
         });
-        return Collections.emptyList();
+
+        try {
+            executor.awaitTermination(10000,
+                                      TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            return Collections.emptyList();
+        }
+
+        return containers;
     }
 
     @Override

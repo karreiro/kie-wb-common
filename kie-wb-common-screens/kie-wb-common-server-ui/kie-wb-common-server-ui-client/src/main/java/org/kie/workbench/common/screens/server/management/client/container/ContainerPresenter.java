@@ -24,6 +24,8 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.ErrorCallback;
@@ -150,6 +152,7 @@ public class ContainerPresenter {
     }
 
     public void onRefresh( @Observes final RefreshRemoteServers refresh ) {
+        Window.alert("--->>>> @Observes final RefreshRemoteServers refresh ) {");
         if ( refresh != null && refresh.getContainerSpecKey() != null ) {
             load( refresh.getContainerSpecKey() );
         } else {
@@ -158,6 +161,7 @@ public class ContainerPresenter {
     }
 
     public void load( @Observes final ContainerSpecSelected containerSpecSelected ) {
+        Window.alert("--->>>> @Observes final ContainerSpecSelected containerSpecSelected ) {");
         if ( containerSpecSelected != null &&
                 containerSpecSelected.getContainerSpecKey() != null ) {
             load( containerSpecSelected.getContainerSpecKey() );
@@ -167,6 +171,7 @@ public class ContainerPresenter {
     }
 
     public void loadContainers( @Observes final ContainerSpecData content ) {
+        Window.alert("--->>>> @Observes final ContainerSpecData content ) ::");
         if ( content != null &&
                 content.getContainerSpec() != null &&
                 content.getContainers() != null ) {
@@ -287,13 +292,13 @@ public class ContainerPresenter {
     }
 
     public void stopContainer() {
-        final RemoteCallback<Object> onSuccess = response -> refresh();
+        final RemoteCallback<Object> onSuccess = response -> {
+            Window.alert("stop :: suc");
+        };
         final ErrorCallback<Object> errorCallback = (o, throwable) -> {
+            Window.alert("stop :: err");
             notification.fire(new NotificationEvent(view.getStopContainerErrorMessage(),
                                                     NotificationEvent.NotificationType.ERROR));
-
-            refresh();
-
             return false;
         };
 

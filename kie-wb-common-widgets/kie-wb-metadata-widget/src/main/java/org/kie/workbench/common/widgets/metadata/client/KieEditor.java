@@ -16,6 +16,8 @@
 
 package org.kie.workbench.common.widgets.metadata.client;
 
+import java.util.function.Supplier;
+
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
@@ -44,13 +46,14 @@ import org.uberfire.ext.editor.commons.client.file.popups.RenamePopUpPresenter;
 import org.uberfire.ext.editor.commons.client.file.popups.SavePopUpPresenter;
 import org.uberfire.ext.editor.commons.client.menu.MenuItems;
 import org.uberfire.ext.editor.commons.client.validation.ValidationErrorReason;
+import org.uberfire.ext.editor.commons.client.validation.Validator;
 import org.uberfire.ext.editor.commons.client.validation.ValidatorWithReasonCallback;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.workbench.events.NotificationEvent;
 import org.uberfire.workbench.model.menu.MenuItem;
 
-public abstract class KieEditor
-        extends BaseEditor
+public abstract class KieEditor<T>
+        extends BaseEditor<T, Metadata>
         implements KieEditorWrapperView.KieEditorWrapperPresenter {
 
     @Inject
@@ -249,8 +252,7 @@ public abstract class KieEditor
                     .addSave(versionRecordManager.newSaveMenuItem(this::saveAction))
                     .addCopy(versionRecordManager.getCurrentPath(),
                              assetUpdateValidator)
-                    .addRename(versionRecordManager.getPathToLatest(),
-                               assetUpdateValidator)
+                    .addRename(saveAndRename())
                     .addDelete(versionRecordManager.getPathToLatest(),
                                assetUpdateValidator);
         }
@@ -258,6 +260,16 @@ public abstract class KieEditor
         fileMenuBuilder
                 .addValidate(onValidate())
                 .addNewTopLevelMenu(versionRecordManager.buildMenu());
+    }
+
+    @Override
+    protected Supplier<Metadata> getMetadataSupplier() {
+        return () -> metadata;
+    }
+
+    @Override
+    public Validator getRenameValidator() {
+        return assetUpdateValidator;
     }
 
     protected void saveAction() {

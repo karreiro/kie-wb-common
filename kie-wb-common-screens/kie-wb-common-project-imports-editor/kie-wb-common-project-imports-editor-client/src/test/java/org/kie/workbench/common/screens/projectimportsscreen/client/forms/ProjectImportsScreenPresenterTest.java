@@ -16,9 +16,13 @@
 
 package org.kie.workbench.common.screens.projectimportsscreen.client.forms;
 
+import java.util.function.Supplier;
+
 import org.guvnor.common.services.project.client.security.ProjectController;
 import org.guvnor.common.services.project.context.ProjectContext;
 import org.guvnor.common.services.project.model.Project;
+import org.guvnor.common.services.project.model.ProjectImports;
+import org.guvnor.common.services.shared.metadata.model.Metadata;
 import org.guvnor.common.services.shared.metadata.model.Overview;
 import org.jboss.errai.bus.client.api.messaging.Message;
 import org.jboss.errai.common.client.api.Caller;
@@ -40,13 +44,21 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.uberfire.backend.vfs.ObservablePath;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.ext.editor.commons.client.history.VersionRecordManager;
+import org.uberfire.ext.editor.commons.client.menu.common.SaveAndRenameCommandFactory;
 import org.uberfire.ext.editor.commons.client.validation.Validator;
+import org.uberfire.ext.editor.commons.service.support.SupportsSaveAndRename;
 import org.uberfire.ext.widgets.common.client.callbacks.HasBusyIndicatorDefaultErrorCallback;
+import org.uberfire.mvp.Command;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.workbench.model.menu.MenuItem;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectImportsScreenPresenterTest {
@@ -82,6 +94,15 @@ public class ProjectImportsScreenPresenterTest {
     protected Overview overview;
 
     @Mock
+    protected ProjectController projectController;
+
+    @Mock
+    protected ProjectContext workbenchContext;
+
+    @Mock
+    protected SaveAndRenameCommandFactory<ProjectImports, Metadata> saveAndRenameCommandFactory;
+
+    @Mock
     private Message message;
 
     @Mock
@@ -92,12 +113,6 @@ public class ProjectImportsScreenPresenterTest {
 
     @Mock
     private Caller<ProjectImportsService> serviceCaller;
-
-    @Mock
-    protected ProjectController projectController;
-
-    @Mock
-    protected ProjectContext workbenchContext;
 
     @InjectMocks
     protected ProjectImportsScreenPresenter presenter = new ProjectImportsScreenPresenter(view,
@@ -111,8 +126,7 @@ public class ProjectImportsScreenPresenterTest {
         when(menuBuilder.addSave(any(MenuItem.class))).thenReturn(menuBuilder);
         when(menuBuilder.addCopy(any(Path.class),
                                  any(Validator.class))).thenReturn(menuBuilder);
-        when(menuBuilder.addRename(any(Path.class),
-                                   any(Validator.class))).thenReturn(menuBuilder);
+        when(menuBuilder.addRename(any(Command.class))).thenReturn(menuBuilder);
         when(menuBuilder.addDelete(any(Path.class))).thenReturn(menuBuilder);
         when(menuBuilder.addNewTopLevelMenu(any(MenuItem.class))).thenReturn(menuBuilder);
     }
@@ -154,12 +168,9 @@ public class ProjectImportsScreenPresenterTest {
         presenter.makeMenuBar();
 
         verify(menuBuilder).addSave(any(MenuItem.class));
-        verify(menuBuilder).addCopy(any(Path.class),
-                                    any(AssetUpdateValidator.class));
-        verify(menuBuilder).addRename(any(Path.class),
-                                      any(AssetUpdateValidator.class));
-        verify(menuBuilder).addDelete(any(Path.class),
-                                      any(AssetUpdateValidator.class));
+        verify(menuBuilder).addCopy(any(Path.class), any(AssetUpdateValidator.class));
+        verify(menuBuilder).addRename(any(Command.class));
+        verify(menuBuilder).addDelete(any(Path.class), any(AssetUpdateValidator.class));
     }
 
     @Test
@@ -169,16 +180,29 @@ public class ProjectImportsScreenPresenterTest {
 
         presenter.makeMenuBar();
 
-        verify(menuBuilder,
-               never()).addSave(any(MenuItem.class));
-        verify(menuBuilder,
-               never()).addCopy(any(Path.class),
-                                any(AssetUpdateValidator.class));
-        verify(menuBuilder,
-               never()).addRename(any(Path.class),
-                                  any(AssetUpdateValidator.class));
-        verify(menuBuilder,
-               never()).addDelete(any(Path.class),
-                                  any(AssetUpdateValidator.class));
+        verify(menuBuilder, never()).addSave(any(MenuItem.class));
+        verify(menuBuilder, never()).addCopy(any(Path.class), any(AssetUpdateValidator.class));
+        verify(menuBuilder, never()).addRename(any(Command.class));
+        verify(menuBuilder, never()).addDelete(any(Path.class), any(AssetUpdateValidator.class));
+    }
+
+    @Test
+    public void testGetContentSupplier() {
+
+        final ProjectImports content = mock(ProjectImports.class);
+
+        presenter.setModel(content);
+
+        final Supplier<ProjectImports> contentSupplier = presenter.getContentSupplier();
+
+        assertEquals(content, contentSupplier.get());
+    }
+
+    @Test
+    public void testGetSaveAndRenameServiceCaller() {
+
+        final Caller<? extends SupportsSaveAndRename<ProjectImports, Metadata>> serviceCaller = presenter.getSaveAndRenameServiceCaller();
+
+        assertEquals(this.serviceCaller, serviceCaller);
     }
 }

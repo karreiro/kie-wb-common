@@ -16,13 +16,18 @@
 
 package org.kie.workbench.common.screens.defaulteditor.client.editor;
 
+import java.util.function.Supplier;
+
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.guvnor.common.services.project.client.security.ProjectController;
 import org.guvnor.common.services.project.context.ProjectContext;
 import org.guvnor.common.services.project.model.Project;
+import org.guvnor.common.services.shared.metadata.model.Metadata;
+import org.jboss.errai.common.client.api.Caller;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.workbench.common.screens.defaulteditor.service.DefaultEditorService;
 import org.kie.workbench.common.widgets.client.menu.FileMenuBuilderImpl;
 import org.kie.workbench.common.widgets.metadata.client.validation.AssetUpdateValidator;
 import org.mockito.InjectMocks;
@@ -31,10 +36,17 @@ import org.mockito.Spy;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.ext.editor.commons.client.history.VersionRecordManager;
 import org.uberfire.ext.editor.commons.client.menu.BasicFileMenuBuilder;
+import org.uberfire.ext.editor.commons.client.menu.common.SaveAndRenameCommandFactory;
+import org.uberfire.ext.editor.commons.service.support.SupportsSaveAndRename;
+import org.uberfire.mvp.Command;
 import org.uberfire.workbench.model.menu.MenuItem;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 @RunWith(GwtMockitoTestRunner.class)
 public class KieTextEditorPresenterTest {
@@ -55,16 +67,27 @@ public class KieTextEditorPresenterTest {
     @Mock
     protected ProjectContext workbenchContext;
 
+    @Mock
+    protected Caller<DefaultEditorService> defaultEditorService;
+
+    @Mock
+    protected KieTextEditorView view;
+
+    @Mock
+    protected SaveAndRenameCommandFactory<String, Metadata> saveAndRenameCommandFactory;
+
     protected KieTextEditorPresenter presenter;
 
     @Before
     public void setup() {
-        presenter = new KieTextEditorPresenter(mock(KieTextEditorView.class)) {
+        presenter = new KieTextEditorPresenter(view) {
             {
                 fileMenuBuilder = KieTextEditorPresenterTest.this.fileMenuBuilder;
                 projectController = KieTextEditorPresenterTest.this.projectController;
                 workbenchContext = KieTextEditorPresenterTest.this.workbenchContext;
                 versionRecordManager = KieTextEditorPresenterTest.this.versionRecordManager;
+                saveAndRenameCommandFactory = KieTextEditorPresenterTest.this.saveAndRenameCommandFactory;
+                defaultEditorService = KieTextEditorPresenterTest.this.defaultEditorService;
             }
         };
     }
@@ -77,12 +100,9 @@ public class KieTextEditorPresenterTest {
         presenter.makeMenuBar();
 
         verify(fileMenuBuilder).addSave(any(MenuItem.class));
-        verify(fileMenuBuilder).addCopy(any(Path.class),
-                                        any(AssetUpdateValidator.class));
-        verify(fileMenuBuilder).addRename(any(Path.class),
-                                          any(AssetUpdateValidator.class));
-        verify(fileMenuBuilder).addDelete(any(Path.class),
-                                          any(AssetUpdateValidator.class));
+        verify(fileMenuBuilder).addCopy(any(Path.class), any(AssetUpdateValidator.class));
+        verify(fileMenuBuilder).addRename(any(Command.class));
+        verify(fileMenuBuilder).addDelete(any(Path.class), any(AssetUpdateValidator.class));
     }
 
     @Test
@@ -92,16 +112,29 @@ public class KieTextEditorPresenterTest {
 
         presenter.makeMenuBar();
 
-        verify(fileMenuBuilder,
-               never()).addSave(any(MenuItem.class));
-        verify(fileMenuBuilder,
-               never()).addCopy(any(Path.class),
-                                any(AssetUpdateValidator.class));
-        verify(fileMenuBuilder,
-               never()).addRename(any(Path.class),
-                                  any(AssetUpdateValidator.class));
-        verify(fileMenuBuilder,
-               never()).addDelete(any(Path.class),
-                                  any(AssetUpdateValidator.class));
+        verify(fileMenuBuilder, never()).addSave(any(MenuItem.class));
+        verify(fileMenuBuilder, never()).addCopy(any(Path.class), any(AssetUpdateValidator.class));
+        verify(fileMenuBuilder, never()).addRename(any(Command.class));
+        verify(fileMenuBuilder, never()).addDelete(any(Path.class), any(AssetUpdateValidator.class));
+    }
+
+    @Test
+    public void testGetSaveAndRenameServiceCaller() {
+
+        final Caller<? extends SupportsSaveAndRename<String, Metadata>> serviceCaller = presenter.getSaveAndRenameServiceCaller();
+
+        assertEquals(defaultEditorService, serviceCaller);
+    }
+
+    @Test
+    public void testGetContentSupplier() {
+
+        final String content = "content";
+
+        doReturn(content).when(view).getContent();
+
+        final Supplier<String> contentSupplier = presenter.getContentSupplier();
+
+        assertEquals(content, contentSupplier.get());
     }
 }

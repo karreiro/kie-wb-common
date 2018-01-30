@@ -65,6 +65,7 @@ import static org.junit.Assert.*;
 /**
  * Simple test using the Pipeline API and the docker Provider & Executors
  */
+@org.junit.Ignore
 public class DockerExecutorTest {
 
     private File tempPath;

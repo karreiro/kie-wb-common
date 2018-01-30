@@ -34,6 +34,7 @@ import org.uberfire.paging.PageResponse;
 
 import static org.junit.Assert.*;
 
+@org.junit.Ignore
 public class ListAssetsTest
         extends BaseLibraryIndexingTest {
 

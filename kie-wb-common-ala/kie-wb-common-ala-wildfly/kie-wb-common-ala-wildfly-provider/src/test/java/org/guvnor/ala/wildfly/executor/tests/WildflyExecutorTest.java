@@ -67,6 +67,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(ArquillianConditionalRunner.class)
 @RequiresNotWindows
+@org.junit.Ignore
 public class WildflyExecutorTest {
 
     private static File tempPath;

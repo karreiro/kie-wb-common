@@ -18,6 +18,8 @@ package org.kie.workbench.common.screens.projecteditor.backend.server;
 
 import java.io.IOException;
 import java.util.Set;
+
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -46,6 +48,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.backend.server.util.Paths;
 import org.uberfire.backend.vfs.Path;
+import org.uberfire.ext.editor.commons.backend.service.SaveAndRenameServiceImpl;
+import org.uberfire.ext.editor.commons.service.RenameService;
+import org.uberfire.ext.editor.commons.service.support.SupportsSaveAndRename;
 import org.uberfire.io.IOService;
 
 @Service
@@ -68,6 +73,8 @@ public class PomEditorServiceImpl implements PomEditorService {
     private POMContentHandler pomContentHandler;
     private ProjectRepositoryResolver repositoryResolver;
     private ProjectRepositoriesService projectRepositoriesService;
+    private RenameService renameService;
+    private SaveAndRenameServiceImpl<String, Metadata> saveAndRenameService;
 
     public PomEditorServiceImpl() {
         //Zero-parameter constructor for WELD proxies
@@ -81,7 +88,9 @@ public class PomEditorServiceImpl implements PomEditorService {
                                  final KieProjectService projectService,
                                  final POMContentHandler pomContentHandler,
                                  final ProjectRepositoryResolver repositoryResolver,
-                                 final ProjectRepositoriesService projectRepositoriesService ) {
+                                 final ProjectRepositoriesService projectRepositoriesService,
+                                 final RenameService renameService,
+                                 final SaveAndRenameServiceImpl<String, Metadata> saveAndRenameService) {
         this.ioService = ioService;
         this.defaultEditorService = defaultEditorService;
         this.metadataService = metadataService;
@@ -91,6 +100,14 @@ public class PomEditorServiceImpl implements PomEditorService {
         this.pomContentHandler = pomContentHandler;
         this.repositoryResolver = repositoryResolver;
         this.projectRepositoriesService = projectRepositoriesService;
+        this.renameService = renameService;
+        this.saveAndRenameService = saveAndRenameService;
+    }
+
+    @PostConstruct
+    public void init() {
+        final SupportsSaveAndRename<String, Metadata> updateService = this;
+        saveAndRenameService.init(updateService);
     }
 
     @Override
@@ -158,4 +175,27 @@ public class PomEditorServiceImpl implements PomEditorService {
         }
     }
 
+    @Override
+    public Path saveAndRename(final Path path,
+                              final String newFileName,
+                              final Metadata metadata,
+                              final String content,
+                              final String comment) {
+        return saveAndRenameService.saveAndRename(path, newFileName, metadata, content, comment);
+    }
+
+    @Override
+    public Path rename(final Path path,
+                       final String newName,
+                       final String comment) {
+        return renameService.rename(path, newName, comment);
+    }
+
+    @Override
+    public Path save(final Path path,
+                     final String content,
+                     final Metadata metadata,
+                     final String comment) {
+        return save(path, content, metadata, comment, DeploymentMode.FORCED);
+    }
 }

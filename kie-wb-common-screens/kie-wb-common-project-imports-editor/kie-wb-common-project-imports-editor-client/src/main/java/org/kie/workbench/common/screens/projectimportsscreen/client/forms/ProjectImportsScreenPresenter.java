@@ -16,16 +16,20 @@
 
 package org.kie.workbench.common.screens.projectimportsscreen.client.forms;
 
+import java.util.function.Supplier;
+
 import javax.inject.Inject;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import org.guvnor.common.services.project.model.ProjectImports;
+import org.guvnor.common.services.shared.metadata.model.Metadata;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.kie.workbench.common.screens.projectimportsscreen.client.resources.i18n.ProjectConfigScreenConstants;
 import org.kie.workbench.common.screens.projectimportsscreen.client.type.ProjectImportsResourceType;
 import org.kie.workbench.common.services.shared.project.ProjectImportsContent;
 import org.kie.workbench.common.services.shared.project.ProjectImportsService;
+import org.kie.workbench.common.widgets.client.menu.FileMenuBuilder;
 import org.kie.workbench.common.widgets.client.resources.i18n.CommonConstants;
 import org.kie.workbench.common.widgets.metadata.client.KieEditor;
 import org.uberfire.backend.vfs.ObservablePath;
@@ -34,6 +38,8 @@ import org.uberfire.client.annotations.WorkbenchEditor;
 import org.uberfire.client.annotations.WorkbenchMenu;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
+import org.uberfire.ext.editor.commons.client.validation.Validator;
+import org.uberfire.ext.editor.commons.service.support.SupportsSaveAndRename;
 import org.uberfire.ext.widgets.common.client.callbacks.HasBusyIndicatorDefaultErrorCallback;
 import org.uberfire.lifecycle.OnClose;
 import org.uberfire.lifecycle.OnMayClose;
@@ -46,7 +52,7 @@ import org.uberfire.workbench.model.menu.Menus;
 
 @WorkbenchEditor(identifier = "projectConfigScreen", supportedTypes = {ProjectImportsResourceType.class})
 public class ProjectImportsScreenPresenter
-        extends KieEditor {
+        extends KieEditor<ProjectImports> {
 
     private ProjectImportsScreenView view;
 
@@ -100,19 +106,12 @@ public class ProjectImportsScreenPresenter
     @Override
     protected void makeMenuBar() {
         if (canUpdateProject()) {
-            fileMenuBuilder
-                    .addSave(versionRecordManager.newSaveMenuItem(new Command() {
-                        @Override
-                        public void execute() {
-                            saveAction();
-                        }
-                    }))
-                    .addCopy(versionRecordManager.getCurrentPath(),
-                             assetUpdateValidator)
-                    .addRename(versionRecordManager.getPathToLatest(),
-                               assetUpdateValidator)
-                    .addDelete(versionRecordManager.getPathToLatest(),
-                               assetUpdateValidator);
+
+            this.fileMenuBuilder
+                    .addSave(versionRecordManager.newSaveMenuItem(this::saveAction))
+                    .addCopy(versionRecordManager.getCurrentPath(), getRenameValidator())
+                    .addRename(saveAndRename())
+                    .addDelete(versionRecordManager.getPathToLatest(), getRenameValidator());
         }
 
         fileMenuBuilder
@@ -123,6 +122,16 @@ public class ProjectImportsScreenPresenter
     protected void loadContent() {
         importsService.call(getModelSuccessCallback(),
                             new HasBusyIndicatorDefaultErrorCallback(view)).loadContent(versionRecordManager.getCurrentPath());
+    }
+
+    @Override
+    protected Supplier<ProjectImports> getContentSupplier() {
+        return () -> model;
+    }
+
+    @Override
+    protected Caller<? extends SupportsSaveAndRename<ProjectImports, Metadata>> getSaveAndRenameServiceCaller() {
+        return importsService;
     }
 
     protected void save() {
@@ -176,5 +185,9 @@ public class ProjectImportsScreenPresenter
     @OnMayClose
     public boolean mayClose() {
         return super.mayClose(model);
+    }
+
+    void setModel(final ProjectImports model) {
+        this.model = model;
     }
 }

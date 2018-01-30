@@ -53,10 +53,12 @@ import org.guvnor.common.services.project.builder.service.PostBuildHandler;
 import org.guvnor.common.services.project.events.NewPackageEvent;
 import org.guvnor.common.services.project.events.NewProjectEvent;
 import org.guvnor.common.services.project.events.RenameProjectEvent;
+import org.guvnor.common.services.project.model.ProjectImports;
 import org.guvnor.common.services.project.service.POMService;
 import org.guvnor.common.services.project.service.ProjectRepositoriesService;
 import org.guvnor.common.services.project.service.ProjectRepositoryResolver;
 import org.guvnor.common.services.shared.metadata.MetadataService;
+import org.guvnor.common.services.shared.metadata.model.Metadata;
 import org.guvnor.m2repo.backend.server.M2RepoServiceImpl;
 import org.guvnor.structure.backend.backcompat.BackwardCompatibleUtil;
 import org.guvnor.structure.backend.config.ConfigGroupMarshaller;
@@ -120,6 +122,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.uberfire.backend.server.io.ConfigIOServiceProducer;
 import org.uberfire.backend.server.util.Paths;
 import org.uberfire.backend.vfs.Path;
+import org.uberfire.ext.editor.commons.backend.service.SaveAndRenameServiceImpl;
+import org.uberfire.ext.editor.commons.service.RenameService;
 import org.uberfire.io.IOService;
 import org.uberfire.io.impl.IOServiceDotFileImpl;
 import org.uberfire.java.nio.file.FileSystemNotFoundException;
@@ -226,6 +230,8 @@ public class DataModelServiceConstructorTest {
             throws IllegalArgumentException, FileSystemNotFoundException, SecurityException, URISyntaxException {
 
         final URL packageUrl = this.getClass().getResource("/DataModelServiceConstructorTest/src/main/java/t1p1");
+        final RenameService renameService = mock(RenameService.class);
+        final SaveAndRenameServiceImpl saveAndRenameService = mock(SaveAndRenameServiceImpl.class);
 
         IOService ioService = new IOServiceDotFileImpl();
         Collection<Role> roles = new ArrayList<>();
@@ -270,7 +276,9 @@ public class DataModelServiceConstructorTest {
         BackwardCompatibleUtil backward = new BackwardCompatibleUtil(configurationFactory);
         ProjectConfigurationContentHandler projectConfigurationContentHandler = new ProjectConfigurationContentHandler();
         ProjectImportsService projectImportsService = new ProjectImportsServiceImpl(ioService,
-                                                                                    projectConfigurationContentHandler);
+                                                                                    projectConfigurationContentHandler,
+                                                                                    renameService,
+                                                                                    saveAndRenameService);
 
         Event<NewProjectEvent> newProjectEvent = new EventSourceMock<>();
         Event<NewPackageEvent> newPackageEvent = new EventSourceMock<>();
@@ -373,7 +381,9 @@ public class DataModelServiceConstructorTest {
         kModuleService.setProjectService(projectService);
 
         ProjectImportsService importsService = new ProjectImportsServiceImpl(ioService,
-                                                                             projectConfigurationContentHandler);
+                                                                             projectConfigurationContentHandler,
+                                                                             renameService,
+                                                                             saveAndRenameService);
         Instance<BuildValidationHelper> buildValidationHelperBeans = null;
         Instance<Predicate<String>> classFilterBeans = null;
         HackedLRUProjectDependenciesClassLoaderCache dependenciesClassLoaderCache = new HackedLRUProjectDependenciesClassLoaderCache();

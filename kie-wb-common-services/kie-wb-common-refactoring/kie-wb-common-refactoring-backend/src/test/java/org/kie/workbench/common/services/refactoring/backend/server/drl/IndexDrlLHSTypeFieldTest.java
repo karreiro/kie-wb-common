@@ -33,6 +33,7 @@ import org.kie.workbench.common.services.refactoring.service.PartType;
 import org.uberfire.ext.metadata.io.KObjectUtil;
 import org.uberfire.java.nio.file.Path;
 
+@org.junit.Ignore
 public class IndexDrlLHSTypeFieldTest extends BaseIndexingTest<TestDrlFileTypeDefinition> {
 
     @Test

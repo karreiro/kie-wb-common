@@ -228,6 +228,7 @@ public abstract class KieEditor<T>
         this.overviewWidget.setContent(overview,
                                        versionRecordManager.getPathToLatest());
         this.metadata = overview.getMetadata();
+        setMetadataOriginalHash(metadata.hashCode());
 
         kieView.clear();
 

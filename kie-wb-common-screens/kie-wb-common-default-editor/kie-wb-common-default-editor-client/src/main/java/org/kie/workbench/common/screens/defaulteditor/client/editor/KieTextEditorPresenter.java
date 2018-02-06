@@ -128,6 +128,8 @@ public abstract class KieTextEditorPresenter
             public void callback(final DefaultEditorContent content) {
                 resetEditorPages(content.getOverview());
                 metadata = content.getOverview().getMetadata();
+                setMetadataOriginalHash(metadata.hashCode());
+
                 view.onStartup(versionRecordManager.getCurrentPath());
                 view.setReadOnly(isReadOnly);
             }

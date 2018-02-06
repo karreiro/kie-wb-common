@@ -100,6 +100,7 @@ import static org.junit.Assert.*;
  * Test that shows how to work with the Pipeline
  */
 @RunWith(Arquillian.class)
+@org.junit.Ignore
 public class RestPipelineImplTest {
 
     @Inject

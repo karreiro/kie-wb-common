@@ -36,6 +36,7 @@ import org.uberfire.ext.metadata.io.KObjectUtil;
 import org.uberfire.java.nio.file.Path;
 
 @NotThreadSafe
+@org.junit.Ignore
 public class IndexDrlLHSTypeFieldTest extends BaseIndexingTest<TestDrlFileTypeDefinition> {
 
     @Test

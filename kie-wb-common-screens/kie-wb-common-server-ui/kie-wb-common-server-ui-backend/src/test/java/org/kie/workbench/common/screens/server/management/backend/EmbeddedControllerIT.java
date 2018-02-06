@@ -33,6 +33,7 @@ import org.kie.server.controller.client.KieServerControllerClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@org.junit.Ignore
 @RunWith(Arquillian.class)
 public class EmbeddedControllerIT extends AbstractControllerIT {
 

@@ -24,8 +24,10 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.logging.client.LogConfiguration;
 import com.google.gwt.user.client.ui.IsWidget;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.commands.general.NavigateToExpressionEditorCommand;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
@@ -67,6 +69,9 @@ import org.uberfire.client.annotations.WorkbenchMenu;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
+import org.uberfire.client.workbench.docks.UberfireDock;
+import org.uberfire.client.workbench.docks.UberfireDockPosition;
+import org.uberfire.client.workbench.docks.UberfireDocks;
 import org.uberfire.client.workbench.events.ChangeTitleWidgetEvent;
 import org.uberfire.ext.widgets.common.client.common.BusyPopup;
 import org.uberfire.lifecycle.OnClose;
@@ -75,6 +80,7 @@ import org.uberfire.lifecycle.OnOpen;
 import org.uberfire.lifecycle.OnStartup;
 import org.uberfire.mvp.Command;
 import org.uberfire.mvp.PlaceRequest;
+import org.uberfire.mvp.impl.DefaultPlaceRequest;
 import org.uberfire.workbench.model.menu.MenuFactory;
 import org.uberfire.workbench.model.menu.Menus;
 
@@ -85,10 +91,8 @@ import static java.util.logging.Level.FINE;
 @WorkbenchScreen(identifier = SessionDiagramEditorScreen.SCREEN_ID)
 public class SessionDiagramEditorScreen {
 
-    private static Logger LOGGER = Logger.getLogger(SessionDiagramEditorScreen.class.getName());
-
     public static final String SCREEN_ID = "SessionDiagramEditorScreen";
-
+    private static Logger LOGGER = Logger.getLogger(SessionDiagramEditorScreen.class.getName());
     private final DefinitionManager definitionManager;
     private final ClientFactoryService clientFactoryServices;
     private final ShowcaseDiagramService diagramService;
@@ -164,6 +168,8 @@ public class SessionDiagramEditorScreen {
             load(name,
                  callback);
         }
+
+        blehCommand().execute();
     }
 
     private Menus makeMenuBar() {
@@ -171,11 +177,36 @@ public class SessionDiagramEditorScreen {
                 MenuFactory
                         .newTopLevelMenu("Save")
                         .respondsWith(getSaveCommand())
+                        .endMenu()
+                        .newTopLevelMenu("Bleeeh")
+                        .respondsWith(blehCommand())
                         .endMenu();
         if (menuDevCommandsBuilder.isEnabled()) {
             m.newTopLevelMenu(menuDevCommandsBuilder.build()).endMenu();
         }
         return m.build();
+    }
+
+    @Inject
+    UberfireDocks uberfireDocks;
+
+    private Command blehCommand() {
+        return () -> {
+            GWT.log("====>> ");
+
+            String authoringPerspectiveIdentifier = "AuthoringPerspective";
+            DefaultPlaceRequest defaultPlaceRequest = new DefaultPlaceRequest("org.kie.dmn.decision.navigator");
+
+            UberfireDock uberfireDock = new UberfireDock(UberfireDockPosition.WEST,
+                                                         IconType.MAP.toString(),
+                                                         defaultPlaceRequest,
+                                                         authoringPerspectiveIdentifier);
+            uberfireDock.withSize(400).withLabel("Decision Navigator");
+
+            uberfireDocks.add(uberfireDock);
+            uberfireDocks.show(UberfireDockPosition.WEST, authoringPerspectiveIdentifier);
+            uberfireDocks.toggle(uberfireDock);
+        };
     }
 
     private Command getSaveCommand() {
@@ -352,37 +383,6 @@ public class SessionDiagramEditorScreen {
         return "sessionDiagramEditorScreenContext";
     }
 
-    private final class ScreenPresenterCallback implements SessionPresenter.SessionPresenterCallback<AbstractClientFullSession, Diagram> {
-
-        private final Command callback;
-
-        private ScreenPresenterCallback(final Command callback) {
-            this.callback = callback;
-        }
-
-        @Override
-        public void afterSessionOpened() {
-
-        }
-
-        @Override
-        public void afterCanvasInitialized() {
-
-        }
-
-        @Override
-        public void onSuccess() {
-            BusyPopup.close();
-            callback.execute();
-        }
-
-        @Override
-        public void onError(final ClientRuntimeError error) {
-            showError(error);
-            callback.execute();
-        }
-    }
-
     private void updateTitle(final String title) {
         // Change screen title.
         SessionDiagramEditorScreen.this.title = title;
@@ -438,6 +438,37 @@ public class SessionDiagramEditorScreen {
         if (LogConfiguration.loggingIsEnabled()) {
             LOGGER.log(level,
                        message);
+        }
+    }
+
+    private final class ScreenPresenterCallback implements SessionPresenter.SessionPresenterCallback<AbstractClientFullSession, Diagram> {
+
+        private final Command callback;
+
+        private ScreenPresenterCallback(final Command callback) {
+            this.callback = callback;
+        }
+
+        @Override
+        public void afterSessionOpened() {
+
+        }
+
+        @Override
+        public void afterCanvasInitialized() {
+
+        }
+
+        @Override
+        public void onSuccess() {
+            BusyPopup.close();
+            callback.execute();
+        }
+
+        @Override
+        public void onError(final ClientRuntimeError error) {
+            showError(error);
+            callback.execute();
         }
     }
 }

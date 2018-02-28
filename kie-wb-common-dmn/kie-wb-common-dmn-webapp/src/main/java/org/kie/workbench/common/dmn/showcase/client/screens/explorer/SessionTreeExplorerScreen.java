@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.kie.workbench.common.dmn.showcase.client.screens.BaseSessionScreen;
 import org.kie.workbench.common.dmn.showcase.client.screens.SessionScreenView;
+import org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorPresenter;
 import org.kie.workbench.common.stunner.client.widgets.explorer.tree.TreeExplorer;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
@@ -40,6 +41,10 @@ public class SessionTreeExplorerScreen extends BaseSessionScreen {
 
     private TreeExplorer explorer;
     private SessionScreenView view;
+
+    @Inject
+    DecisionNavigatorPresenter decisionNavigatorPresenter;
+
 
     public SessionTreeExplorerScreen() {
         //CDI proxy
@@ -89,6 +94,7 @@ public class SessionTreeExplorerScreen extends BaseSessionScreen {
         if (handler != null) {
             explorer.show(handler);
             view.showScreenView(explorer);
+//            decisionNavigatorPresenter.setHandler(handler);
         }
     }
 

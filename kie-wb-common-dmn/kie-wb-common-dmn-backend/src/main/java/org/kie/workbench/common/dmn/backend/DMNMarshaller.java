@@ -152,7 +152,8 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
                             final InputStream input) throws IOException {
         org.kie.dmn.model.v1_1.Definitions dmnXml = marshaller.unmarshal(new InputStreamReader(input));
 
-        Map<String, Entry<org.kie.dmn.model.v1_1.DRGElement, Node>> elems = dmnXml.getDrgElement().stream().collect(Collectors.toMap(org.kie.dmn.model.v1_1.DRGElement::getId,
+        List<org.kie.dmn.model.v1_1.DRGElement> drgElement = dmnXml.getDrgElement();
+        Map<String, Entry<org.kie.dmn.model.v1_1.DRGElement, Node>> elems = drgElement.stream().collect(Collectors.toMap(org.kie.dmn.model.v1_1.DRGElement::getId,
                                                                                                                                      dmn -> new SimpleEntry<>(dmn,
                                                                                                                                                               dmnToStunner(dmn))));
 

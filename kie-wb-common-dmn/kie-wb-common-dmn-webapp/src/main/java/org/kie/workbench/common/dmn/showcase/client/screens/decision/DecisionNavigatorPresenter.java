@@ -23,8 +23,10 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import org.kie.workbench.common.dmn.showcase.client.screens.decision.tree.DecisionNavigatorTreePresenter;
 import org.kie.workbench.common.dmn.showcase.client.screens.decision.tree.DecisionNavigatorTreeView;
+import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.uberfire.client.annotations.DefaultPosition;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
@@ -32,12 +34,6 @@ import org.uberfire.client.annotations.WorkbenchScreen;
 import org.uberfire.client.mvp.UberElemental;
 import org.uberfire.workbench.model.CompassPosition;
 import org.uberfire.workbench.model.Position;
-
-import static org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorItem.Type.COLUMNS;
-import static org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorItem.Type.ITEM;
-import static org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorItem.Type.ROOT;
-import static org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorItem.Type.SUB_ITEM;
-import static org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorItem.Type.TABLE;
 
 @ApplicationScoped
 @WorkbenchScreen(identifier = "org.kie.dmn.decision.navigator")
@@ -48,6 +44,11 @@ public class DecisionNavigatorPresenter {
 
     @Inject
     private DecisionNavigatorTreePresenter treePresenter;
+
+    @Inject
+    private DecisionNavigatorChildrenTraverse navigatorChildrenTraverse;
+
+    private AbstractCanvasHandler handler;
 
     @WorkbenchPartView
     public UberElemental<DecisionNavigatorPresenter> getView() {
@@ -81,38 +82,31 @@ public class DecisionNavigatorPresenter {
 
     private List<DecisionNavigatorItem> getItems() {
 
-        return new ArrayList<DecisionNavigatorItem>() {{
+        if (handler == null) {
+            GWT.log("=====> handler == null");
+            return new ArrayList<>();
+        }
 
-            final List<DecisionNavigatorItem> goOutChildren = new ArrayList<DecisionNavigatorItem>() {{
-                add(makeItem("Preferred restaurants", COLUMNS));
-            }};
+        if (handler.getDiagram() == null) {
+            GWT.log("=====> handler.getDiagram() == null");
+            return new ArrayList<>();
+        }
 
-            final List<DecisionNavigatorItem> dineAtHomeChildren = new ArrayList<DecisionNavigatorItem>() {{
-                add(makeItem("Ingredients", TABLE));
-            }};
+        if (handler.getDiagram().getGraph() == null) {
+            GWT.log("=====> handler.getDiagram().getGraph() == null");
+            return new ArrayList<>();
+        }
 
-            final List<DecisionNavigatorItem> planningChildren = new ArrayList<DecisionNavigatorItem>() {{
-                add(makeItem("cookbook", ITEM));
-                add(makeItem("Go out", ITEM, goOutChildren));
-                add(makeItem("Zagat's guide", ITEM));
-                add(makeItem("Number of diners", SUB_ITEM));
-                add(makeItem("What's in the fridge", SUB_ITEM));
-                add(makeItem("Dine at home", ITEM, dineAtHomeChildren));
-            }};
+        GWT.log("=====> shh" + navigatorChildrenTraverse.getItems(handler.getDiagram().getGraph()).size());
+//        return new ArrayList<>();
 
-            add(makeItem("Planning", ROOT, planningChildren));
-        }};
+        return this.navigatorChildrenTraverse.getItems(handler.getDiagram().getGraph());
     }
 
-    private DecisionNavigatorItem makeItem(final String label,
-                                           final DecisionNavigatorItem.Type subItem) {
-        return new DecisionNavigatorItem(label, subItem);
-    }
+    public void setHandler(final AbstractCanvasHandler handler) {
+        this.handler = handler;
 
-    private DecisionNavigatorItem makeItem(final String label,
-                                           final DecisionNavigatorItem.Type item,
-                                           final List<DecisionNavigatorItem> children) {
-        return new DecisionNavigatorItem(label, item, children);
+        initTreePresenter();
     }
 
     public interface View extends UberElemental<DecisionNavigatorPresenter> {

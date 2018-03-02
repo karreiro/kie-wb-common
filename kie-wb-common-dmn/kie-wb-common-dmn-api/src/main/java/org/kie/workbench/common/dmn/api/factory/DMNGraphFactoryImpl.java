@@ -104,9 +104,10 @@ public class DMNGraphFactoryImpl
 
         //Add default elements
         final List<Command> commands = buildInitialisationCommands();
-        final CompositeCommand.Builder commandBuilder =
-                new CompositeCommand.Builder<>();
+        final CompositeCommand.Builder commandBuilder = new CompositeCommand.Builder<>();
+
         commands.forEach(commandBuilder::addCommand);
+
         graphCommandManager.execute(createGraphContext(graph),
                                     commandBuilder.build());
 

@@ -15,6 +15,8 @@
  */
 package org.kie.workbench.common.dmn.api.definition;
 
+import java.util.Set;
+
 import org.kie.workbench.common.dmn.api.property.background.BackgroundSet;
 import org.kie.workbench.common.dmn.api.property.dimensions.RectangleDimensionsSet;
 import org.kie.workbench.common.dmn.api.property.font.FontSet;
@@ -26,4 +28,6 @@ public interface DMNViewDefinition extends DMNDefinition {
     FontSet getFontSet();
 
     RectangleDimensionsSet getDimensionsSet();
+
+    Set<String> getStunnerLabels();
 }

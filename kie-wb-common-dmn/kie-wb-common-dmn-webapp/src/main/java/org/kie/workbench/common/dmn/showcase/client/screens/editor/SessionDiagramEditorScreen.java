@@ -192,7 +192,7 @@ public class SessionDiagramEditorScreen {
 
     private Command blehCommand() {
         return () -> {
-            GWT.log("====>> ");
+            // GWT.log("====>> ");
 
             String authoringPerspectiveIdentifier = "AuthoringPerspective";
             DefaultPlaceRequest defaultPlaceRequest = new DefaultPlaceRequest("org.kie.dmn.decision.navigator");

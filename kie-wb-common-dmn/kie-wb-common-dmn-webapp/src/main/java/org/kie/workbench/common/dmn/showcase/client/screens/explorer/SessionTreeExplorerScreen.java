@@ -94,7 +94,7 @@ public class SessionTreeExplorerScreen extends BaseSessionScreen {
         if (handler != null) {
             explorer.show(handler);
             view.showScreenView(explorer);
-//            decisionNavigatorPresenter.setHandler(handler);
+            decisionNavigatorPresenter.setHandler(handler);
         }
     }
 

@@ -25,6 +25,7 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import org.jboss.errai.common.client.api.IsElement;
@@ -45,6 +46,7 @@ import org.kie.workbench.common.stunner.core.client.canvas.event.registration.Ca
 import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasSelectionEvent;
 import org.kie.workbench.common.stunner.core.client.shape.factory.ShapeFactory;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
+import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.Graph;
@@ -100,7 +102,11 @@ public class TreeExplorer implements IsWidget {
     public void show(final CanvasHandler canvasHandler) {
         this.canvasHandler = canvasHandler;
         if (null != canvasHandler && null != canvasHandler.getDiagram()) {
-            doShow(canvasHandler.getDiagram().getGraph());
+
+            Diagram diagram = canvasHandler.getDiagram();
+            Graph graph = diagram.getGraph();
+
+            doShow(graph);
         }
     }
 
@@ -121,6 +127,9 @@ public class TreeExplorer implements IsWidget {
                                                                                  final Node<org.kie.workbench.common.stunner.core.graph.content.view.View, Edge> node) {
                                                    super.startNodeTraversal(parents,
                                                                             node);
+
+//                                                   GWT.log("=====> startNodeTraversal/2 - " + String.join(" ", node.getLabels()));
+
                                                    addItem(parents.get(parents.size() - 1),
                                                            node,
                                                            expand,
@@ -131,6 +140,7 @@ public class TreeExplorer implements IsWidget {
                                                @Override
                                                public void startNodeTraversal(final Node<org.kie.workbench.common.stunner.core.graph.content.view.View, Edge> node) {
                                                    super.startNodeTraversal(node);
+//                                                   GWT.log("=====> startNodeTraversal/1 - " + String.join(" ", node.getLabels()));
                                                    addItem(node,
                                                            expand,
                                                            false);

@@ -168,7 +168,8 @@ public abstract class AbstractVFSDiagramService<M extends Metadata, D extends Di
                 // Parse and load the diagram raw data.
                 final InputStream is = loadPath(file);
                 try {
-                    Graph<DefinitionSet, ?> graph = services.getDiagramMarshaller().unmarshall(metadata,
+                    DiagramMarshaller<Graph, Metadata, Diagram<Graph, Metadata>> diagramMarshaller = services.getDiagramMarshaller();
+                    Graph<DefinitionSet, ?> graph = diagramMarshaller.unmarshall(metadata,
                                                                                                is);
                     DiagramFactory<M, ?> factory = factoryManager.registry().getDiagramFactory(graph.getContent().getDefinition(),
                                                                                                getMetadataType());

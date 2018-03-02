@@ -29,17 +29,13 @@ public class DecisionNavigatorItem {
 
     private List<DecisionNavigatorItem> children;
 
-    public DecisionNavigatorItem(final String label,
+    public DecisionNavigatorItem(final String uuid,
+                                 final String label,
                                  final Type type) {
+        this.uuid = uuid;
         this.label = label;
         this.type = type;
         this.children = new ArrayList<>();
-    }
-
-    public DecisionNavigatorItem(final String label, final Type type, final List<DecisionNavigatorItem> children) {
-        this.label = label;
-        this.type = type;
-        this.children = children;
     }
 
     public String getUUID() {

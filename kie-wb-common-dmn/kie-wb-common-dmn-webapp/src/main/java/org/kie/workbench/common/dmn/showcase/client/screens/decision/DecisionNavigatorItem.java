@@ -66,7 +66,7 @@ public class DecisionNavigatorItem {
         TABLE,
         SUB_ITEM
 
-//        // caret-down, caret-right
+//        // caret-down"\f0d7", caret-right"\f0da"
 //
 //        ROOT("fa-share-alt"),
 //

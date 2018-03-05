@@ -20,4 +20,70 @@
     <div data-field="main-tree"></div>
     <hr/>
     <div data-field="drd-tree">drd tree</div>
+
+    <style type="text/css">
+        [data-field="main-tree"] ul {
+            list-style: none;
+            padding: 0 0 0 2em;
+            line-height: 2em;
+        }
+
+        [data-field="main-tree"] ul ul {
+            padding: 0 0 0 2.5em;
+        }
+
+        [data-field="main-tree"] ul li {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: default;
+            user-select: none;
+            padding-right: 1em;
+        }
+
+        [data-field="main-tree"] ul .parent-node ul {
+            display: block;
+        }
+
+        [data-field="main-tree"] ul li.parent-node.closed ul {
+            display: none;
+        }
+
+        [data-field="main-tree"] ul li:before,
+        [data-field="main-tree"] ul li span:before {
+            font-family: FontAwesome;
+            -webkit-font-smoothing: antialiased;
+            padding-right: 0.5em;
+        }
+
+        [data-field="main-tree"] ul .parent-node:before  {
+            content: "\f0d7";
+            position: absolute;
+            margin-left: -1em;
+        }
+
+        [data-field="main-tree"] ul li.parent-node.closed:before {
+            content: "\f0da";
+        }
+
+        [data-field="main-tree"] ul li.kie-root span:before {
+            content: "\f1e0";
+        }
+
+        [data-field="main-tree"] ul li.kie-item span:before {
+            content: "\f0c8";
+        }
+
+        [data-field="main-tree"] ul li.kie-sub-item span:before {
+            content: "\f16e";
+        }
+
+        [data-field="main-tree"] ul li.kie-table span:before {
+            content: "\f0ce";
+        }
+
+        [data-field="main-tree"] ul li.kie-columns span:before {
+            content: "\f0db";
+        }
+    </style>
 </div>

@@ -95,6 +95,7 @@ public class DecisionNavigatorPresenter {
                 add(makeItem("cookbook", ITEM));
                 add(makeItem("Go out", ITEM, goOutChildren));
                 add(makeItem("Zagat's guide", ITEM));
+                add(makeItem("Big name, big name, big name, big name, big name, big name, big name, big name, big name, big name", ITEM));
                 add(makeItem("Number of diners", SUB_ITEM));
                 add(makeItem("What's in the fridge", SUB_ITEM));
                 add(makeItem("Dine at home", ITEM, dineAtHomeChildren));

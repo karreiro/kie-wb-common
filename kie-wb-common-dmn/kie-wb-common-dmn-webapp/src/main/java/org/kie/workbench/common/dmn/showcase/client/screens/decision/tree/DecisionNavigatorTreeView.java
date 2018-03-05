@@ -22,6 +22,7 @@ import javax.inject.Inject;
 
 import elemental2.dom.DomGlobal;
 import elemental2.dom.Element;
+import elemental2.dom.Event;
 import elemental2.dom.HTMLDivElement;
 import elemental2.dom.HTMLElement;
 import org.jboss.errai.common.client.dom.elemental2.Elemental2DomUtil;
@@ -73,13 +74,50 @@ public class DecisionNavigatorTreeView implements DecisionNavigatorTreePresenter
 
         items.forEach(i -> {
             Element li = DomGlobal.document.createElement("li");
+            Element span = DomGlobal.document.createElement("span");
 
-            li.textContent = i.getLabel();
+            li.setAttribute("title", i.getLabel());
+            li.classList.add(getCssClass(i));
+//            li.textContent = i.getLabel();
+
+            span.textContent = i.getLabel();
+            li.appendChild(span);
             li.appendChild(createUl(i.getChildren()));
+
+            if (i.getChildren().size() > 0) {
+                li.classList.add("parent-node");
+            }
+
+            setupCollapse(li);
 
             ul.appendChild(li);
         });
 
         return ul;
+    }
+
+    private void setupCollapse(final Element li) {
+        li.onclick = i -> {
+
+            toggle(li);
+
+            i.stopPropagation();
+
+            return null;
+        };
+    }
+
+    private Object toggle(final Element li) {
+
+        li.classList.toggle("closed");
+
+        return null;
+    }
+
+    private String getCssClass(final DecisionNavigatorItem i) {
+
+        final String typeName = i.getType().name();
+
+        return "kie-" + typeName.toLowerCase().replace('_', '-');
     }
 }

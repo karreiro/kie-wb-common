@@ -83,21 +83,21 @@ public class DecisionNavigatorPresenter {
     private List<DecisionNavigatorItem> getItems() {
 
         if (handler == null) {
-            GWT.log("=====> handler == null");
+           // GWT.log("=====> handler == null");
             return new ArrayList<>();
         }
 
         if (handler.getDiagram() == null) {
-            GWT.log("=====> handler.getDiagram() == null");
+          //  GWT.log("=====> handler.getDiagram() == null");
             return new ArrayList<>();
         }
 
         if (handler.getDiagram().getGraph() == null) {
-            GWT.log("=====> handler.getDiagram().getGraph() == null");
+        //    GWT.log("=====> handler.getDiagram().getGraph() == null");
             return new ArrayList<>();
         }
 
-        GWT.log("=====> shh" + navigatorChildrenTraverse.getItems(handler.getDiagram().getGraph()).size());
+       // GWT.log("=====> shh" + navigatorChildrenTraverse.getItems(handler.getDiagram().getGraph()).size());
 //        return new ArrayList<>();
 
         return this.navigatorChildrenTraverse.getItems(handler.getDiagram().getGraph());

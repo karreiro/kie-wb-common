@@ -73,7 +73,8 @@ public class DecisionConverter implements NodeConverter<org.kie.dmn.model.v1_1.D
 
     @Override
     public org.kie.dmn.model.v1_1.Decision dmnFromNode(final Node<View<Decision>, ?> node) {
-        Decision source = node.getContent().getDefinition();
+        View<Decision> content = node.getContent();
+        Decision source = content.getDefinition();
         org.kie.dmn.model.v1_1.Decision d = new org.kie.dmn.model.v1_1.Decision();
         d.setId(source.getId().getValue());
         d.setDescription(DescriptionPropertyConverter.dmnFromWB(source.getDescription()));

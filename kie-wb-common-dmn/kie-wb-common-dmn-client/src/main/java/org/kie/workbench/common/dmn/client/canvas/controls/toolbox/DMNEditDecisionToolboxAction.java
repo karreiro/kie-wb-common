@@ -22,6 +22,7 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import org.kie.workbench.common.dmn.api.definition.v1_1.Decision;
 import org.kie.workbench.common.dmn.client.events.EditExpressionEvent;
 import org.kie.workbench.common.stunner.core.client.api.SessionManager;
@@ -74,6 +75,8 @@ public class DMNEditDecisionToolboxAction implements ToolboxAction<AbstractCanva
     public ToolboxAction<AbstractCanvasHandler> onMouseClick(final AbstractCanvasHandler canvasHandler,
                                                              final String uuid,
                                                              final MouseClickEvent event) {
+
+        GWT.log("@@@@@@@@@@@@@ DMNEditDecisionToolboxAction");
         // Notice the toolbox factory ensure this action is only being included
         // for Decision definitions, next cast is safe.
         final Node<View<? extends Decision>, Edge> decisionNode

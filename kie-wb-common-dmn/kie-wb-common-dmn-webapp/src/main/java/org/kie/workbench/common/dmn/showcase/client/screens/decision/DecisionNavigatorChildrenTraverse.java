@@ -18,7 +18,6 @@ package org.kie.workbench.common.dmn.showcase.client.screens.decision;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.Dependent;
@@ -26,12 +25,14 @@ import javax.inject.Inject;
 
 import com.google.gwt.core.client.GWT;
 import org.kie.workbench.common.dmn.api.definition.DMNViewDefinition;
+import org.kie.workbench.common.dmn.api.definition.HasExpression;
+import org.kie.workbench.common.dmn.api.definition.v1_1.BusinessKnowledgeModel;
+import org.kie.workbench.common.dmn.api.definition.v1_1.Decision;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.actions.TextPropertyProvider;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.actions.TextPropertyProviderFactory;
 import org.kie.workbench.common.stunner.core.definition.adapter.AdapterManager;
 import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionAdapter;
-import org.kie.workbench.common.stunner.core.definition.property.PropertyMetaTypes;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.Graph;
@@ -83,50 +84,27 @@ public class DecisionNavigatorChildrenTraverse {
             final TextPropertyProvider provider = textPropertyProviderFactory.getProvider(item);
             final String name = provider.getText(item);
 
-
             DefinitionManager definitionManager = definitionUtils.getDefinitionManager();
-
             AdapterManager adapters = definitionManager.adapters();
-
             DefinitionAdapter<Object> objectDefinitionAdapter = adapters.forDefinition();
-
             View content = item.getContent();
-
             Object definition = content.getDefinition();
 
             final String title = objectDefinitionAdapter.getTitle(definition);
 
-//            GWT.log("----------------> " + objectDefinitionAdapter.getProperties(definition));
-//            Set<?> properties = objectDefinitionAdapter.getMetaProperty(definition);
+            if (definition instanceof BusinessKnowledgeModel) {
+                GWT.log("B ===========>>> " + ((BusinessKnowledgeModel) definition).getEncapsulatedLogic().getExpression().getClass().getName());
+            } else if (definition instanceof Decision) {
+                GWT.log("D ===========>>> " + ((Decision) definition).getExpression().getClass().getName());
+            }
 
             if ((name == null || name.trim().equals("")) && title != null) {
-                GWT.log(title + "------------------------------------------------>");
-                GWT.log(definition.toString());
-
-                try {
-                    DMNViewDefinition definition1 = (DMNViewDefinition) definition;
-                    GWT.log("============> " + String.join(", ", definition1.getStunnerLabels()));
-                } catch (Exception e) {
-                    GWT.log("============> e r r o r");
-                }
-
-                GWT.log(title + "------------------------------------------------<");
                 return title;
             }
 
-            GWT.log(name + "------------------------------------------------>");
-            GWT.log(definition.toString());
-            try {
-                DMNViewDefinition definition1 = (DMNViewDefinition) definition;
-                GWT.log("============> " + String.join(", ", definition1.getStunnerLabels()));
-            } catch (Exception e) {
-                GWT.log("============> e r r o r");
-            }
-            GWT.log(name + "------------------------------------------------<");
-
             return (name != null ? name : NO_NAME);
         } catch (Exception e) {
-            return NO_NAME + "---";
+            return NO_NAME;
         }
     }
 

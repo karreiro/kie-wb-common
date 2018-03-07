@@ -24,6 +24,7 @@ import java.util.function.Predicate;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.event.AbstractCanvasHandlerEvent;
@@ -98,11 +99,12 @@ public abstract class AbstractToolboxControl
     void onCanvasSelectionEvent(final @Observes CanvasSelectionEvent event) {
         checkNotNull("event",
                      event);
+        //GWT.log("========> 123");
         handleCanvasSelectionEvent(event);
     }
 
     void onCanvasClearSelectionEvent(final @Observes CanvasClearSelectionEvent event) {
-        checkNotNull("event",
+        checkNotNull("event", 
                      event);
         handleCanvasClearSelectionEvent(event);
     }
@@ -114,12 +116,14 @@ public abstract class AbstractToolboxControl
     }
 
     protected void handleCanvasSelectionEvent(final CanvasSelectionEvent event) {
+        //GWT.log("========> 456");
         if (checkEventContext(event)) {
             if (1 == event.getIdentifiers().size()) {
                 final String uuid = event.getIdentifiers().iterator().next();
                 show(uuid);
             } else {
-                showMultiple(event.getIdentifiers());
+                Collection<String> identifiers = event.getIdentifiers();
+                showMultiple(identifiers);
             }
         }
     }

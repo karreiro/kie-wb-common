@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import com.google.gwt.core.client.GWT;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvas;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.Toolbox;
@@ -90,6 +91,7 @@ public class ActionsToolbox<V extends ActionsToolboxView<?>>
 
     @Override
     public ActionsToolbox show() {
+        // GWT.log("----------------->> " + getView().getClass().getName());
         getView().show();
         return this;
     }

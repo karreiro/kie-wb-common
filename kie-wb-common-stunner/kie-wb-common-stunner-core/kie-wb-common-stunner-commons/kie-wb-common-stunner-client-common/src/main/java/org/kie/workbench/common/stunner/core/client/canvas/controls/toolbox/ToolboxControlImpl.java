@@ -24,6 +24,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.gwt.core.client.GWT;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.AbstractCanvasHandlerRegistrationControl;
 import org.kie.workbench.common.stunner.core.client.components.toolbox.Toolbox;
@@ -174,7 +175,9 @@ public class ToolboxControlImpl<F extends ToolboxFactory<AbstractCanvasHandler, 
         }
 
         public void show() {
-            list.forEach(Toolbox::show);
+            list.forEach((toolbox) -> {
+                toolbox.show();
+            });
         }
 
         public void hide() {

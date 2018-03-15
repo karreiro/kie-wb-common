@@ -30,7 +30,9 @@ import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.commands.general.NavigateToExpressionEditorCommand;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
 import org.kie.workbench.common.dmn.client.events.EditExpressionEvent;
+import org.kie.workbench.common.dmn.client.events.ExpressionEditorSelectedEvent;
 import org.kie.workbench.common.dmn.showcase.client.screens.ShowcaseDiagramService;
+import org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorDock;
 import org.kie.workbench.common.stunner.client.widgets.menu.dev.MenuDevCommandsBuilder;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenterFactory;
@@ -74,6 +76,7 @@ import org.uberfire.lifecycle.OnFocus;
 import org.uberfire.lifecycle.OnOpen;
 import org.uberfire.lifecycle.OnStartup;
 import org.uberfire.mvp.Command;
+import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.workbench.model.menu.MenuFactory;
 import org.uberfire.workbench.model.menu.Menus;
@@ -85,10 +88,8 @@ import static java.util.logging.Level.FINE;
 @WorkbenchScreen(identifier = SessionDiagramEditorScreen.SCREEN_ID)
 public class SessionDiagramEditorScreen {
 
-    private static Logger LOGGER = Logger.getLogger(SessionDiagramEditorScreen.class.getName());
-
     public static final String SCREEN_ID = "SessionDiagramEditorScreen";
-
+    private static Logger LOGGER = Logger.getLogger(SessionDiagramEditorScreen.class.getName());
     private final DefinitionManager definitionManager;
     private final ClientFactoryService clientFactoryServices;
     private final ShowcaseDiagramService diagramService;
@@ -99,13 +100,15 @@ public class SessionDiagramEditorScreen {
     private final MenuDevCommandsBuilder menuDevCommandsBuilder;
     private final ScreenPanelView screenPanelView;
     private final ScreenErrorView screenErrorView;
-
+    @Inject
+    DecisionNavigatorDock decisionNavigatorDock;
     private SessionPresenter<AbstractClientFullSession, ?, Diagram> presenter;
     private PlaceRequest placeRequest;
     private String title = "Authoring Screen";
     private Menus menu = null;
-
     private ExpressionEditorView.Presenter expressionEditor;
+    @Inject
+    private Event<ExpressionEditorSelectedEvent> editorSelectedEvent;
 
     @Inject
     public SessionDiagramEditorScreen(final DefinitionManager definitionManager,
@@ -164,6 +167,8 @@ public class SessionDiagramEditorScreen {
             load(name,
                  callback);
         }
+
+//        blehCommand().execute();
     }
 
     private Menus makeMenuBar() {
@@ -296,6 +301,7 @@ public class SessionDiagramEditorScreen {
                       session,
                       new ScreenPresenterCallback(callback));
         expressionEditor.init(presenter);
+        openDock(session);
     }
 
     @OnOpen
@@ -308,8 +314,7 @@ public class SessionDiagramEditorScreen {
         if (null != getSession() && !isSameSession(sessionManager.getCurrentSession())) {
             sessionManager.open(getSession());
         } else if (null != getSession()) {
-            log(FINE,
-                "Session already active, no action.");
+            log(FINE, "Session already active, no action.");
         }
     }
 
@@ -319,7 +324,18 @@ public class SessionDiagramEditorScreen {
 
     @OnClose
     public void onClose() {
+        destroyDock();
         destroySession();
+    }
+
+    private void openDock(final AbstractClientFullSession session) {
+        decisionNavigatorDock.open();
+        decisionNavigatorDock.setupContent(session.getCanvasHandler());
+    }
+
+    private void destroyDock() {
+        decisionNavigatorDock.close();
+        decisionNavigatorDock.resetContent();
     }
 
     @WorkbenchMenu
@@ -350,37 +366,6 @@ public class SessionDiagramEditorScreen {
     @WorkbenchContextId
     public String getMyContextRef() {
         return "sessionDiagramEditorScreenContext";
-    }
-
-    private final class ScreenPresenterCallback implements SessionPresenter.SessionPresenterCallback<AbstractClientFullSession, Diagram> {
-
-        private final Command callback;
-
-        private ScreenPresenterCallback(final Command callback) {
-            this.callback = callback;
-        }
-
-        @Override
-        public void afterSessionOpened() {
-
-        }
-
-        @Override
-        public void afterCanvasInitialized() {
-
-        }
-
-        @Override
-        public void onSuccess() {
-            BusyPopup.close();
-            callback.execute();
-        }
-
-        @Override
-        public void onError(final ClientRuntimeError error) {
-            showError(error);
-            callback.execute();
-        }
     }
 
     private void updateTitle(final String title) {
@@ -421,7 +406,7 @@ public class SessionDiagramEditorScreen {
         }
     }
 
-    private void OnEditExpressionEvent(final @Observes EditExpressionEvent event) {
+    private void onEditExpressionEvent(final @Observes EditExpressionEvent event) {
         if (isSameSession(event.getSession())) {
             sessionCommandManager.execute((AbstractCanvasHandler) sessionManager.getCurrentSession().getCanvasHandler(),
                                           new NavigateToExpressionEditorCommand(expressionEditor,
@@ -438,6 +423,37 @@ public class SessionDiagramEditorScreen {
         if (LogConfiguration.loggingIsEnabled()) {
             LOGGER.log(level,
                        message);
+        }
+    }
+
+    private final class ScreenPresenterCallback implements SessionPresenter.SessionPresenterCallback<AbstractClientFullSession, Diagram> {
+
+        private final Command callback;
+
+        private ScreenPresenterCallback(final Command callback) {
+            this.callback = callback;
+        }
+
+        @Override
+        public void afterSessionOpened() {
+
+        }
+
+        @Override
+        public void afterCanvasInitialized() {
+
+        }
+
+        @Override
+        public void onSuccess() {
+            BusyPopup.close();
+            callback.execute();
+        }
+
+        @Override
+        public void onError(final ClientRuntimeError error) {
+            showError(error);
+            callback.execute();
         }
     }
 }

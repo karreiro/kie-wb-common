@@ -23,19 +23,27 @@ import org.kie.workbench.common.dmn.api.definition.HasExpression;
 import org.kie.workbench.common.dmn.api.definition.HasName;
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
 import org.kie.workbench.common.stunner.core.client.session.event.AbstractSessionEvent;
+import org.kie.workbench.common.stunner.core.graph.Node;
 
 @NonPortable
 public class EditExpressionEvent extends AbstractSessionEvent {
 
+    private final Node node;
     private Optional<HasName> hasName;
     private HasExpression hasExpression;
 
     public EditExpressionEvent(final ClientSession session,
                                final Optional<HasName> hasName,
-                               final HasExpression hasExpression) {
+                               final HasExpression hasExpression,
+                               final Node node) {
         super(session);
         this.hasName = hasName;
         this.hasExpression = hasExpression;
+        this.node = node;
+    }
+
+    public Node getNode() {
+        return node;
     }
 
     public Optional<HasName> getHasName() {

@@ -18,6 +18,7 @@ package org.kie.workbench.common.dmn.client.commands.general;
 
 import java.util.Optional;
 
+import com.google.gwt.core.client.GWT;
 import org.kie.workbench.common.dmn.api.definition.HasExpression;
 import org.kie.workbench.common.dmn.api.definition.HasName;
 import org.kie.workbench.common.dmn.client.commands.VetoExecutionCommand;
@@ -66,9 +67,14 @@ public class NavigateToExpressionEditorCommand extends BaseNavigateCommand imple
                 hidePaletteWidget(true);
                 editor.setExpression(hasName,
                                      hasExpression);
-                editor.setExitCommand(() -> navigateToDRGEditor(hasName,
-                                                                hasExpression));
+                editor.setExitCommand(() -> {
+                    navigateToDRGEditor(hasName,
+                                        hasExpression);
+                    GWT.log("On Close..");
+                });
                 addExpressionEditorToCanvasWidget();
+
+                GWT.log("On Open..");
 
                 return CanvasCommandResultBuilder.SUCCESS;
             }

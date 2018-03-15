@@ -19,6 +19,7 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import org.kie.workbench.common.dmn.api.factory.DMNGraphFactory;
@@ -64,6 +65,9 @@ import org.uberfire.workbench.model.menu.Menus;
 public class DMNDiagramEditor extends AbstractProjectDiagramEditor<DMNDiagramResourceType> {
 
     public static final String EDITOR_ID = "DMNDiagramEditor";
+
+//    @Inject
+//    DecisionNavigatorDock decisionNavigatorDock;
 
     @Inject
     public DMNDiagramEditor(final View view,
@@ -120,11 +124,16 @@ public class DMNDiagramEditor extends AbstractProjectDiagramEditor<DMNDiagramRes
     @OnOpen
     public void onOpen() {
         super.doOpen();
+
+        if (getCanvasHandler() != null) {
+
+        }
     }
 
     @OnClose
     public void onClose() {
         super.doClose();
+        GWT.log("-->> close");
     }
 
     @OnFocus

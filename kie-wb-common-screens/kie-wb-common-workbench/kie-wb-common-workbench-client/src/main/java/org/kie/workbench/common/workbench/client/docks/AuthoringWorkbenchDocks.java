@@ -74,6 +74,10 @@ public class AuthoringWorkbenchDocks {
         this.libraryInternalPreferences = libraryInternalPreferences;
     }
 
+    public UberfireDocks getUberfireDocks() {
+        return uberfireDocks;
+    }
+
     @PostConstruct
     public void initialize() {
         // Initializing the handlers

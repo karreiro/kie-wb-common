@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.showcase.client.screens.decision;
+package org.kie.workbench.common.dmn.client.decision;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.kie.workbench.common.dmn.showcase.client.screens.decision.tree.DecisionNavigatorTreePresenter;
+import org.kie.workbench.common.dmn.client.decision.tree.DecisionNavigatorTreePresenter;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Element;
@@ -37,7 +37,7 @@ import org.uberfire.client.mvp.UberElemental;
 import org.uberfire.workbench.model.CompassPosition;
 import org.uberfire.workbench.model.Position;
 
-import static org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorItem.Type.ITEM;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.ITEM;
 
 @ApplicationScoped
 @WorkbenchScreen(identifier = DecisionNavigatorPresenter.SCREEN_ID)

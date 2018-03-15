@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.showcase.client.screens.decision;
+package org.kie.workbench.common.dmn.client.decision;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,11 +57,11 @@ import org.kie.workbench.common.stunner.core.graph.processing.traverse.content.A
 import org.kie.workbench.common.stunner.core.graph.processing.traverse.content.ChildrenTraverseProcessor;
 import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 
-import static org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorItem.Type.COLUMNS;
-import static org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorItem.Type.ITEM;
-import static org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorItem.Type.ROOT;
-import static org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorItem.Type.SUB_ITEM;
-import static org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorItem.Type.TABLE;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.COLUMNS;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.ITEM;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.ROOT;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.SUB_ITEM;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.TABLE;
 
 @Dependent
 public class DecisionNavigatorChildrenTraverse {

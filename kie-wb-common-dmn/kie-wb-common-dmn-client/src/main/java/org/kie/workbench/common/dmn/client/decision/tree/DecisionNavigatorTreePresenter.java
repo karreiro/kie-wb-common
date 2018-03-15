@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.showcase.client.screens.decision.tree;
+package org.kie.workbench.common.dmn.client.decision.tree;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,12 +25,11 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
-import com.google.gwt.core.client.GWT;
 import elemental2.dom.Element;
-import org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorItem;
+import org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem;
 import org.uberfire.client.mvp.UberElemental;
 
-import static org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorItem.Type.ROOT;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.ROOT;
 
 @Dependent
 public class DecisionNavigatorTreePresenter {

@@ -31,8 +31,9 @@ import org.kie.workbench.common.dmn.client.commands.general.NavigateToExpression
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
 import org.kie.workbench.common.dmn.client.events.EditExpressionEvent;
 import org.kie.workbench.common.dmn.client.events.ExpressionEditorSelectedEvent;
+import org.kie.workbench.common.dmn.showcase.client.perspectives.AuthoringPerspective;
 import org.kie.workbench.common.dmn.showcase.client.screens.ShowcaseDiagramService;
-import org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorDock;
+import org.kie.workbench.common.dmn.client.decision.DecisionNavigatorDock;
 import org.kie.workbench.common.stunner.client.widgets.menu.dev.MenuDevCommandsBuilder;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenterFactory;
@@ -76,7 +77,6 @@ import org.uberfire.lifecycle.OnFocus;
 import org.uberfire.lifecycle.OnOpen;
 import org.uberfire.lifecycle.OnStartup;
 import org.uberfire.mvp.Command;
-import org.uberfire.mvp.ParameterizedCommand;
 import org.uberfire.mvp.PlaceRequest;
 import org.uberfire.workbench.model.menu.MenuFactory;
 import org.uberfire.workbench.model.menu.Menus;
@@ -137,6 +137,7 @@ public class SessionDiagramEditorScreen {
 
     @OnStartup
     public void onStartup(final PlaceRequest placeRequest) {
+        decisionNavigatorDock.init(AuthoringPerspective.PERSPECTIVE_ID);
         this.placeRequest = placeRequest;
         this.menu = makeMenuBar();
         final String name = placeRequest.getParameter("name",

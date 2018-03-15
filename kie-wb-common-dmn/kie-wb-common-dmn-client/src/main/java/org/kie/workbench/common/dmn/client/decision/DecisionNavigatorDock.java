@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.showcase.client.screens.decision;
+package org.kie.workbench.common.dmn.client.decision;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.kie.workbench.common.dmn.showcase.client.perspectives.AuthoringPerspective;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.uberfire.client.workbench.docks.UberfireDock;
 import org.uberfire.client.workbench.docks.UberfireDockPosition;
@@ -43,6 +41,8 @@ public class DecisionNavigatorDock {
 
     private boolean isOpened = false;
 
+    private String associatedPerspective;
+
     @Inject
     public DecisionNavigatorDock(final UberfireDocks uberfireDocks,
                                  final DecisionNavigatorPresenter decisionNavigatorPresenter) {
@@ -50,8 +50,8 @@ public class DecisionNavigatorDock {
         this.decisionNavigatorPresenter = decisionNavigatorPresenter;
     }
 
-    @PostConstruct
-    public void init() {
+    public void init(final String associatedPerspective) {
+        this.associatedPerspective = associatedPerspective;
         this.uberfireDock = makeUberfireDock();
     }
 
@@ -97,6 +97,10 @@ public class DecisionNavigatorDock {
         return uberfireDock.withSize(DOCK_SIZE).withLabel(DOCK_LABEL);
     }
 
+    private String perspective() {
+        return associatedPerspective;
+    }
+
     private String icon() {
         return IconType.MAP.toString();
     }
@@ -107,9 +111,5 @@ public class DecisionNavigatorDock {
 
     private DefaultPlaceRequest placeRequest() {
         return new DefaultPlaceRequest(DecisionNavigatorPresenter.SCREEN_ID);
-    }
-
-    private String perspective() {
-        return AuthoringPerspective.PERSPECTIVE_ID;
     }
 }

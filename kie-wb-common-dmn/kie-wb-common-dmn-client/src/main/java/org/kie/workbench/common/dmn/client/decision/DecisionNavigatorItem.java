@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.showcase.client.screens.decision;
+package org.kie.workbench.common.dmn.client.decision;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.event.Event;
 
-import com.google.gwt.core.client.GWT;
 import org.kie.workbench.common.dmn.client.events.EditExpressionEvent;
 
 public class DecisionNavigatorItem {

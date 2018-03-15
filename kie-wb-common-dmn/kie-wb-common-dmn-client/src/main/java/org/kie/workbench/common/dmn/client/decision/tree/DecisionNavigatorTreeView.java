@@ -14,27 +14,22 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.showcase.client.screens.decision.tree;
+package org.kie.workbench.common.dmn.client.decision.tree;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
-import com.google.gwt.core.client.GWT;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.Element;
 import elemental2.dom.HTMLDivElement;
 import elemental2.dom.HTMLElement;
 import elemental2.dom.Node;
-import elemental2.dom.NodeList;
-import org.jboss.aesh.cl.Option;
 import org.jboss.errai.common.client.dom.elemental2.Elemental2DomUtil;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
-import org.kie.workbench.common.dmn.showcase.client.screens.decision.DecisionNavigatorItem;
+import org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem;
 
 @Templated
 public class DecisionNavigatorTreeView implements DecisionNavigatorTreePresenter.View {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.showcase.client.screens.decision;
+package org.kie.workbench.common.dmn.client.decision;
 
 import javax.inject.Inject;
 
@@ -23,9 +23,7 @@ import elemental2.dom.HTMLElement;
 import org.jboss.errai.common.client.dom.elemental2.Elemental2DomUtil;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
-import org.kie.workbench.common.dmn.showcase.client.screens.decision.tree.DecisionNavigatorTreePresenter;
-import org.kie.workbench.common.dmn.showcase.client.screens.decision.tree.DecisionNavigatorTreeView;
-import org.kie.workbench.common.stunner.client.widgets.explorer.tree.TreeExplorer;
+import org.kie.workbench.common.dmn.client.decision.tree.DecisionNavigatorTreePresenter;
 
 @Templated
 public class DecisionNavigatorView implements DecisionNavigatorPresenter.View {

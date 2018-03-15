@@ -33,11 +33,6 @@ public class InstanceMock<T> implements Instance<T> {
         return null;
     }
 
-    @Override
-    public <U extends T> Instance<U> select(final TypeLiteral<U> typeLiteral, final Annotation... annotations) {
-        return null;
-    }
-
     // @Override
     // public <U extends T> Instance<U> select(final TypeLiteral<U> typeLiteral, final Annotation... annotations) {
     //     return null;

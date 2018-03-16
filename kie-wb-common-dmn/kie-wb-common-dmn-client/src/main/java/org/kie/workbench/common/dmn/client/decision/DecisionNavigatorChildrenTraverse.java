@@ -43,8 +43,11 @@ import org.kie.workbench.common.dmn.api.definition.v1_1.LiteralExpression;
 import org.kie.workbench.common.dmn.api.definition.v1_1.Relation;
 import org.kie.workbench.common.dmn.client.events.EditExpressionEvent;
 import org.kie.workbench.common.stunner.core.client.api.SessionManager;
+import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
+import org.kie.workbench.common.stunner.core.client.canvas.Canvas;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.actions.TextPropertyProvider;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.actions.TextPropertyProviderFactory;
+import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasSelectionEvent;
 import org.kie.workbench.common.stunner.core.definition.adapter.AdapterManager;
 import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionAdapter;
 import org.kie.workbench.common.stunner.core.graph.Edge;
@@ -81,6 +84,12 @@ public class DecisionNavigatorChildrenTraverse {
     private Event<EditExpressionEvent> eventEditExpressionEvent;
 
     @Inject
+    private Event<CanvasSelectionEvent> canvasSelectionEventEvent;
+
+    @Inject
+    private DecisionNavigatorPresenter decisionNavigatorPresenter;
+
+    @Inject
     public DecisionNavigatorChildrenTraverse(final ChildrenTraverseProcessor traverseProcessor,
                                              final TextPropertyProviderFactory textPropertyProviderFactory,
                                              final DefinitionUtils definitionUtils) {
@@ -110,6 +119,11 @@ public class DecisionNavigatorChildrenTraverse {
         final List<DecisionNavigatorItem> nestedElements = getNestedElements(node);
 
         DecisionNavigatorItem decisionNavigatorItem = new DecisionNavigatorItem(uuid, label, type, nestedElements);
+
+        AbstractCanvasHandler canvas = decisionNavigatorPresenter.getHandler();
+        CanvasSelectionEvent canvasSelectionEvent = new CanvasSelectionEvent(canvas, uuid);
+        decisionNavigatorItem.setCanvasSelectionEvent(canvasSelectionEvent);
+        decisionNavigatorItem.setCanvasSelectionEventEvent(canvasSelectionEventEvent);
 
         nestedElements.forEach(n -> n.getParents().add(decisionNavigatorItem));
 
@@ -164,7 +178,7 @@ public class DecisionNavigatorChildrenTraverse {
         Map<Class<? extends Expression>, DecisionNavigatorItem.Type> map = new HashMap<Class<? extends Expression>, DecisionNavigatorItem.Type>() {{
             put(Context.class, SUB_ITEM);
             put(DecisionTable.class, TABLE);
-            put(FunctionDefinition.class, ITEM);
+            put(FunctionDefinition.class, SUB_ITEM);
             put(Invocation.class, SUB_ITEM);
             put(org.kie.workbench.common.dmn.api.definition.v1_1.List.class, COLUMNS);
             put(LiteralExpression.class, SUB_ITEM);

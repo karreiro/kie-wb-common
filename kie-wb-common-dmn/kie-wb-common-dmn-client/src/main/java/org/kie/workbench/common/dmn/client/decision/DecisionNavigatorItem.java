@@ -22,6 +22,7 @@ import java.util.List;
 import javax.enterprise.event.Event;
 
 import org.kie.workbench.common.dmn.client.events.EditExpressionEvent;
+import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasSelectionEvent;
 
 public class DecisionNavigatorItem {
 
@@ -34,7 +35,9 @@ public class DecisionNavigatorItem {
     private List<DecisionNavigatorItem> children = new ArrayList<>();
     private List<DecisionNavigatorItem> parents = new ArrayList<>();
     private EditExpressionEvent editExpressionEvent;
+    private CanvasSelectionEvent canvasSelectionEvent;
     private Event<EditExpressionEvent> eventEditExpressionEvent;
+    private Event<CanvasSelectionEvent> canvasSelectionEventEvent;
 
     public DecisionNavigatorItem(final String uuid,
                                  final String label,
@@ -78,6 +81,10 @@ public class DecisionNavigatorItem {
         if (editExpressionEvent != null) {
             eventEditExpressionEvent.fire(editExpressionEvent);
         }
+
+        if (canvasSelectionEventEvent != null) {
+            canvasSelectionEventEvent.fire(canvasSelectionEvent);
+        }
     }
 
     public void setEditExpressionEvent(final EditExpressionEvent editExpressionEvent) {
@@ -86,6 +93,14 @@ public class DecisionNavigatorItem {
 
     public void setEventEditExpressionEvent(final Event<EditExpressionEvent> eventEditExpressionEvent) {
         this.eventEditExpressionEvent = eventEditExpressionEvent;
+    }
+
+    public void setCanvasSelectionEventEvent(final Event<CanvasSelectionEvent> canvasSelectionEventEvent) {
+        this.canvasSelectionEventEvent = canvasSelectionEventEvent;
+    }
+
+    public void setCanvasSelectionEvent(final CanvasSelectionEvent canvasSelectionEvent) {
+        this.canvasSelectionEvent = canvasSelectionEvent;
     }
 
     public enum Type {

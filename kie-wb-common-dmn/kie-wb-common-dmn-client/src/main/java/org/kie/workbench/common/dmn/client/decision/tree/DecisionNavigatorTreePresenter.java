@@ -84,7 +84,7 @@ public class DecisionNavigatorTreePresenter {
         }});
 
         if (view.hasItem(item)) {
-            view.update(item);
+            view.update(parent, item);
         } else {
             view.addItem(parent, item);
         }
@@ -141,7 +141,7 @@ public class DecisionNavigatorTreePresenter {
 
         Element findItem(DecisionNavigatorItem item);
 
-        void update(DecisionNavigatorItem item);
+        void update(final DecisionNavigatorItem parent, DecisionNavigatorItem item);
 
         void remove(DecisionNavigatorItem item);
 

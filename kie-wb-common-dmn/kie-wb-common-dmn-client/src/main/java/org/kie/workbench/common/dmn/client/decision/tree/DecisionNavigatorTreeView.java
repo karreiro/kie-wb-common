@@ -75,7 +75,10 @@ public class DecisionNavigatorTreeView implements DecisionNavigatorTreePresenter
     @Override
     public void addItem(final DecisionNavigatorItem parent,
                         final DecisionNavigatorItem item) {
+        Element li = items.querySelector("[data-uuid=\"" + parent.getUUID() + "\"]");
         Element ul = items.querySelector("[data-uuid=\"" + parent.getUUID() + "\"] ul");
+
+        li.classList.add("parent-node");
 
         if (ul == null) {
             return;
@@ -94,7 +97,9 @@ public class DecisionNavigatorTreeView implements DecisionNavigatorTreePresenter
     }
 
     @Override
-    public void update(final DecisionNavigatorItem item) {
+    public void update(final DecisionNavigatorItem parent,
+                       final DecisionNavigatorItem item) {
+
         Element oldLi = findItem(item);
         Element newLi = createLi(item);
         Node parentNode = oldLi.parentNode;
@@ -162,18 +167,29 @@ public class DecisionNavigatorTreeView implements DecisionNavigatorTreePresenter
 
     private Element createLi(final DecisionNavigatorItem i) {
         Element li = DomGlobal.document.createElement("li");
+        Element div = DomGlobal.document.createElement("div");
         Element span = DomGlobal.document.createElement("span");
 
         li.setAttribute("data-uuid", i.getUUID());
         li.setAttribute("title", i.getLabel());
         li.classList.add(getCssClass(i));
 
-        span.textContent = i.getLabel();
-        li.appendChild(span);
+        span.onclick = (e) -> {
+            toggle(li);
+            e.stopPropagation();
+
+            return null;
+        };
+
+        div.appendChild(span);
+        div.appendChild(DomGlobal.document.createTextNode(i.getLabel()));
+
+        li.appendChild(div);
         li.appendChild(createUl(i.getChildren()));
 
-        span.onclick = (e) -> {
+        div.onclick = (e) -> {
             i.onClick();
+
             return null;
         };
 
@@ -181,19 +197,7 @@ public class DecisionNavigatorTreeView implements DecisionNavigatorTreePresenter
             li.classList.add("parent-node");
         }
 
-        setupCollapse(li);
         return li;
-    }
-
-    private void setupCollapse(final Element li) {
-        li.onclick = i -> {
-
-            toggle(li);
-
-            i.stopPropagation();
-
-            return null;
-        };
     }
 
     private Object toggle(final Element li) {

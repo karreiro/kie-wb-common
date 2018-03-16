@@ -41,18 +41,20 @@
             padding-right: 1em;
         }
 
-        [data-field="main-tree"] ul li span.selected,
-        [data-field="main-tree"] ul li span.selected:hover {
+        [data-field="main-tree"] ul li div.selected,
+        [data-field="main-tree"] ul li div.selected:hover {
             background: #ddf0f8;
         }
 
-        [data-field="main-tree"] ul li span:hover {
+        [data-field="main-tree"] ul li div:hover {
             background: #EFEFEF;
         }
 
-        [data-field="main-tree"] ul li span {
-            padding: 0.2em 0.4em;
+        [data-field="main-tree"] ul li div {
+            padding: 0 0.4em;
+            line-height: 1.6em;
             border-radius: 0.25em;
+            display: inline-block;
         }
 
         [data-field="main-tree"] ul .parent-node ul {
@@ -63,40 +65,40 @@
             display: none;
         }
 
-        [data-field="main-tree"] ul li:before,
         [data-field="main-tree"] ul li span:before {
             font-family: FontAwesome;
             -webkit-font-smoothing: antialiased;
             padding-right: 0.5em;
+            cursor: pointer;
         }
 
-        [data-field="main-tree"] ul .parent-node:before {
+        [data-field="main-tree"] ul span:before {
             content: "\f0d7";
             position: absolute;
-            margin-left: -1em;
+            margin: 0.1em 0 0 -1.5em;
         }
 
-        [data-field="main-tree"] ul li.parent-node.closed:before {
+        [data-field="main-tree"] ul li.parent-node.closed > span:before {
             content: "\f0da";
         }
 
-        [data-field="main-tree"] ul li.kie-root span:before {
+        [data-field="main-tree"] ul li.kie-root div > span:before {
             content: "\f1e0";
         }
 
-        [data-field="main-tree"] ul li.kie-item span:before {
+        [data-field="main-tree"] ul li.kie-item div > span:before {
             content: "\f0c8";
         }
 
-        [data-field="main-tree"] ul li.kie-sub-item span:before {
+        [data-field="main-tree"] ul li.kie-sub-item div > span:before {
             content: "\f16e";
         }
 
-        [data-field="main-tree"] ul li.kie-table span:before {
+        [data-field="main-tree"] ul li.kie-table div > span:before {
             content: "\f0ce";
         }
 
-        [data-field="main-tree"] ul li.kie-columns span:before {
+        [data-field="main-tree"] ul li.kie-columns div > span:before {
             content: "\f0db";
         }
     </style>

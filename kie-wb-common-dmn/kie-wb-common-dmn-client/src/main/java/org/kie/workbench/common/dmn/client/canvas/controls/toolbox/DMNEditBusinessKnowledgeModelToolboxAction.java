@@ -83,7 +83,8 @@ public class DMNEditBusinessKnowledgeModelToolboxAction implements ToolboxAction
         final BusinessKnowledgeModel bkm = bkmNode.getContent().getDefinition();
         editExpressionEvent.fire(new EditExpressionEvent(sessionManager.getCurrentSession(),
                                                          Optional.of(bkm),
-                                                         bkm.getEncapsulatedLogic()));
+                                                         bkm.getEncapsulatedLogic(),
+                                                         bkmNode));
 
         return this;
     }

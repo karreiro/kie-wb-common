@@ -19,6 +19,8 @@ package org.kie.workbench.common.dmn.client.editors.expressions.types.relation;
 import java.util.Collections;
 import java.util.Optional;
 
+import javax.enterprise.event.Event;
+
 import com.ait.lienzo.test.LienzoMockitoTestRunner;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.junit.Before;
@@ -39,6 +41,7 @@ import org.kie.workbench.common.dmn.client.session.DMNClientFullSession;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.container.CellEditorControlsView;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.HasListSelectorControl;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.ListSelectorView;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellTuple;
 import org.kie.workbench.common.dmn.client.widgets.layer.DMNGridLayer;
 import org.kie.workbench.common.dmn.client.widgets.panel.DMNGridPanel;
@@ -133,6 +136,9 @@ public class RelationGridTest {
     @Mock
     private ListSelectorView.Presenter listSelector;
 
+    @Mock
+    private Event<ExpressionEditorChanged> editorSelectedEvent;
+
     @Captor
     private ArgumentCaptor<AddRelationColumnCommand> addColumnCommand;
 
@@ -164,6 +170,7 @@ public class RelationGridTest {
                                             gridLayer,
                                             sessionManager,
                                             sessionCommandManager,
+                                            editorSelectedEvent,
                                             cellEditorControls,
                                             translationService,
                                             listSelector));

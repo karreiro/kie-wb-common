@@ -18,7 +18,9 @@ package org.kie.workbench.common.screens.datamodeller.client.widgets.advanceddom
 
 import java.lang.annotation.Annotation;
 import java.util.Iterator;
+
 import javax.enterprise.inject.Instance;
+import javax.enterprise.util.TypeLiteral;
 
 public class InstanceMock<T> implements Instance<T> {
 

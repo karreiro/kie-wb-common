@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javax.enterprise.event.Event;
+
 import com.ait.lienzo.test.LienzoMockitoTestRunner;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.junit.Before;
@@ -50,6 +52,7 @@ import org.kie.workbench.common.dmn.client.widgets.grid.controls.container.CellE
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.HasListSelectorControl;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.ListSelectorView;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.DMNGridData;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellTuple;
 import org.kie.workbench.common.dmn.client.widgets.layer.DMNGridLayer;
 import org.kie.workbench.common.dmn.client.widgets.panel.DMNGridPanel;
@@ -152,6 +155,9 @@ public class FunctionGridTest {
     @Mock
     private GridWidget supplementaryLiteralExpressionEditor;
 
+    @Mock
+    private Event<ExpressionEditorChanged> editorSelectedEvent;
+
     private LiteralExpression supplementaryLiteralExpression = new LiteralExpression();
 
     @Captor
@@ -176,6 +182,7 @@ public class FunctionGridTest {
                                                                                  gridLayer,
                                                                                  sessionManager,
                                                                                  sessionCommandManager,
+                                                                                 editorSelectedEvent,
                                                                                  expressionEditorDefinitionsSupplier,
                                                                                  supplementaryEditorDefinitionsSupplier,
                                                                                  cellEditorControls,

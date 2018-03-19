@@ -16,6 +16,8 @@
 
 package org.kie.workbench.common.dmn.client.widgets.grid;
 
+import javax.enterprise.event.Event;
+
 import com.ait.lienzo.client.core.shape.Node;
 import com.ait.lienzo.client.core.shape.Viewport;
 import com.ait.lienzo.test.LienzoMockitoTestRunner;
@@ -24,6 +26,7 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.container.CellEditorControlsView;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.BaseUIModelMapper;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellTuple;
 import org.kie.workbench.common.dmn.client.widgets.layer.DMNGridLayer;
 import org.kie.workbench.common.dmn.client.widgets.panel.DMNGridPanel;
@@ -72,6 +75,9 @@ public abstract class BaseExpressionGridTest {
 
     @Mock
     protected GridCellTuple parentCell;
+
+    @Mock
+    protected Event<ExpressionEditorChanged> editorSelectedEvent;
 
     protected BaseExpressionGrid grid;
 

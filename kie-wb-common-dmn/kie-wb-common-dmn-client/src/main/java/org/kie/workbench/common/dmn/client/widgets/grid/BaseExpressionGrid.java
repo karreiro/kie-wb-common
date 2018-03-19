@@ -23,6 +23,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import javax.enterprise.event.Event;
+
 import com.ait.lienzo.client.core.event.INodeXYEvent;
 import com.ait.lienzo.client.core.event.NodeMouseDoubleClickHandler;
 import com.ait.lienzo.client.core.shape.Group;
@@ -41,6 +43,7 @@ import org.kie.workbench.common.dmn.client.widgets.grid.columns.EditableHeaderMe
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.container.CellEditorControlsView;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.BaseUIModelMapper;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.DMNGridData;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellTuple;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellValueTuple;
 import org.kie.workbench.common.dmn.client.widgets.layer.DMNGridLayer;
@@ -76,6 +79,7 @@ public abstract class BaseExpressionGrid<E extends Expression, M extends BaseUIM
     protected final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager;
     protected final CellEditorControlsView.Presenter cellEditorControls;
     protected final TranslationService translationService;
+    protected final Event<ExpressionEditorChanged> editorSelectedEvent;
 
     protected M uiModelMapper;
 
@@ -90,6 +94,7 @@ public abstract class BaseExpressionGrid<E extends Expression, M extends BaseUIM
                               final GridRenderer gridRenderer,
                               final SessionManager sessionManager,
                               final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+                              final Event<ExpressionEditorChanged> editorSelectedEvent,
                               final CellEditorControlsView.Presenter cellEditorControls,
                               final TranslationService translationService,
                               final boolean isNested) {
@@ -102,6 +107,7 @@ public abstract class BaseExpressionGrid<E extends Expression, M extends BaseUIM
              gridRenderer,
              sessionManager,
              sessionCommandManager,
+             editorSelectedEvent,
              cellEditorControls,
              translationService,
              () -> isNested);
@@ -117,6 +123,7 @@ public abstract class BaseExpressionGrid<E extends Expression, M extends BaseUIM
                               final GridRenderer gridRenderer,
                               final SessionManager sessionManager,
                               final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+                              final Event<ExpressionEditorChanged> editorSelectedEvent,
                               final CellEditorControlsView.Presenter cellEditorControls,
                               final TranslationService translationService,
                               final boolean isNested) {
@@ -130,6 +137,7 @@ public abstract class BaseExpressionGrid<E extends Expression, M extends BaseUIM
              gridRenderer,
              sessionManager,
              sessionCommandManager,
+             editorSelectedEvent,
              cellEditorControls,
              translationService,
              () -> isNested);
@@ -145,6 +153,7 @@ public abstract class BaseExpressionGrid<E extends Expression, M extends BaseUIM
                        final GridRenderer gridRenderer,
                        final SessionManager sessionManager,
                        final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+                       final Event<ExpressionEditorChanged> editorSelectedEvent,
                        final CellEditorControlsView.Presenter cellEditorControls,
                        final TranslationService translationService,
                        final Supplier<Boolean> isNested) {
@@ -158,6 +167,7 @@ public abstract class BaseExpressionGrid<E extends Expression, M extends BaseUIM
              gridRenderer,
              sessionManager,
              sessionCommandManager,
+             editorSelectedEvent,
              cellEditorControls,
              translationService,
              isNested);
@@ -173,6 +183,7 @@ public abstract class BaseExpressionGrid<E extends Expression, M extends BaseUIM
                        final GridRenderer gridRenderer,
                        final SessionManager sessionManager,
                        final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+                       final Event<ExpressionEditorChanged> editorSelectedEvent,
                        final CellEditorControlsView.Presenter cellEditorControls,
                        final TranslationService translationService,
                        final Supplier<Boolean> isNested) {
@@ -185,6 +196,7 @@ public abstract class BaseExpressionGrid<E extends Expression, M extends BaseUIM
         this.parent = parent;
         this.sessionManager = sessionManager;
         this.sessionCommandManager = sessionCommandManager;
+        this.editorSelectedEvent = editorSelectedEvent;
         this.cellEditorControls = cellEditorControls;
         this.translationService = translationService;
 
@@ -291,6 +303,7 @@ public abstract class BaseExpressionGrid<E extends Expression, M extends BaseUIM
 
     @Override
     public void select() {
+        editorSelectedEvent.fire(new ExpressionEditorChanged());
         selectFirstCell();
         super.select();
     }

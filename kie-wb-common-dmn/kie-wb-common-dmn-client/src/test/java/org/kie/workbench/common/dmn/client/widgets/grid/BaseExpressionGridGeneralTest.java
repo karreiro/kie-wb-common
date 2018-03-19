@@ -76,6 +76,7 @@ public class BaseExpressionGridGeneralTest extends BaseExpressionGridTest {
                                       renderer,
                                       sessionManager,
                                       sessionCommandManager,
+                                      editorSelectedEvent,
                                       cellEditorControls,
                                       translationService,
                                       false) {

@@ -19,6 +19,8 @@ package org.kie.workbench.common.dmn.client.editors.expressions.types.function.s
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javax.enterprise.event.Event;
+
 import com.ait.lienzo.test.LienzoMockitoTestRunner;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.junit.Before;
@@ -35,6 +37,7 @@ import org.kie.workbench.common.dmn.client.editors.expressions.types.context.Exp
 import org.kie.workbench.common.dmn.client.widgets.grid.BaseExpressionGrid;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.container.CellEditorControlsView;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.ListSelectorView;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellTuple;
 import org.kie.workbench.common.dmn.client.widgets.layer.DMNGridLayer;
 import org.kie.workbench.common.dmn.client.widgets.panel.DMNGridPanel;
@@ -77,6 +80,9 @@ public abstract class BaseFunctionSupplementaryGridTest<D extends ExpressionEdit
 
     @Mock
     protected ListSelectorView.Presenter listSelector;
+
+    @Mock
+    protected Event<ExpressionEditorChanged> editorSelectedEvent;
 
     @Mock
     private GridCellTuple parent;

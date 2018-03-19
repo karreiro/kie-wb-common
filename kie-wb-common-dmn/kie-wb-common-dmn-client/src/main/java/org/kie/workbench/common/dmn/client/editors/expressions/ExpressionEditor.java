@@ -18,6 +18,7 @@ package org.kie.workbench.common.dmn.client.editors.expressions;
 import java.util.Optional;
 
 import javax.enterprise.context.Dependent;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import org.jboss.errai.common.client.dom.HTMLElement;
@@ -26,6 +27,9 @@ import org.kie.workbench.common.dmn.api.definition.HasName;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
 import org.kie.workbench.common.stunner.client.widgets.toolbar.ToolbarCommand;
 import org.kie.workbench.common.stunner.client.widgets.toolbar.impl.EditorToolbar;
+import org.kie.workbench.common.stunner.core.client.api.SessionManager;
+import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasFocusedSelectionEvent;
+import org.kie.workbench.common.stunner.core.client.session.ClientSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientFullSession;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.uberfire.mvp.Command;
@@ -35,7 +39,7 @@ public class ExpressionEditor implements ExpressionEditorView.Presenter {
 
     private ExpressionEditorView view;
 
-    private Optional<Command> exitCommand;
+    private Optional<Command> exitCommand = Optional.empty();
 
     private ToolbarCommandStateHandler toolbarCommandStateHandler;
 
@@ -84,7 +88,12 @@ public class ExpressionEditor implements ExpressionEditorView.Presenter {
         exitCommand.ifPresent(c -> {
             toolbarCommandStateHandler.exit();
             c.execute();
+            exitCommand = Optional.empty();
         });
+    }
+
+    public void onCanvasFocusedSelectionEvent(@Observes CanvasFocusedSelectionEvent event) {
+        exit();
     }
 
     //Package-protected for Unit Tests

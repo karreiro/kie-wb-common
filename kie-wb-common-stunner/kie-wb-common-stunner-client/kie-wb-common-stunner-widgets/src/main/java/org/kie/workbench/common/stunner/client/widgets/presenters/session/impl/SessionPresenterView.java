@@ -18,8 +18,10 @@ package org.kie.workbench.common.stunner.client.widgets.presenters.session.impl;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ContextMenuEvent;
 import com.google.gwt.event.dom.client.ScrollEvent;
@@ -40,6 +42,7 @@ import org.jboss.errai.ui.shared.api.annotations.ForEvent;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.kie.workbench.common.stunner.client.widgets.palette.PaletteWidget;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
+import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasFocusedSelectionEvent;
 import org.kie.workbench.common.stunner.core.client.components.palette.model.PaletteDefinition;
 import org.uberfire.client.workbench.widgets.listbar.ResizeFlowPanel;
 
@@ -106,6 +109,15 @@ public class SessionPresenterView extends Composite
         palettePanel.getElement().getStyle().setLeft(paletteInitialLeft + e.getRelativeElement().getScrollLeft(), Style.Unit.PX);
 
         e.preventDefault();
+    }
+
+    void onCanvasFocusedSelectionEvent(final @Observes CanvasFocusedSelectionEvent event) {
+
+        Double shapeX = event.getShapeX();
+        Double shapeY = event.getShapeY();
+
+        sessionContainer.getElement().setScrollLeft(shapeX.intValue());
+        sessionContainer.getElement().setScrollTop(shapeY.intValue());
     }
 
     @Override

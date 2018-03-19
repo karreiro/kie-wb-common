@@ -19,6 +19,8 @@ package org.kie.workbench.common.dmn.client.editors.expressions.types.dtable;
 import java.util.List;
 import java.util.Optional;
 
+import javax.enterprise.event.Event;
+
 import com.ait.lienzo.test.LienzoMockitoTestRunner;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.junit.Before;
@@ -40,6 +42,7 @@ import org.kie.workbench.common.dmn.client.resources.i18n.DMNEditorConstants;
 import org.kie.workbench.common.dmn.client.widgets.grid.BaseExpressionGrid;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.container.CellEditorControlsView;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.ListSelectorView;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellTuple;
 import org.kie.workbench.common.dmn.client.widgets.layer.DMNGridLayer;
 import org.kie.workbench.common.dmn.client.widgets.panel.DMNGridPanel;
@@ -86,6 +89,9 @@ public class DecisionTableEditorDefinitionTest {
     @Mock
     private HasExpression hasExpression;
 
+    @Mock
+    private Event<ExpressionEditorChanged> editorSelectedEvent;
+
     private Optional<HasName> hasName = Optional.of(HasName.NOP);
 
     private DecisionTableEditorDefinition definition;
@@ -97,6 +103,7 @@ public class DecisionTableEditorDefinitionTest {
                                                             gridLayer,
                                                             sessionManager,
                                                             sessionCommandManager,
+                                                            editorSelectedEvent,
                                                             cellEditorControls,
                                                             translationService,
                                                             listSelector,

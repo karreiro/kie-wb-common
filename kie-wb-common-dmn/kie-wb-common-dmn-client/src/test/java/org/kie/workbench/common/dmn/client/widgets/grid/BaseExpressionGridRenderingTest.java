@@ -160,6 +160,7 @@ public class BaseExpressionGridRenderingTest extends BaseExpressionGridTest {
                                       renderer,
                                       sessionManager,
                                       sessionCommandManager,
+                                      editorSelectedEvent,
                                       cellEditorControls,
                                       translationService,
                                       () -> isHeaderHidden) {

@@ -21,7 +21,9 @@ import java.util.List;
 
 import javax.enterprise.event.Event;
 
+import com.google.gwt.core.client.GWT;
 import org.kie.workbench.common.dmn.client.events.EditExpressionEvent;
+import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasFocusedSelectionEvent;
 import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasSelectionEvent;
 
 public class DecisionNavigatorItem {
@@ -35,9 +37,11 @@ public class DecisionNavigatorItem {
     private List<DecisionNavigatorItem> children = new ArrayList<>();
     private List<DecisionNavigatorItem> parents = new ArrayList<>();
     private EditExpressionEvent editExpressionEvent;
-    private CanvasSelectionEvent canvasSelectionEvent;
+    private CanvasFocusedSelectionEvent canvasSelectionEvent;
+    private CanvasSelectionEvent canvasSelectionEvent2;
     private Event<EditExpressionEvent> eventEditExpressionEvent;
-    private Event<CanvasSelectionEvent> canvasSelectionEventEvent;
+    private Event<CanvasFocusedSelectionEvent> canvasSelectionEventEvent;
+    private Event<CanvasSelectionEvent> canvasSelectionEventEvent2;
 
     public DecisionNavigatorItem(final String uuid,
                                  final String label,
@@ -85,6 +89,10 @@ public class DecisionNavigatorItem {
         if (canvasSelectionEventEvent != null) {
             canvasSelectionEventEvent.fire(canvasSelectionEvent);
         }
+
+        if (canvasSelectionEventEvent2 != null) {
+            canvasSelectionEventEvent2.fire(canvasSelectionEvent2);
+        }
     }
 
     public void setEditExpressionEvent(final EditExpressionEvent editExpressionEvent) {
@@ -95,12 +103,20 @@ public class DecisionNavigatorItem {
         this.eventEditExpressionEvent = eventEditExpressionEvent;
     }
 
-    public void setCanvasSelectionEventEvent(final Event<CanvasSelectionEvent> canvasSelectionEventEvent) {
+    public void setCanvasSelectionEventEvent(final Event<CanvasFocusedSelectionEvent> canvasSelectionEventEvent) {
         this.canvasSelectionEventEvent = canvasSelectionEventEvent;
     }
 
-    public void setCanvasSelectionEvent(final CanvasSelectionEvent canvasSelectionEvent) {
+    public void setCanvasSelectionEvent(final CanvasFocusedSelectionEvent canvasSelectionEvent) {
         this.canvasSelectionEvent = canvasSelectionEvent;
+    }
+
+    public void setCanvasSelectionEventEvent2(final Event<CanvasSelectionEvent> canvasSelectionEventEvent2) {
+        this.canvasSelectionEventEvent2 = canvasSelectionEventEvent2;
+    }
+
+    public void setCanvasSelectionEvent2(final CanvasSelectionEvent canvasSelectionEvent2) {
+        this.canvasSelectionEvent2 = canvasSelectionEvent2;
     }
 
     public enum Type {

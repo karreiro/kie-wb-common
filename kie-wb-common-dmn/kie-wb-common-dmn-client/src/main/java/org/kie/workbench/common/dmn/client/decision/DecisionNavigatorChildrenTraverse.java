@@ -47,7 +47,9 @@ import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler
 import org.kie.workbench.common.stunner.core.client.canvas.Canvas;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.actions.TextPropertyProvider;
 import org.kie.workbench.common.stunner.core.client.canvas.controls.actions.TextPropertyProviderFactory;
+import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasFocusedSelectionEvent;
 import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasSelectionEvent;
+import org.kie.workbench.common.stunner.core.client.shape.Shape;
 import org.kie.workbench.common.stunner.core.definition.adapter.AdapterManager;
 import org.kie.workbench.common.stunner.core.definition.adapter.DefinitionAdapter;
 import org.kie.workbench.common.stunner.core.graph.Edge;
@@ -84,7 +86,10 @@ public class DecisionNavigatorChildrenTraverse {
     private Event<EditExpressionEvent> eventEditExpressionEvent;
 
     @Inject
-    private Event<CanvasSelectionEvent> canvasSelectionEventEvent;
+    private Event<CanvasFocusedSelectionEvent> canvasSelectionEventEvent;
+
+    @Inject
+    private Event<CanvasSelectionEvent> canvasSelectionEventEvent2;
 
     @Inject
     private DecisionNavigatorPresenter decisionNavigatorPresenter;
@@ -121,9 +126,26 @@ public class DecisionNavigatorChildrenTraverse {
         DecisionNavigatorItem decisionNavigatorItem = new DecisionNavigatorItem(uuid, label, type, nestedElements);
 
         AbstractCanvasHandler canvas = decisionNavigatorPresenter.getHandler();
-        CanvasSelectionEvent canvasSelectionEvent = new CanvasSelectionEvent(canvas, uuid);
+        CanvasFocusedSelectionEvent canvasSelectionEvent = new CanvasFocusedSelectionEvent(canvas, uuid);
+        CanvasSelectionEvent canvasSelectionEvent2 = new CanvasSelectionEvent(canvas, uuid);
+
+        try {
+            Shape shape = canvas.getCanvas().getShape(uuid);
+
+            double shapeX = shape.getShapeView().getShapeX() - 50;
+            double shapeY = shape.getShapeView().getShapeY() - 50;
+            GWT.log("Shape(x, y) => (" + shapeX + ", " + shapeY + ")");
+
+            canvasSelectionEvent.setShapeX(shapeX);
+            canvasSelectionEvent.setShapeY(shapeY);
+        } catch (Exception e) {
+
+        }
+
         decisionNavigatorItem.setCanvasSelectionEvent(canvasSelectionEvent);
         decisionNavigatorItem.setCanvasSelectionEventEvent(canvasSelectionEventEvent);
+        decisionNavigatorItem.setCanvasSelectionEvent2(canvasSelectionEvent2);
+        decisionNavigatorItem.setCanvasSelectionEventEvent2(canvasSelectionEventEvent2);
 
         nestedElements.forEach(n -> n.getParents().add(decisionNavigatorItem));
 

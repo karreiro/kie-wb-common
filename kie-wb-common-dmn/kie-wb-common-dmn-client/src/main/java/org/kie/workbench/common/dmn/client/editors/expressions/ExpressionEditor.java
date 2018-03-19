@@ -30,6 +30,7 @@ import org.kie.workbench.common.stunner.client.widgets.presenters.session.Sessio
 import org.kie.workbench.common.stunner.client.widgets.toolbar.ToolbarCommand;
 import org.kie.workbench.common.stunner.client.widgets.toolbar.impl.EditorToolbar;
 import org.kie.workbench.common.stunner.core.client.api.SessionManager;
+import org.kie.workbench.common.stunner.core.client.canvas.event.selection.CanvasFocusedSelectionEvent;
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientFullSession;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
@@ -41,7 +42,7 @@ public class ExpressionEditor implements ExpressionEditorView.Presenter {
     private ExpressionEditorView view;
     private SessionManager sessionManager;
 
-    private Optional<Command> exitCommand;
+    private Optional<Command> exitCommand = Optional.empty();
 
     private ToolbarCommandStateHandler toolbarCommandStateHandler;
 
@@ -107,7 +108,12 @@ public class ExpressionEditor implements ExpressionEditorView.Presenter {
         exitCommand.ifPresent(c -> {
             toolbarCommandStateHandler.exit();
             c.execute();
+            exitCommand = Optional.empty();
         });
+    }
+
+    public void onCanvasFocusedSelectionEvent(@Observes CanvasFocusedSelectionEvent event) {
+        exit();
     }
 
     //Package-protected for Unit Tests

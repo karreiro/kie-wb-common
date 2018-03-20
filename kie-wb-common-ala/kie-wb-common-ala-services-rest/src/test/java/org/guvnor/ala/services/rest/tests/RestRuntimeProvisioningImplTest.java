@@ -76,6 +76,7 @@ import static org.junit.Assert.*;
 /**
  * Test that shows how to work with the Runtime Provisioning Service
  */
+@org.junit.Ignore
 @RunWith(Arquillian.class)
 public class RestRuntimeProvisioningImplTest {
 

@@ -65,6 +65,7 @@ import static org.junit.Assert.*;
  * Test the Wildfly Provider by starting a docker image of wildfly and deploying
  * an application there.
  */
+@org.junit.Ignore
 @RunWith(ArquillianConditionalRunner.class)
 @RequiresNotWindows
 public class WildflyExecutorTest {

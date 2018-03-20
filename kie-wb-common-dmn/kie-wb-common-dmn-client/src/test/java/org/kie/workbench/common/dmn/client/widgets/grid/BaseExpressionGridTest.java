@@ -36,6 +36,7 @@ import org.kie.workbench.common.stunner.core.client.command.SessionCommandManage
 import org.mockito.Mock;
 import org.uberfire.ext.wires.core.grids.client.model.impl.BaseBounds;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.renderers.grids.GridRenderer;
+import org.uberfire.mocks.EventSourceMock;
 
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
@@ -77,7 +78,7 @@ public abstract class BaseExpressionGridTest {
     protected GridCellTuple parentCell;
 
     @Mock
-    protected Event<ExpressionEditorChanged> editorSelectedEvent;
+    protected EventSourceMock<ExpressionEditorChanged> editorSelectedEvent;
 
     protected BaseExpressionGrid grid;
 

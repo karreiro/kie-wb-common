@@ -47,6 +47,7 @@ import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.mockito.Mock;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.GridWidget;
+import org.uberfire.mocks.EventSourceMock;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -88,7 +89,7 @@ public class JavaFunctionEditorDefinitionTest {
     private HasExpression hasExpression;
 
     @Mock
-    private Event<ExpressionEditorChanged> editorSelectedEvent;
+    private EventSourceMock<ExpressionEditorChanged> editorSelectedEvent;
 
     private Optional<HasName> hasName = Optional.empty();
 

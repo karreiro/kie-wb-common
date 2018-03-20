@@ -52,6 +52,7 @@ import org.uberfire.ext.wires.core.grids.client.model.GridData;
 import org.uberfire.ext.wires.core.grids.client.model.impl.BaseGridCell;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.GridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.impl.BaseGridWidget;
+import org.uberfire.mocks.EventSourceMock;
 import org.uberfire.mvp.Command;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -101,7 +102,7 @@ public class LiteralExpressionGridTest {
     private HasExpression hasExpression;
 
     @Mock
-    private Event<ExpressionEditorChanged> editorSelectedEvent;
+    private EventSourceMock<ExpressionEditorChanged> editorSelectedEvent;
 
     private LiteralExpressionGrid grid;
 

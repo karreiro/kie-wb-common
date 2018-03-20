@@ -52,6 +52,7 @@ import org.uberfire.ext.wires.core.grids.client.widget.grid.renderers.columns.Gr
 import org.uberfire.ext.wires.core.grids.client.widget.grid.renderers.grids.GridRenderer;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.GridSelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.pinning.GridPinnedModeManager;
+import org.uberfire.mocks.EventSourceMock;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -85,7 +86,7 @@ public class ExpressionEditorColumnTest {
     private SessionCommandManager<AbstractCanvasHandler> sessionCommandManager;
 
     @Mock
-    private Event<ExpressionEditorChanged> editorSelectedEvent;
+    private EventSourceMock<ExpressionEditorChanged> editorSelectedEvent;
 
     @Mock
     private CellEditorControlsView.Presenter cellEditorControls;

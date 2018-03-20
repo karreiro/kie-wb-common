@@ -51,6 +51,7 @@ import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.mockito.Mock;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.GridWidget;
+import org.uberfire.mocks.EventSourceMock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -90,7 +91,7 @@ public class DecisionTableEditorDefinitionTest {
     private HasExpression hasExpression;
 
     @Mock
-    private Event<ExpressionEditorChanged> editorSelectedEvent;
+    private EventSourceMock<ExpressionEditorChanged> editorSelectedEvent;
 
     private Optional<HasName> hasName = Optional.of(HasName.NOP);
 

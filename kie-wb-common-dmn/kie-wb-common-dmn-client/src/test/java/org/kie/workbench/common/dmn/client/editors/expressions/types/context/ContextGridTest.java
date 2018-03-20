@@ -64,6 +64,7 @@ import org.uberfire.ext.wires.core.grids.client.widget.dnd.GridWidgetDnDHandlers
 import org.uberfire.ext.wires.core.grids.client.widget.grid.columns.RowNumberColumn;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.selections.impl.RowSelectionStrategy;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.impl.GridLayerRedrawManager;
+import org.uberfire.mocks.EventSourceMock;
 import org.uberfire.mvp.Command;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -147,7 +148,7 @@ public class ContextGridTest {
     private GridWidgetDnDHandlersState dndHandlersState;
 
     @Mock
-    private Event<ExpressionEditorChanged> editorSelectedEvent;
+    private EventSourceMock<ExpressionEditorChanged> editorSelectedEvent;
 
     @Captor
     private ArgumentCaptor<AddContextEntryCommand> addContextEntryCommandCaptor;

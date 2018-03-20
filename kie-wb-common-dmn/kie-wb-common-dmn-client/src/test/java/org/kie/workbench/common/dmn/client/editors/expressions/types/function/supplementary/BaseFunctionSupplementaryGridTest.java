@@ -47,6 +47,7 @@ import org.kie.workbench.common.stunner.core.client.command.SessionCommandManage
 import org.mockito.Mock;
 import org.uberfire.ext.wires.core.grids.client.model.GridData;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.columns.RowNumberColumn;
+import org.uberfire.mocks.EventSourceMock;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -82,7 +83,7 @@ public abstract class BaseFunctionSupplementaryGridTest<D extends ExpressionEdit
     protected ListSelectorView.Presenter listSelector;
 
     @Mock
-    protected Event<ExpressionEditorChanged> editorSelectedEvent;
+    protected EventSourceMock<ExpressionEditorChanged> editorSelectedEvent;
 
     @Mock
     private GridCellTuple parent;

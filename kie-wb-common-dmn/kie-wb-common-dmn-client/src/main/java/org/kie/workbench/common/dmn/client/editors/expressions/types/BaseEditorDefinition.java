@@ -16,9 +16,12 @@
 
 package org.kie.workbench.common.dmn.client.editors.expressions.types;
 
+import javax.enterprise.event.Event;
+
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.kie.workbench.common.dmn.api.definition.v1_1.Expression;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.container.CellEditorControlsView;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.kie.workbench.common.dmn.client.widgets.layer.DMNGridLayer;
 import org.kie.workbench.common.dmn.client.widgets.panel.DMNGridPanel;
 import org.kie.workbench.common.stunner.core.client.api.SessionManager;
@@ -31,6 +34,7 @@ public abstract class BaseEditorDefinition<T extends Expression> implements Expr
     protected DMNGridLayer gridLayer;
     protected SessionManager sessionManager;
     protected SessionCommandManager<AbstractCanvasHandler> sessionCommandManager;
+    protected Event<ExpressionEditorChanged> editorSelectedEvent;
     protected CellEditorControlsView.Presenter cellEditorControls;
     protected TranslationService translationService;
 
@@ -42,12 +46,14 @@ public abstract class BaseEditorDefinition<T extends Expression> implements Expr
                                 final DMNGridLayer gridLayer,
                                 final SessionManager sessionManager,
                                 final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+                                final Event<ExpressionEditorChanged> editorSelectedEvent,
                                 final CellEditorControlsView.Presenter cellEditorControls,
                                 final TranslationService translationService) {
         this.gridPanel = gridPanel;
         this.gridLayer = gridLayer;
         this.sessionManager = sessionManager;
         this.sessionCommandManager = sessionCommandManager;
+        this.editorSelectedEvent = editorSelectedEvent;
         this.cellEditorControls = cellEditorControls;
         this.translationService = translationService;
     }

@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.enterprise.context.Dependent;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import org.jboss.errai.ui.client.local.spi.TranslationService;
@@ -40,6 +41,7 @@ import org.kie.workbench.common.dmn.client.resources.i18n.DMNEditorConstants;
 import org.kie.workbench.common.dmn.client.widgets.grid.BaseExpressionGrid;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.container.CellEditorControlsView;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.ListSelectorView;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellTuple;
 import org.kie.workbench.common.dmn.client.widgets.layer.DMNGridLayer;
 import org.kie.workbench.common.dmn.client.widgets.panel.DMNGridPanel;
@@ -68,6 +70,7 @@ public class PMMLFunctionEditorDefinition extends BaseEditorDefinition<Context> 
                                         final @DMNEditor DMNGridLayer gridLayer,
                                         final SessionManager sessionManager,
                                         final @Session SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+                                        final Event<ExpressionEditorChanged> editorSelectedEvent,
                                         final @DMNEditor Supplier<ExpressionEditorDefinitions> expressionEditorDefinitionsSupplier,
                                         final CellEditorControlsView.Presenter cellEditorControls,
                                         final TranslationService translationService,
@@ -76,6 +79,7 @@ public class PMMLFunctionEditorDefinition extends BaseEditorDefinition<Context> 
               gridLayer,
               sessionManager,
               sessionCommandManager,
+              editorSelectedEvent,
               cellEditorControls,
               translationService);
         this.expressionEditorDefinitionsSupplier = expressionEditorDefinitionsSupplier;
@@ -125,6 +129,7 @@ public class PMMLFunctionEditorDefinition extends BaseEditorDefinition<Context> 
                                                          gridLayer,
                                                          sessionManager,
                                                          sessionCommandManager,
+                                                         editorSelectedEvent,
                                                          expressionEditorDefinitionsSupplier,
                                                          cellEditorControls,
                                                          translationService,

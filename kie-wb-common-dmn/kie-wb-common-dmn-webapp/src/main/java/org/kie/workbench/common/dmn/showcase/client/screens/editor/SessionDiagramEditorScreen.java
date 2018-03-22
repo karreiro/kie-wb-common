@@ -30,7 +30,10 @@ import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.commands.general.NavigateToExpressionEditorCommand;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
 import org.kie.workbench.common.dmn.client.events.EditExpressionEvent;
+//import org.kie.workbench.common.dmn.client.events.ExpressionEditorSelectedEvent;
+import org.kie.workbench.common.dmn.showcase.client.perspectives.AuthoringPerspective;
 import org.kie.workbench.common.dmn.showcase.client.screens.ShowcaseDiagramService;
+import org.kie.workbench.common.dmn.client.decision.DecisionNavigatorDock;
 import org.kie.workbench.common.stunner.client.widgets.menu.dev.MenuDevCommandsBuilder;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenterFactory;
@@ -42,6 +45,7 @@ import org.kie.workbench.common.stunner.core.client.annotation.DiagramEditor;
 import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
+import org.kie.workbench.common.stunner.core.client.command.CanvasCommandManager;
 import org.kie.workbench.common.stunner.core.client.command.SessionCommandManager;
 import org.kie.workbench.common.stunner.core.client.service.ClientFactoryService;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
@@ -85,10 +89,8 @@ import static java.util.logging.Level.FINE;
 @WorkbenchScreen(identifier = SessionDiagramEditorScreen.SCREEN_ID)
 public class SessionDiagramEditorScreen {
 
-    private static Logger LOGGER = Logger.getLogger(SessionDiagramEditorScreen.class.getName());
-
     public static final String SCREEN_ID = "SessionDiagramEditorScreen";
-
+    private static Logger LOGGER = Logger.getLogger(SessionDiagramEditorScreen.class.getName());
     private final DefinitionManager definitionManager;
     private final ClientFactoryService clientFactoryServices;
     private final ShowcaseDiagramService diagramService;
@@ -99,12 +101,12 @@ public class SessionDiagramEditorScreen {
     private final MenuDevCommandsBuilder menuDevCommandsBuilder;
     private final ScreenPanelView screenPanelView;
     private final ScreenErrorView screenErrorView;
-
+    @Inject
+    DecisionNavigatorDock decisionNavigatorDock;
     private SessionPresenter<AbstractClientFullSession, ?, Diagram> presenter;
     private PlaceRequest placeRequest;
     private String title = "Authoring Screen";
     private Menus menu = null;
-
     private ExpressionEditorView.Presenter expressionEditor;
 
     @Inject
@@ -134,6 +136,7 @@ public class SessionDiagramEditorScreen {
 
     @OnStartup
     public void onStartup(final PlaceRequest placeRequest) {
+        decisionNavigatorDock.init(AuthoringPerspective.PERSPECTIVE_ID);
         this.placeRequest = placeRequest;
         this.menu = makeMenuBar();
         final String name = placeRequest.getParameter("name",
@@ -296,6 +299,8 @@ public class SessionDiagramEditorScreen {
                       session,
                       new ScreenPresenterCallback(callback));
         expressionEditor.init(presenter);
+
+        openDock(session);
     }
 
     @OnOpen
@@ -308,8 +313,7 @@ public class SessionDiagramEditorScreen {
         if (null != getSession() && !isSameSession(sessionManager.getCurrentSession())) {
             sessionManager.open(getSession());
         } else if (null != getSession()) {
-            log(FINE,
-                "Session already active, no action.");
+            log(FINE, "Session already active, no action.");
         }
     }
 
@@ -319,7 +323,18 @@ public class SessionDiagramEditorScreen {
 
     @OnClose
     public void onClose() {
+        destroyDock();
         destroySession();
+    }
+
+    private void openDock(final AbstractClientFullSession session) {
+        decisionNavigatorDock.open();
+        decisionNavigatorDock.setupContent(session.getCanvasHandler());
+    }
+
+    private void destroyDock() {
+        decisionNavigatorDock.close();
+        decisionNavigatorDock.resetContent();
     }
 
     @WorkbenchMenu
@@ -350,37 +365,6 @@ public class SessionDiagramEditorScreen {
     @WorkbenchContextId
     public String getMyContextRef() {
         return "sessionDiagramEditorScreenContext";
-    }
-
-    private final class ScreenPresenterCallback implements SessionPresenter.SessionPresenterCallback<AbstractClientFullSession, Diagram> {
-
-        private final Command callback;
-
-        private ScreenPresenterCallback(final Command callback) {
-            this.callback = callback;
-        }
-
-        @Override
-        public void afterSessionOpened() {
-
-        }
-
-        @Override
-        public void afterCanvasInitialized() {
-
-        }
-
-        @Override
-        public void onSuccess() {
-            BusyPopup.close();
-            callback.execute();
-        }
-
-        @Override
-        public void onError(final ClientRuntimeError error) {
-            showError(error);
-            callback.execute();
-        }
     }
 
     private void updateTitle(final String title) {
@@ -421,7 +405,7 @@ public class SessionDiagramEditorScreen {
         }
     }
 
-    private void OnEditExpressionEvent(final @Observes EditExpressionEvent event) {
+    private void onEditExpressionEvent(final @Observes EditExpressionEvent event) {
         if (isSameSession(event.getSession())) {
             sessionCommandManager.execute((AbstractCanvasHandler) sessionManager.getCurrentSession().getCanvasHandler(),
                                           new NavigateToExpressionEditorCommand(expressionEditor,
@@ -438,6 +422,37 @@ public class SessionDiagramEditorScreen {
         if (LogConfiguration.loggingIsEnabled()) {
             LOGGER.log(level,
                        message);
+        }
+    }
+
+    private final class ScreenPresenterCallback implements SessionPresenter.SessionPresenterCallback<AbstractClientFullSession, Diagram> {
+
+        private final Command callback;
+
+        private ScreenPresenterCallback(final Command callback) {
+            this.callback = callback;
+        }
+
+        @Override
+        public void afterSessionOpened() {
+
+        }
+
+        @Override
+        public void afterCanvasInitialized() {
+
+        }
+
+        @Override
+        public void onSuccess() {
+            BusyPopup.close();
+            callback.execute();
+        }
+
+        @Override
+        public void onError(final ClientRuntimeError error) {
+            showError(error);
+            callback.execute();
         }
     }
 }

@@ -16,6 +16,8 @@
 
 package org.kie.workbench.common.dmn.client.canvas.controls.toolbox;
 
+import java.util.Optional;
+
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -125,9 +127,11 @@ public class DMNEditBusinessKnowledgeModelToolboxActionTest {
         final EditExpressionEvent editExprEvent = eventCaptor.getValue();
         assertEquals(bkmFunction,
                      editExprEvent.getHasExpression());
-        assertEquals(bkm,
-                     editExprEvent.getHasName().get());
+        assertEquals(Optional.of(bkm),
+                     editExprEvent.getHasName());
         assertEquals(session,
                      editExprEvent.getSession());
+        assertEquals(bkmNode,
+                     editExprEvent.getNode());
     }
 }

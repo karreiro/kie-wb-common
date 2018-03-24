@@ -18,6 +18,8 @@ package org.kie.workbench.common.dmn.client.editors.expressions.types.context;
 
 import java.util.Optional;
 
+import javax.enterprise.event.Event;
+
 import com.ait.lienzo.test.LienzoMockitoTestRunner;
 import org.assertj.core.api.Assertions;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
@@ -33,6 +35,7 @@ import org.kie.workbench.common.dmn.client.widgets.grid.controls.container.CellE
 import org.kie.workbench.common.dmn.client.widgets.grid.model.BaseUIModelMapper;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.DMNGridColumn;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.DMNGridRow;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellTuple;
 import org.kie.workbench.common.dmn.client.widgets.layer.DMNGridLayer;
 import org.kie.workbench.common.dmn.client.widgets.panel.DMNGridPanel;
@@ -49,6 +52,7 @@ import org.uberfire.ext.wires.core.grids.client.widget.grid.renderers.columns.Gr
 import org.uberfire.ext.wires.core.grids.client.widget.grid.renderers.grids.GridRenderer;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.GridSelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.pinning.GridPinnedModeManager;
+import org.uberfire.mocks.EventSourceMock;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -80,6 +84,9 @@ public class ExpressionEditorColumnTest {
 
     @Mock
     private SessionCommandManager<AbstractCanvasHandler> sessionCommandManager;
+
+    @Mock
+    private EventSourceMock<ExpressionEditorChanged> editorSelectedEvent;
 
     @Mock
     private CellEditorControlsView.Presenter cellEditorControls;
@@ -375,6 +382,7 @@ public class ExpressionEditorColumnTest {
                                       renderer,
                                       sessionManager,
                                       sessionCommandManager,
+                                      editorSelectedEvent,
                                       cellEditorControls,
                                       translationService,
                                       false) {

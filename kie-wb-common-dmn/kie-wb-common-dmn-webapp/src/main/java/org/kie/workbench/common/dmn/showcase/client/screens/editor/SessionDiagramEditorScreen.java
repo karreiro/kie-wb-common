@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
@@ -28,8 +29,10 @@ import com.google.gwt.logging.client.LogConfiguration;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.commands.general.NavigateToExpressionEditorCommand;
+import org.kie.workbench.common.dmn.client.decision.DecisionNavigatorDock;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
 import org.kie.workbench.common.dmn.client.events.EditExpressionEvent;
+import org.kie.workbench.common.dmn.showcase.client.perspectives.AuthoringPerspective;
 import org.kie.workbench.common.dmn.showcase.client.screens.ShowcaseDiagramService;
 import org.kie.workbench.common.stunner.client.widgets.menu.dev.MenuDevCommandsBuilder;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
@@ -99,7 +102,7 @@ public class SessionDiagramEditorScreen {
     private final MenuDevCommandsBuilder menuDevCommandsBuilder;
     private final ScreenPanelView screenPanelView;
     private final ScreenErrorView screenErrorView;
-
+    private final DecisionNavigatorDock decisionNavigatorDock;
     private SessionPresenter<AbstractClientFullSession, ?, Diagram> presenter;
     private PlaceRequest placeRequest;
     private String title = "Authoring Screen";
@@ -118,7 +121,8 @@ public class SessionDiagramEditorScreen {
                                       final MenuDevCommandsBuilder menuDevCommandsBuilder,
                                       final ScreenPanelView screenPanelView,
                                       final ScreenErrorView screenErrorView,
-                                      final ExpressionEditorView.Presenter expressionEditor) {
+                                      final ExpressionEditorView.Presenter expressionEditor,
+                                      final DecisionNavigatorDock decisionNavigatorDock) {
         this.definitionManager = definitionManager;
         this.clientFactoryServices = clientFactoryServices;
         this.diagramService = diagramService;
@@ -130,6 +134,12 @@ public class SessionDiagramEditorScreen {
         this.screenPanelView = screenPanelView;
         this.screenErrorView = screenErrorView;
         this.expressionEditor = expressionEditor;
+        this.decisionNavigatorDock = decisionNavigatorDock;
+    }
+
+    @PostConstruct
+    public void init() {
+        decisionNavigatorDock.init(AuthoringPerspective.PERSPECTIVE_ID);
     }
 
     @OnStartup
@@ -283,8 +293,8 @@ public class SessionDiagramEditorScreen {
                                   });
     }
 
-    private void openDiagram(final Diagram diagram,
-                             final Command callback) {
+    void openDiagram(final Diagram diagram,
+                     final Command callback) {
         final AbstractClientFullSession session = newSession(diagram);
         presenter = sessionPresenterFactory.newPresenterEditor();
         screenPanelView.setWidget(presenter.getView());
@@ -296,6 +306,7 @@ public class SessionDiagramEditorScreen {
                       session,
                       new ScreenPresenterCallback(callback));
         expressionEditor.init(presenter);
+        openDock(session);
     }
 
     @OnOpen
@@ -319,7 +330,18 @@ public class SessionDiagramEditorScreen {
 
     @OnClose
     public void onClose() {
+        destroyDock();
         destroySession();
+    }
+
+    void openDock(final AbstractClientFullSession session) {
+        decisionNavigatorDock.open();
+        decisionNavigatorDock.setupContent(session.getCanvasHandler());
+    }
+
+    void destroyDock() {
+        decisionNavigatorDock.close();
+        decisionNavigatorDock.resetContent();
     }
 
     @WorkbenchMenu
@@ -333,7 +355,7 @@ public class SessionDiagramEditorScreen {
         }
     }
 
-    private void destroySession() {
+    void destroySession() {
         presenter.destroy();
     }
 
@@ -390,7 +412,7 @@ public class SessionDiagramEditorScreen {
                                                                      this.title));
     }
 
-    private AbstractClientFullSession newSession(final Diagram diagram) {
+    AbstractClientFullSession newSession(final Diagram diagram) {
         return (AbstractClientFullSession) sessionManager.getSessionFactory(diagram,
                                                                             ClientFullSession.class).newSession();
     }
@@ -421,7 +443,7 @@ public class SessionDiagramEditorScreen {
         }
     }
 
-    private void OnEditExpressionEvent(final @Observes EditExpressionEvent event) {
+    private void onEditExpressionEvent(final @Observes EditExpressionEvent event) {
         if (isSameSession(event.getSession())) {
             sessionCommandManager.execute((AbstractCanvasHandler) sessionManager.getCurrentSession().getCanvasHandler(),
                                           new NavigateToExpressionEditorCommand(expressionEditor,

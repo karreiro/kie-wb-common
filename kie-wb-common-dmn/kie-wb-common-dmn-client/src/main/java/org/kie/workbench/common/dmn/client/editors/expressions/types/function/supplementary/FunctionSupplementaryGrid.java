@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javax.enterprise.event.Event;
+
 import com.ait.lienzo.shared.core.types.EventPropagationMode;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.kie.workbench.common.dmn.api.definition.HasExpression;
@@ -36,6 +38,7 @@ import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.HasListSel
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.ListSelectorView;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.DMNGridData;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.DMNGridRow;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellTuple;
 import org.kie.workbench.common.dmn.client.widgets.layer.DMNGridLayer;
 import org.kie.workbench.common.dmn.client.widgets.panel.DMNGridPanel;
@@ -60,6 +63,7 @@ public class FunctionSupplementaryGrid extends BaseExpressionGrid<Context, Conte
                                      final DMNGridLayer gridLayer,
                                      final SessionManager sessionManager,
                                      final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+                                     final Event<ExpressionEditorChanged> editorSelectedEvent,
                                      final Supplier<ExpressionEditorDefinitions> expressionEditorDefinitionsSupplier,
                                      final CellEditorControlsView.Presenter cellEditorControls,
                                      final TranslationService translationService,
@@ -78,6 +82,7 @@ public class FunctionSupplementaryGrid extends BaseExpressionGrid<Context, Conte
               new ContextGridRenderer(true),
               sessionManager,
               sessionCommandManager,
+              editorSelectedEvent,
               cellEditorControls,
               translationService,
               true);

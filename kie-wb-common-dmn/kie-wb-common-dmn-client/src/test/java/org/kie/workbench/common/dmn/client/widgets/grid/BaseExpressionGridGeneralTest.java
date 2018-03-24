@@ -33,6 +33,7 @@ import org.kie.workbench.common.dmn.api.definition.v1_1.LiteralExpression;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.BaseUIModelMapper;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.DMNGridColumn;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.DMNGridRow;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.uberfire.ext.wires.core.grids.client.model.GridColumn;
@@ -48,6 +49,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -76,6 +78,7 @@ public class BaseExpressionGridGeneralTest extends BaseExpressionGridTest {
                                       renderer,
                                       sessionManager,
                                       sessionCommandManager,
+                                      editorSelectedEvent,
                                       cellEditorControls,
                                       translationService,
                                       false) {
@@ -165,9 +168,12 @@ public class BaseExpressionGridGeneralTest extends BaseExpressionGridTest {
 
     @Test
     public void testSelect() {
+        doNothing().when(editorSelectedEvent).fire(any());
+
         grid.select();
 
         verify(grid).selectFirstCell();
+        verify(editorSelectedEvent).fire(any(ExpressionEditorChanged.class));
     }
 
     @Test

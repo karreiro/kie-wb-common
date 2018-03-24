@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.enterprise.event.Event;
+
 import com.ait.lienzo.shared.core.types.EventPropagationMode;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.kie.workbench.common.dmn.api.definition.HasExpression;
@@ -33,6 +35,7 @@ import org.kie.workbench.common.dmn.client.widgets.grid.controls.container.CellE
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.HasListSelectorControl;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.ListSelectorView;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.DMNGridRow;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellTuple;
 import org.kie.workbench.common.dmn.client.widgets.layer.DMNGridLayer;
 import org.kie.workbench.common.dmn.client.widgets.panel.DMNGridPanel;
@@ -56,6 +59,7 @@ public class LiteralExpressionGrid extends BaseExpressionGrid<LiteralExpression,
                                  final DMNGridLayer gridLayer,
                                  final SessionManager sessionManager,
                                  final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
+                                 final Event<ExpressionEditorChanged> editorSelectedEvent,
                                  final CellEditorControlsView.Presenter cellEditorControls,
                                  final TranslationService translationService,
                                  final ListSelectorView.Presenter listSelector,
@@ -69,6 +73,7 @@ public class LiteralExpressionGrid extends BaseExpressionGrid<LiteralExpression,
               new LiteralExpressionGridRenderer(isNested),
               sessionManager,
               sessionCommandManager,
+              editorSelectedEvent,
               cellEditorControls,
               translationService,
               isNested);

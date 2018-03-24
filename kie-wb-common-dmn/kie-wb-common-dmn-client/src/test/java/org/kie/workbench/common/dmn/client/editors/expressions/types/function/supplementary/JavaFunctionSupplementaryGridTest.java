@@ -28,6 +28,7 @@ public class JavaFunctionSupplementaryGridTest extends BaseFunctionSupplementary
                                                 gridLayer,
                                                 sessionManager,
                                                 sessionCommandManager,
+                                                editorSelectedEvent,
                                                 expressionEditorDefinitionsSupplier,
                                                 cellEditorControls,
                                                 translationService,

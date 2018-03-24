@@ -28,6 +28,7 @@ public class PMMLFunctionSupplementaryGridTest extends BaseFunctionSupplementary
                                                 gridLayer,
                                                 sessionManager,
                                                 sessionCommandManager,
+                                                editorSelectedEvent,
                                                 expressionEditorDefinitionsSupplier,
                                                 cellEditorControls,
                                                 translationService,

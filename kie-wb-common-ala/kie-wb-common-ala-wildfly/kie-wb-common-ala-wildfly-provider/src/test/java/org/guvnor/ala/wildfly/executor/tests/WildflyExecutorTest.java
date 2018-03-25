@@ -53,6 +53,7 @@ import org.guvnor.ala.wildfly.service.WildflyRuntimeManager;
 import org.jboss.arquillian.junit.InSequence;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -65,6 +66,7 @@ import static org.junit.Assert.*;
  * Test the Wildfly Provider by starting a docker image of wildfly and deploying
  * an application there.
  */
+@Ignore
 @RunWith(ArquillianConditionalRunner.class)
 @RequiresNotWindows
 public class WildflyExecutorTest {

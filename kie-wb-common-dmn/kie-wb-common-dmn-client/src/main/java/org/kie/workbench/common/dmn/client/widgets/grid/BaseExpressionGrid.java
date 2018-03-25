@@ -22,6 +22,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import javax.enterprise.event.Event;
+
 import com.ait.lienzo.client.core.event.INodeXYEvent;
 import com.ait.lienzo.client.core.event.NodeMouseDoubleClickHandler;
 import com.ait.lienzo.client.core.shape.Group;
@@ -43,6 +45,7 @@ import org.kie.workbench.common.dmn.client.widgets.grid.controls.container.CellE
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.ListSelectorView;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.BaseUIModelMapper;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.DMNGridData;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellTuple;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellValueTuple;
 import org.kie.workbench.common.dmn.client.widgets.layer.DMNGridLayer;
@@ -92,6 +95,7 @@ public abstract class BaseExpressionGrid<E extends Expression, M extends BaseUIM
     protected final ListSelectorView.Presenter listSelector;
 
     protected final TranslationService translationService;
+    protected final Event<ExpressionEditorChanged> editorSelectedEvent;
 
     protected M uiModelMapper;
 
@@ -109,6 +113,7 @@ public abstract class BaseExpressionGrid<E extends Expression, M extends BaseUIM
                               final SessionManager sessionManager,
                               final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
                               final CanvasCommandFactory<AbstractCanvasHandler> canvasCommandFactory,
+                              final Event<ExpressionEditorChanged> editorSelectedEvent,
                               final CellEditorControlsView.Presenter cellEditorControls,
                               final ListSelectorView.Presenter listSelector,
                               final TranslationService translationService,
@@ -126,6 +131,7 @@ public abstract class BaseExpressionGrid<E extends Expression, M extends BaseUIM
              sessionManager,
              sessionCommandManager,
              canvasCommandFactory,
+             editorSelectedEvent,
              cellEditorControls,
              listSelector,
              translationService,
@@ -145,6 +151,7 @@ public abstract class BaseExpressionGrid<E extends Expression, M extends BaseUIM
                               final SessionManager sessionManager,
                               final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
                               final CanvasCommandFactory<AbstractCanvasHandler> canvasCommandFactory,
+                              final Event<ExpressionEditorChanged> editorSelectedEvent,
                               final CellEditorControlsView.Presenter cellEditorControls,
                               final ListSelectorView.Presenter listSelector,
                               final TranslationService translationService,
@@ -161,6 +168,7 @@ public abstract class BaseExpressionGrid<E extends Expression, M extends BaseUIM
         this.sessionManager = sessionManager;
         this.sessionCommandManager = sessionCommandManager;
         this.canvasCommandFactory = canvasCommandFactory;
+        this.editorSelectedEvent = editorSelectedEvent;
         this.cellEditorControls = cellEditorControls;
         this.listSelector = listSelector;
         this.translationService = translationService;
@@ -355,8 +363,13 @@ public abstract class BaseExpressionGrid<E extends Expression, M extends BaseUIM
 
     @Override
     public void select() {
+        fireExpressionEditorChanged();
         selectFirstCell();
         super.select();
+    }
+
+    private void fireExpressionEditorChanged() {
+        editorSelectedEvent.fire(new ExpressionEditorChanged());
     }
 
     @Override

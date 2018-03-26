@@ -32,7 +32,6 @@ import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.graph.Node;
-import org.kie.workbench.common.stunner.core.graph.util.GraphUtils;
 import org.uberfire.client.annotations.DefaultPosition;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
@@ -113,20 +112,16 @@ public class DecisionNavigatorPresenter {
         refreshTreeView();
     }
 
-    public void addElement(final Element<?> element) {
+    public void addOrUpdateElement(final Element<?> element) {
+        treePresenter.addOrUpdateItem(makeItem(element));
+    }
 
-        final Element parentElement = getParentElement(element);
-        final DecisionNavigatorItem parent = makeItem(parentElement);
-        final DecisionNavigatorItem item = makeItem(element);
-
-        treePresenter.addOrUpdateItem(parent, item);
+    public void updateElement(final Element<?> element) {
+        treePresenter.updateItem(makeItem(element));
     }
 
     public void removeElement(final Element<?> element) {
-
-        final DecisionNavigatorItem item = makeItem(element);
-
-        treePresenter.remove(item);
+        treePresenter.remove(makeItem(element));
     }
 
     public void removeAllElements() {
@@ -153,10 +148,6 @@ public class DecisionNavigatorPresenter {
     protected Graph getGraph() {
         final Diagram diagram = handler.getDiagram();
         return diagram.getGraph();
-    }
-
-    Element<?> getParentElement(final Element<?> element) {
-        return GraphUtils.getParent((Node<?, ? extends Edge>) element);
     }
 
     DecisionNavigatorItem makeItem(final Element<?> element) {

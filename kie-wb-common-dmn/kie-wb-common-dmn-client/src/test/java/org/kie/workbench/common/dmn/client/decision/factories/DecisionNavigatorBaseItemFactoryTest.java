@@ -17,6 +17,7 @@
 package org.kie.workbench.common.dmn.client.decision.factories;
 
 import java.util.List;
+import java.util.TreeSet;
 
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
@@ -104,6 +105,7 @@ public class DecisionNavigatorBaseItemFactoryTest {
 
         final String itemUUID = "itemUUID";
         final String childUUID = "childUUID";
+        final String parentUUID = "parentUUID";
         final String label = "label";
         final Command onClick = mock(Command.class);
         final DecisionNavigatorItem child = new DecisionNavigatorItem(childUUID);
@@ -113,14 +115,39 @@ public class DecisionNavigatorBaseItemFactoryTest {
         doReturn(label).when(factory).getLabel(node);
         doReturn(onClick).when(factory).makeOnClickCommand(node);
         doReturn(nestedItems).when(factory).makeNestedItems(node);
+        doReturn(parentUUID).when(factory).parentUUID(node);
 
         final DecisionNavigatorItem item = factory.makeItem(node, ITEM);
 
         assertEquals(itemUUID, item.getUUID());
         assertEquals(label, item.getLabel());
         assertEquals(onClick, item.getOnClick());
-        assertEquals(nestedItems, item.getChildren());
-        assertEquals(singletonList(item), child.getParents());
+        assertEquals(parentUUID, item.getParentUUID());
+        assertEquals(asTreeSet(child), item.getChildren());
+    }
+
+    @Test
+    public void testParentUUIDWhenElementIsNotNull() {
+
+        final Element element = mock(Element.class);
+        final String expectedUUID = "123";
+
+        when(element.getUUID()).thenReturn(expectedUUID);
+        doReturn(element).when(factory).getParentElement(node);
+
+        final String actualUUID = factory.parentUUID(node);
+
+        assertEquals(expectedUUID, actualUUID);
+    }
+
+    @Test
+    public void testParentUUIDWhenElementIsNull() {
+
+        doReturn(null).when(factory).getParentElement(node);
+
+        final String actualUUID = factory.parentUUID(node);
+
+        assertEquals("", actualUUID);
     }
 
     @Test
@@ -273,5 +300,11 @@ public class DecisionNavigatorBaseItemFactoryTest {
         final List<DecisionNavigatorItem> nestedItems = factory.makeNestedItems(node);
 
         assertEquals(emptyList(), nestedItems);
+    }
+
+    private TreeSet<DecisionNavigatorItem> asTreeSet(final DecisionNavigatorItem child) {
+        return new TreeSet<DecisionNavigatorItem>() {{
+            add(child);
+        }};
     }
 }

@@ -80,8 +80,9 @@ public class DecisionNavigatorNestedItemFactory {
         final DecisionNavigatorItem.Type type = getType(node);
         final String label = getLabel(node);
         final Command onClick = makeOnClickCommand(node);
+        final String parentUUID = node.getUUID();
 
-        return new DecisionNavigatorItem(uuid, label, type, onClick);
+        return new DecisionNavigatorItem(uuid, label, type, onClick, parentUUID);
     }
 
     public boolean hasNestedElement(final Node<View, Edge> node) {

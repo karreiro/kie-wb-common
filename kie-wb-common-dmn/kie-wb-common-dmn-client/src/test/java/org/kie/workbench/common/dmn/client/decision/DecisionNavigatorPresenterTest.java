@@ -192,20 +192,29 @@ public class DecisionNavigatorPresenterTest {
     }
 
     @Test
-    public void testAddElement() {
+    public void testAddOrUpdateElement() {
 
-        final Element parentElement = mock(Element.class);
         final Element element = mock(Element.class);
-        final DecisionNavigatorItem parentItem = mock(DecisionNavigatorItem.class);
         final DecisionNavigatorItem item = mock(DecisionNavigatorItem.class);
 
-        doReturn(parentElement).when(presenter).getParentElement(element);
-        doReturn(parentItem).when(presenter).makeItem(parentElement);
         doReturn(item).when(presenter).makeItem(element);
 
-        presenter.addElement(element);
+        presenter.addOrUpdateElement(element);
 
-        verify(treePresenter).addOrUpdateItem(parentItem, item);
+        verify(treePresenter).addOrUpdateItem(item);
+    }
+
+    @Test
+    public void testUpdateElement() {
+
+        final Element element = mock(Element.class);
+        final DecisionNavigatorItem item = mock(DecisionNavigatorItem.class);
+
+        doReturn(item).when(presenter).makeItem(element);
+
+        presenter.updateElement(element);
+
+        verify(treePresenter).updateItem(item);
     }
 
     @Test

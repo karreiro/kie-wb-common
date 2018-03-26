@@ -18,8 +18,11 @@ package org.kie.workbench.common.dmn.client.decision.tree;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.TreeSet;
 
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.junit.Before;
@@ -28,11 +31,13 @@ import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem;
 import org.mockito.Mock;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.ITEM;
 import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.ROOT;
 import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.TABLE;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -81,33 +86,158 @@ public class DecisionNavigatorTreePresenterTest {
     }
 
     @Test
+    public void testAddOrUpdateItemWhenItemIsNotChanged() {
+
+        final DecisionNavigatorItem item = mock(DecisionNavigatorItem.class);
+
+        doReturn(true).when(presenter).hasParent(item);
+        doReturn(false).when(presenter).isChanged(item);
+
+        presenter.addOrUpdateItem(item);
+
+        verify(view, never()).hasItem(any());
+        verify(presenter, never()).updateItem(item);
+        verify(presenter, never()).addItem(item);
+    }
+
+    @Test
+    public void testAddOrUpdateItemWhenItemDoesNotHaveParent() {
+
+        final DecisionNavigatorItem item = mock(DecisionNavigatorItem.class);
+
+        doReturn(false).when(presenter).hasParent(item);
+        doReturn(true).when(presenter).isChanged(item);
+
+        presenter.addOrUpdateItem(item);
+
+        verify(view, never()).hasItem(any());
+        verify(presenter, never()).updateItem(item);
+        verify(presenter, never()).addItem(item);
+    }
+
+    @Test
     public void testAddOrUpdateItemWhenViewHasTheItem() {
 
-        final DecisionNavigatorItem parent = mock(DecisionNavigatorItem.class);
         final DecisionNavigatorItem item = mock(DecisionNavigatorItem.class);
 
         when(view.hasItem(item)).thenReturn(true);
+        doReturn(true).when(presenter).hasParent(item);
+        doReturn(true).when(presenter).isChanged(item);
+        doNothing().when(presenter).updateItem(any());
 
-        presenter.addOrUpdateItem(parent, item);
+        presenter.addOrUpdateItem(item);
 
-        verify(presenter).index(asList(parent, item));
-        verify(view).update(item);
-        verify(view, never()).addItem(parent, item);
+        verify(presenter).updateItem(item);
+        verify(presenter, never()).addItem(any());
     }
 
     @Test
     public void testAddOrUpdateItemWhenViewDoesNotHaveTheItem() {
 
-        final DecisionNavigatorItem parent = mock(DecisionNavigatorItem.class);
         final DecisionNavigatorItem item = mock(DecisionNavigatorItem.class);
 
         when(view.hasItem(item)).thenReturn(false);
+        doReturn(true).when(presenter).hasParent(item);
+        doReturn(true).when(presenter).isChanged(item);
+        doNothing().when(presenter).addItem(any());
 
-        presenter.addOrUpdateItem(parent, item);
+        presenter.addOrUpdateItem(item);
 
-        verify(presenter).index(asList(parent, item));
-        verify(view).addItem(parent, item);
-        verify(view, never()).update(item);
+        verify(presenter).addItem(item);
+        verify(presenter, never()).updateItem(any());
+    }
+
+    @Test
+    public void testHasParentWhenItemHasParent() {
+
+        final String parentUUID = "parentUUID";
+        final DecisionNavigatorItem item = mock(DecisionNavigatorItem.class);
+        final DecisionNavigatorItem parent = mock(DecisionNavigatorItem.class);
+        final Map<String, DecisionNavigatorItem> indexedItems = new HashMap<String, DecisionNavigatorItem>() {{
+            put(parentUUID, parent);
+        }};
+
+        when(item.getParentUUID()).thenReturn(parentUUID);
+        doReturn(indexedItems).when(presenter).getIndexedItems();
+
+        final boolean hasParent = presenter.hasParent(item);
+
+        assertTrue(hasParent);
+    }
+
+    @Test
+    public void testHasParentWhenItemDoesNotHaveParent() {
+
+        final DecisionNavigatorItem item = mock(DecisionNavigatorItem.class);
+        final Map<String, DecisionNavigatorItem> indexedItems = new HashMap<>();
+
+        doReturn(indexedItems).when(presenter).getIndexedItems();
+
+        final boolean hasParent = presenter.hasParent(item);
+
+        assertFalse(hasParent);
+    }
+
+    @Test
+    public void testIsChangedWhenItemIsUpdated() {
+
+        final String uuid = "uuid";
+        final DecisionNavigatorItem item1 = new DecisionNavigatorItem(uuid, "Node0", null, null, null);
+        final DecisionNavigatorItem item2 = new DecisionNavigatorItem(uuid, "NodeJS", null, null, null);
+        final Map<String, DecisionNavigatorItem> indexedItems = new HashMap<String, DecisionNavigatorItem>() {{
+            put(uuid, item2);
+        }};
+
+        doReturn(indexedItems).when(presenter).getIndexedItems();
+
+        final boolean isChanged = presenter.isChanged(item1);
+
+        assertTrue(isChanged);
+    }
+
+    @Test
+    public void testIsChangedWhenItemIsNotUpdated() {
+
+        final String uuid = "uuid";
+        final DecisionNavigatorItem item1 = new DecisionNavigatorItem(uuid, "Node0", null, null, null);
+        final DecisionNavigatorItem item2 = new DecisionNavigatorItem(uuid, "Node0", null, null, null);
+        final Map<String, DecisionNavigatorItem> indexedItems = new HashMap<String, DecisionNavigatorItem>() {{
+            put(uuid, item2);
+        }};
+
+        doReturn(indexedItems).when(presenter).getIndexedItems();
+
+        final boolean isChanged = presenter.isChanged(item1);
+
+        assertFalse(isChanged);
+    }
+
+    @Test
+    public void testAddItem() {
+
+        final DecisionNavigatorItem item = mock(DecisionNavigatorItem.class);
+        final DecisionNavigatorItem nextItem = mock(DecisionNavigatorItem.class);
+
+        doReturn(nextItem).when(presenter).nextItem(item);
+
+        presenter.addItem(item);
+
+        verify(presenter).index(item);
+        verify(view).addItem(item, nextItem);
+    }
+
+    @Test
+    public void testUpdateItem() {
+
+        final DecisionNavigatorItem item = mock(DecisionNavigatorItem.class);
+        final DecisionNavigatorItem nextItem = mock(DecisionNavigatorItem.class);
+
+        doReturn(nextItem).when(presenter).nextItem(item);
+
+        presenter.updateItem(item);
+
+        verify(presenter).index(item);
+        verify(view).update(item, nextItem);
     }
 
     @Test
@@ -117,21 +247,17 @@ public class DecisionNavigatorTreePresenterTest {
 
         presenter.remove(item);
 
+        verify(presenter).unIndex(item);
         verify(view).remove(item);
     }
 
     @Test
     public void testRemoveAllItems() {
 
-        final DecisionNavigatorItem item = mock(DecisionNavigatorItem.class);
-
-        doReturn(item).when(presenter).findRoot();
-
         presenter.removeAllItems();
 
-        verify(view).removeChildren(item);
+        verify(view).clean();
         verify(indexedItems).clear();
-        verify(presenter).index(item);
     }
 
     @Test
@@ -167,6 +293,23 @@ public class DecisionNavigatorTreePresenterTest {
     }
 
     @Test
+    public void testNextItem() {
+
+        final String parentUUID = "parentUUID";
+        final DecisionNavigatorItem item1 = new DecisionNavigatorItem("item1", "AAA", null, null, parentUUID);
+        final DecisionNavigatorItem item2 = new DecisionNavigatorItem("item2", "BBB", null, null, parentUUID);
+        final DecisionNavigatorItem item3 = new DecisionNavigatorItem("item3", "CCC", null, null, parentUUID);
+        final DecisionNavigatorItem parent = mock(DecisionNavigatorItem.class);
+        final TreeSet<DecisionNavigatorItem> children = spy(asTreeSet(item1, item2, item3));
+
+        when(parent.getChildren()).thenReturn(children);
+        when(indexedItems.get(parentUUID)).thenReturn(parent);
+        doReturn(children).when(parent).getChildren();
+
+        assertEquals(item3, presenter.nextItem(item2));
+    }
+
+    @Test
     public void testListIndex() {
 
         final DecisionNavigatorItem item1 = mock(DecisionNavigatorItem.class);
@@ -185,16 +328,35 @@ public class DecisionNavigatorTreePresenterTest {
         final DecisionNavigatorItem item = mock(DecisionNavigatorItem.class);
         final DecisionNavigatorItem child1 = mock(DecisionNavigatorItem.class);
         final DecisionNavigatorItem child2 = mock(DecisionNavigatorItem.class);
-        final List<DecisionNavigatorItem> children = Arrays.asList(child1, child2);
+        final DecisionNavigatorItem parent = mock(DecisionNavigatorItem.class);
+        final TreeSet<DecisionNavigatorItem> children = asTreeSet(child1, child2);
         final String uuid = "uuid";
 
+        doReturn(Optional.of(parent)).when(presenter).parent(item);
         when(item.getUUID()).thenReturn(uuid);
         when(item.getChildren()).thenReturn(children);
 
         presenter.index(item);
 
+        verify(parent).addChild(item);
         verify(indexedItems).put(uuid, item);
         verify(presenter).index(children);
+    }
+
+    @Test
+    public void testUnIndex() {
+
+        final DecisionNavigatorItem item = mock(DecisionNavigatorItem.class);
+        final DecisionNavigatorItem parent = mock(DecisionNavigatorItem.class);
+        final String uuid = "uuid";
+
+        doReturn(Optional.of(parent)).when(presenter).parent(item);
+        when(item.getUUID()).thenReturn(uuid);
+
+        presenter.unIndex(item);
+
+        verify(parent).removeChild(item);
+        verify(indexedItems).remove(uuid);
     }
 
     @Test
@@ -213,5 +375,11 @@ public class DecisionNavigatorTreePresenterTest {
         final DecisionNavigatorItem actualRoot = presenter.findRoot();
 
         assertEquals(expectedRoot, actualRoot);
+    }
+
+    private TreeSet<DecisionNavigatorItem> asTreeSet(final DecisionNavigatorItem... items) {
+        return new TreeSet<DecisionNavigatorItem>() {{
+            addAll(Arrays.asList(items));
+        }};
     }
 }

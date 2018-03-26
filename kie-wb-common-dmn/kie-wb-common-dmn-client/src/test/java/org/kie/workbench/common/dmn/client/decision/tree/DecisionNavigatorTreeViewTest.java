@@ -19,6 +19,7 @@ package org.kie.workbench.common.dmn.client.decision.tree;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.TreeSet;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwtmockito.GwtMockitoTestRunner;
@@ -42,7 +43,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.SUB_ITEM;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -111,41 +111,52 @@ public class DecisionNavigatorTreeViewTest {
     @Test
     public void testAddItemWhenElementExists() {
 
-        final String parentUUID = "123";
-        final String itemUUID = "456";
-        final DecisionNavigatorItem parent = makeItem(parentUUID);
-        final DecisionNavigatorItem item = makeItem(itemUUID);
+        final String itemUUID = "itemUUID";
+        final String nextItemUUID = "nextItemUUID";
+        final String parentUUID = "parentUUID";
+        final DecisionNavigatorItem item = makeItem(itemUUID, parentUUID);
+        final DecisionNavigatorItem nextItem = makeItem(nextItemUUID, parentUUID);
         final Element parentElement = mock(Element.class);
-        final Element itemElement = mock(Element.class);
-        final Element treeItemElement = mock(Element.class);
+        final Element parentChildrenElement = mock(Element.class);
+        final Element newChild = mock(Element.class);
+        final Element refChild = mock(Element.class);
         final DOMTokenList domTokenList = mock(DOMTokenList.class);
 
         parentElement.classList = domTokenList;
 
         doReturn(parentElement).when(treeView).findTreeItemElement(parentUUID);
-        doReturn(itemElement).when(treeView).findTreeItemChildrenElement(parentUUID);
-        doReturn(treeItemElement).when(treeView).makeTreeItemElement(item);
+        doReturn(parentChildrenElement).when(treeView).findTreeItemChildrenElement(parentUUID);
+        doReturn(newChild).when(treeView).makeTreeItemElement(item);
+        doReturn(refChild).when(treeView).findItem(nextItem);
 
-        treeView.addItem(parent, item);
+        treeView.addItem(item, nextItem);
 
         verify(domTokenList).add("parent-node");
-        verify(itemElement).appendChild(treeItemElement);
+        verify(parentChildrenElement).insertBefore(newChild, refChild);
     }
 
     @Test
-    public void testAddItemWhenElementDoesNotExist() {
+    public void testUpdate() {
 
-        final String parentUUID = "123";
-        final String itemUUID = "456";
-        final DecisionNavigatorItem parent = makeItem(parentUUID);
-        final DecisionNavigatorItem item = makeItem(itemUUID);
-        final Element itemElement = mock(Element.class);
+        final String itemUUID = "itemUUID";
+        final String nextItemUUID = "nextItemUUID";
+        final String parentUUID = "parentUUID";
+        final DecisionNavigatorItem item = makeItem(itemUUID, parentUUID);
+        final DecisionNavigatorItem nextItem = makeItem(nextItemUUID, parentUUID);
+        final Element parentElement = mock(Element.class);
+        final Element oldChild = mock(Element.class);
+        final Element newChild = mock(Element.class);
+        final Element refChild = mock(Element.class);
 
-        doReturn(itemElement).when(treeView).findTreeItemChildrenElement(parentUUID);
+        doReturn(parentElement).when(treeView).findTreeItemChildrenElement(parentUUID);
+        doReturn(oldChild).when(treeView).findItem(item);
+        doReturn(newChild).when(treeView).makeTreeItemElement(item);
+        doReturn(refChild).when(treeView).findItem(nextItem);
 
-        treeView.addItem(parent, item);
+        treeView.update(item, nextItem);
 
-        verify(itemElement, never()).appendChild(any());
+        verify(oldChild).remove();
+        verify(parentElement).insertBefore(newChild, refChild);
     }
 
     @Test
@@ -253,24 +264,6 @@ public class DecisionNavigatorTreeViewTest {
     }
 
     @Test
-    public void testUpdate() {
-
-        final DecisionNavigatorItem item = makeItem("uuid");
-        final Element oldElement = mock(Element.class);
-        final Element newElement = mock(Element.class);
-        final Node node = mock(Node.class);
-
-        oldElement.parentNode = node;
-
-        doReturn(oldElement).when(treeView).findItem(item);
-        doReturn(newElement).when(treeView).makeTreeItemElement(item);
-
-        treeView.update(item);
-
-        verify(node).replaceChild(newElement, oldElement);
-    }
-
-    @Test
     public void testRemove() {
 
         final DecisionNavigatorItem item = makeItem("uuid");
@@ -281,25 +274,6 @@ public class DecisionNavigatorTreeViewTest {
         treeView.remove(item);
 
         verify(element).remove();
-    }
-
-    @Test
-    public void testRemoveChildren() {
-
-        final String uuid = "uuid";
-        final DecisionNavigatorItem item = makeItem(uuid);
-        final Element itemElement = mock(Element.class);
-        final Element itemChildrenElement = mock(Element.class);
-        final Element emptyElement = mock(Element.class);
-
-        doReturn(itemElement).when(treeView).findTreeItemElement(uuid);
-        doReturn(itemChildrenElement).when(treeView).findTreeItemChildrenElement(uuid);
-        doReturn(emptyElement).when(treeView).createElement("ul");
-
-        treeView.removeChildren(item);
-
-        verify(itemChildrenElement).remove();
-        verify(itemElement).appendChild(emptyElement);
     }
 
     @Test
@@ -428,7 +402,9 @@ public class DecisionNavigatorTreeViewTest {
 
         final DecisionNavigatorItem item = mock(DecisionNavigatorItem.class);
         final DecisionNavigatorItem child = mock(DecisionNavigatorItem.class);
-        final List<DecisionNavigatorItem> children = Collections.singletonList(child);
+        final TreeSet<DecisionNavigatorItem> children = new TreeSet<DecisionNavigatorItem>() {{
+            add(child);
+        }};
         final org.jboss.errai.common.client.dom.DOMTokenList classList = mock(org.jboss.errai.common.client.dom.DOMTokenList.class);
         final HTMLElement element = mock(HTMLElement.class);
         final String cssClass = "css-class";
@@ -516,12 +492,17 @@ public class DecisionNavigatorTreeViewTest {
         final Command onClick = () -> {
         };
         final String expectedCSSClass = "kie-sub-item";
-        final String actualCSSClass = treeItem.getCSSClass(new DecisionNavigatorItem(uuid, label, subItem, onClick));
+        final String actualCSSClass = treeItem.getCSSClass(new DecisionNavigatorItem(uuid, label, subItem, onClick, null));
 
         assertEquals(expectedCSSClass, actualCSSClass);
     }
 
     private DecisionNavigatorItem makeItem(final String uuid) {
-        return new DecisionNavigatorItem(uuid);
+        return makeItem(uuid, null);
+    }
+
+    private DecisionNavigatorItem makeItem(final String uuid,
+                                           final String parentUUID) {
+        return new DecisionNavigatorItem(uuid, null, null, null, parentUUID);
     }
 }

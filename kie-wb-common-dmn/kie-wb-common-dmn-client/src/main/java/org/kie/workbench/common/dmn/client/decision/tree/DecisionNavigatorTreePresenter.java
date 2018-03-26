@@ -16,9 +16,12 @@
 
 package org.kie.workbench.common.dmn.client.decision.tree;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.TreeSet;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
@@ -27,7 +30,6 @@ import javax.inject.Inject;
 import org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem;
 import org.uberfire.client.mvp.UberElemental;
 
-import static java.util.Arrays.asList;
 import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.ROOT;
 
 @Dependent
@@ -57,32 +59,45 @@ public class DecisionNavigatorTreePresenter {
         setup(items);
     }
 
-    public void addOrUpdateItem(final DecisionNavigatorItem parent,
-                                final DecisionNavigatorItem item) {
+    public void addOrUpdateItem(final DecisionNavigatorItem item) {
 
-        index(asList(parent, item));
+        if (!isChanged(item) || !hasParent(item)) {
+            return;
+        }
 
         if (view.hasItem(item)) {
-            view.update(item);
+            updateItem(item);
         } else {
-            view.addItem(parent, item);
+            addItem(item);
         }
     }
 
+    public void updateItem(final DecisionNavigatorItem item) {
+        index(item);
+        view.update(item, nextItem(item));
+    }
+
+    public void addItem(final DecisionNavigatorItem item) {
+        index(item);
+        view.addItem(item, nextItem(item));
+    }
+
     public void remove(final DecisionNavigatorItem item) {
+        unIndex(item);
         view.remove(item);
     }
 
     public void removeAllItems() {
-        final DecisionNavigatorItem root = findRoot();
-
-        view.removeChildren(root);
+        view.clean();
         getIndexedItems().clear();
-        index(root);
     }
 
     public DecisionNavigatorItem getActiveParent() {
         return getIndexedItems().get(activeParentUUID);
+    }
+
+    public void setActiveParentUUID(final String activeParentUUID) {
+        this.activeParentUUID = activeParentUUID;
     }
 
     public void selectItem(final String uuid) {
@@ -93,17 +108,46 @@ public class DecisionNavigatorTreePresenter {
         view.deselect();
     }
 
-    public void setActiveParentUUID(final String activeParentUUID) {
-        this.activeParentUUID = activeParentUUID;
+    DecisionNavigatorItem nextItem(final DecisionNavigatorItem item) {
+
+        final DecisionNavigatorItem parent = getIndexedItems().get(item.getParentUUID());
+        final TreeSet<DecisionNavigatorItem> children = parent.getChildren();
+
+        return children.higher(item);
     }
 
-    void index(final List<DecisionNavigatorItem> items) {
+    void index(final Collection<DecisionNavigatorItem> items) {
         items.forEach(this::index);
     }
 
     void index(final DecisionNavigatorItem item) {
+
+        parent(item).ifPresent(parent -> parent.addChild(item));
+
         getIndexedItems().put(item.getUUID(), item);
+
         index(item.getChildren());
+    }
+
+    void unIndex(final DecisionNavigatorItem item) {
+
+        parent(item).ifPresent(parent -> parent.removeChild(item));
+
+        getIndexedItems().remove(item.getUUID());
+    }
+
+    boolean isChanged(final DecisionNavigatorItem item) {
+        final DecisionNavigatorItem currentItem = getIndexedItems().get(item.getUUID());
+        return !item.equals(currentItem);
+    }
+
+    boolean hasParent(final DecisionNavigatorItem item) {
+        return parent(item).isPresent();
+    }
+
+    Optional<DecisionNavigatorItem> parent(final DecisionNavigatorItem item) {
+        final DecisionNavigatorItem parent = getIndexedItems().get(item.getParentUUID());
+        return Optional.ofNullable(parent);
     }
 
     DecisionNavigatorItem findRoot() {
@@ -131,16 +175,15 @@ public class DecisionNavigatorTreePresenter {
 
         void setup(final List<DecisionNavigatorItem> items);
 
-        void addItem(final DecisionNavigatorItem parent,
-                     final DecisionNavigatorItem item);
+        void addItem(final DecisionNavigatorItem item,
+                     final DecisionNavigatorItem nextItem);
+
+        void update(final DecisionNavigatorItem item,
+                    final DecisionNavigatorItem nextItem);
 
         boolean hasItem(final DecisionNavigatorItem item);
 
-        void update(final DecisionNavigatorItem item);
-
         void remove(final DecisionNavigatorItem item);
-
-        void removeChildren(final DecisionNavigatorItem item);
 
         void select(final String uuid);
 

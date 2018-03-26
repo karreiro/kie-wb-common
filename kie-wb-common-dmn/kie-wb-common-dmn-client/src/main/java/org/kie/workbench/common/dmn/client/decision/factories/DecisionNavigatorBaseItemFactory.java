@@ -18,6 +18,7 @@ package org.kie.workbench.common.dmn.client.decision.factories;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
@@ -37,6 +38,7 @@ import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
+import org.kie.workbench.common.stunner.core.graph.util.GraphUtils;
 import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 import org.uberfire.mvp.Command;
 
@@ -83,14 +85,27 @@ public class DecisionNavigatorBaseItemFactory {
         final String label = getLabel(node);
         final Command onClick = makeOnClickCommand(node);
         final List<DecisionNavigatorItem> nestedItems = makeNestedItems(node);
+        final String parentUUID = parentUUID(node);
 
-        final DecisionNavigatorItem item = new DecisionNavigatorItem(uuid, label, type, onClick, nestedItems);
-
-        nestedItems.forEach(nestedItem -> {
-            nestedItem.getParents().add(item);
-        });
+        final DecisionNavigatorItem item = new DecisionNavigatorItem(uuid, label, type, onClick, parentUUID);
+        nestedItems.forEach(item::addChild);
 
         return item;
+    }
+
+    String parentUUID(final Node<View, Edge> node) {
+
+        final Optional<? extends Element<?>> parentElement = Optional.ofNullable(getParentElement(node));
+
+        if (parentElement.isPresent()) {
+            return parentElement.get().getUUID();
+        }
+
+        return "";
+    }
+
+    Element<?> getParentElement(final Element<?> element) {
+        return GraphUtils.getParent((Node<?, ? extends Edge>) element);
     }
 
     Command makeOnClickCommand(final Node<View, Edge> node) {

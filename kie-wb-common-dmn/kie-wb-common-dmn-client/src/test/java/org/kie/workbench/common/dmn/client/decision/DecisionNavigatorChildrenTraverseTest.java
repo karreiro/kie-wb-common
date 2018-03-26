@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.junit.Before;
@@ -52,6 +52,9 @@ public class DecisionNavigatorChildrenTraverseTest {
 
     @Mock
     private Node<View, Edge> node;
+
+    @Mock
+    private Node<View, Edge> parent;
 
     @Mock
     private List<Node<View, Edge>> nodes;
@@ -100,86 +103,37 @@ public class DecisionNavigatorChildrenTraverseTest {
 
         final DecisionNavigatorChildrenTraverse.TraverseCallback traverseCallback = spy(traverse.makeTraverseCallback());
         final DecisionNavigatorItem item = makeItem("item");
-        final DecisionNavigatorItem parent1 = makeItem("parent1");
-        final DecisionNavigatorItem parent2 = makeItem("parent2");
-        final List<DecisionNavigatorItem> parentItems = Arrays.asList(parent1, parent2);
+        final DecisionNavigatorItem parentItem = makeItem("parent");
 
-        doReturn(parentItems).when(traverseCallback).findItems(nodes);
+        when(nodes.get(0)).thenReturn(parent);
         when(itemFactory.makeItem(node)).thenReturn(item);
+
+        doReturn(Optional.of(parentItem)).when(traverseCallback).findItem(parent);
 
         traverseCallback.startNodeTraversal(nodes, node);
 
-        assertEquals(item.getParents(), Arrays.asList(parent1, parent2));
-        assertEquals(parent1.getChildren(), Collections.singletonList(item));
-        assertEquals(parent2.getChildren(), Collections.singletonList(item));
+        verify(parentItem).addChild(item);
     }
 
     @Test
-    public void testFindItems() {
+    public void testFindItem() {
 
         final DecisionNavigatorChildrenTraverse.TraverseCallback traverseCallback = spy(traverse.makeTraverseCallback());
-        final Node<View, Edge> node1 = makeNode("123");
-        final Node<View, Edge> node2 = makeNode("456");
-        final Node<View, Edge> node3 = makeNode("789");
-        final List<Node<View, Edge>> nodes = Arrays.asList(node1, node2, node3);
         final DecisionNavigatorItem item1 = makeItem("123");
         final DecisionNavigatorItem item2 = makeItem("ABC");
         final DecisionNavigatorItem item3 = makeItem("456");
         final List<DecisionNavigatorItem> items = Arrays.asList(item1, item2, item3);
 
+        when(node.getUUID()).thenReturn("ABC");
         doReturn(items).when(traverseCallback).getItems();
 
-        final List<DecisionNavigatorItem> actualItems = traverseCallback.findItems(nodes);
-        final List<DecisionNavigatorItem> expectedItems = Arrays.asList(item1, item3);
+        final Optional<DecisionNavigatorItem> actualItem = traverseCallback.findItem(node);
+        final Optional<DecisionNavigatorItem> expectedItem = Optional.ofNullable(item2);
 
-        assertEquals(expectedItems, actualItems);
+        assertEquals(expectedItem, actualItem);
     }
 
     private DecisionNavigatorItem makeItem(final String uuid) {
-        return new DecisionNavigatorItem(uuid);
-    }
-
-    private Node<View, Edge> makeNode(final String uuid) {
-        return new Node<View, Edge>() {
-            @Override
-            public List<Edge> getInEdges() {
-                return null;
-            }
-
-            @Override
-            public List<Edge> getOutEdges() {
-                return null;
-            }
-
-            @Override
-            public String getUUID() {
-                return uuid;
-            }
-
-            @Override
-            public Set<String> getLabels() {
-                return null;
-            }
-
-            @Override
-            public View getContent() {
-                return null;
-            }
-
-            @Override
-            public void setContent(final View content) {
-
-            }
-
-            @Override
-            public Node<View, Edge> asNode() {
-                return null;
-            }
-
-            @Override
-            public Edge<View, Node> asEdge() {
-                return null;
-            }
-        };
+        return spy(new DecisionNavigatorItem(uuid));
     }
 }

@@ -18,14 +18,14 @@ package org.kie.workbench.common.dmn.client.decision;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import org.kie.workbench.common.dmn.client.decision.factories.DecisionNavigatorItemFactory;
 import org.kie.workbench.common.stunner.core.graph.Edge;
-import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.relationship.Child;
@@ -78,11 +78,10 @@ public class DecisionNavigatorChildrenTraverse {
 
             super.startNodeTraversal(parents, node);
 
+            final Node<View, Edge> parentNode = parents.get(0);
             final DecisionNavigatorItem item = itemFactory.makeItem(node);
-            final List<DecisionNavigatorItem> parentItems = findItems(parents);
 
-            item.getParents().addAll(parentItems);
-            parentItems.forEach(parentItem -> parentItem.getChildren().add(item));
+            findItem(parentNode).ifPresent(parent -> parent.addChild(item));
 
             return true;
         }
@@ -93,21 +92,12 @@ public class DecisionNavigatorChildrenTraverse {
             getItems().add(itemFactory.makeRoot(node));
         }
 
-        List<DecisionNavigatorItem> findItems(final List<Node<View, Edge>> nodes) {
-
-            final List<String> nodesUUIDs = nodesUUIDs(nodes);
+        Optional<DecisionNavigatorItem> findItem(final Node<View, Edge> node) {
 
             return getItems()
                     .stream()
-                    .filter(item -> nodesUUIDs.contains(item.getUUID()))
-                    .collect(Collectors.toList());
-        }
-
-        private List<String> nodesUUIDs(final List<Node<View, Edge>> nodes) {
-            return nodes
-                    .stream()
-                    .map(Element::getUUID)
-                    .collect(Collectors.toList());
+                    .filter(item -> item.getUUID().equals(node.getUUID()))
+                    .findFirst();
         }
     }
 }

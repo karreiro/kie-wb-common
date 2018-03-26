@@ -114,14 +114,14 @@ public class DecisionNavigatorObserverTest {
 
         observer.onCanvasElementAdded(new CanvasElementAddedEvent(canvasHandler, element));
 
-        verify(presenter).addElement(element);
+        verify(presenter).addOrUpdateElement(element);
     }
 
     @Test
     public void testOnCanvasElementAddedWhenPresenterIsNotPresent() {
         observer.onCanvasElementAdded(new CanvasElementAddedEvent(canvasHandler, element));
 
-        verify(presenter, never()).addElement(any());
+        verify(presenter, never()).addOrUpdateElement(any());
     }
 
     @Test
@@ -130,14 +130,14 @@ public class DecisionNavigatorObserverTest {
 
         observer.onCanvasElementUpdated(new CanvasElementUpdatedEvent(canvasHandler, element));
 
-        verify(presenter).addElement(element);
+        verify(presenter).addOrUpdateElement(element);
     }
 
     @Test
     public void testOnCanvasElementUpdatedWhenPresenterIsNotPresent() {
         observer.onCanvasElementUpdated(new CanvasElementUpdatedEvent(canvasHandler, element));
 
-        verify(presenter, never()).addElement(any());
+        verify(presenter, never()).addOrUpdateElement(any());
     }
 
     @Test
@@ -229,7 +229,7 @@ public class DecisionNavigatorObserverTest {
         observer.init(presenter);
         observer.onNestedElementAdded(new ExpressionEditorChanged());
 
-        verify(presenter).addElement(node);
+        verify(presenter).updateElement(node);
         verify(treePresenter).selectItem(uuid2);
         verify(treePresenter).selectItem(uuid3);
     }

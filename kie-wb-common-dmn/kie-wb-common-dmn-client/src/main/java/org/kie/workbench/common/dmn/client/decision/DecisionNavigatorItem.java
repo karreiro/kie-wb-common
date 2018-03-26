@@ -16,13 +16,12 @@
 
 package org.kie.workbench.common.dmn.client.decision;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
+import java.util.TreeSet;
 
 import org.uberfire.mvp.Command;
 
-public class DecisionNavigatorItem {
+public class DecisionNavigatorItem implements Comparable {
 
     private String uuid;
 
@@ -32,30 +31,20 @@ public class DecisionNavigatorItem {
 
     private Command onClick;
 
-    private List<DecisionNavigatorItem> children = new ArrayList<>();
+    private String parentUUID;
 
-    private List<DecisionNavigatorItem> parents = new ArrayList<>();
+    private TreeSet<DecisionNavigatorItem> children = new TreeSet<>();
 
     public DecisionNavigatorItem(final String uuid,
                                  final String label,
                                  final Type type,
                                  final Command onClick,
-                                 final List<DecisionNavigatorItem> children) {
+                                 final String parentUUID) {
         this.uuid = uuid;
         this.label = label;
         this.type = type;
         this.onClick = onClick;
-        this.children = children;
-    }
-
-    public DecisionNavigatorItem(final String uuid,
-                                 final String label,
-                                 final Type type,
-                                 final Command onClick) {
-        this.uuid = uuid;
-        this.label = label;
-        this.type = type;
-        this.onClick = onClick;
+        this.parentUUID = parentUUID;
     }
 
     public DecisionNavigatorItem(final String uuid) {
@@ -74,12 +63,17 @@ public class DecisionNavigatorItem {
         return type;
     }
 
-    public List<DecisionNavigatorItem> getChildren() {
+    public TreeSet<DecisionNavigatorItem> getChildren() {
         return children;
     }
 
-    public List<DecisionNavigatorItem> getParents() {
-        return parents;
+    public void removeChild(final DecisionNavigatorItem item) {
+        getChildren().removeIf(i -> i.getUUID().equals(item.getUUID()));
+    }
+
+    public void addChild(final DecisionNavigatorItem item) {
+        removeChild(item);
+        getChildren().add(item);
     }
 
     public void onClick() {
@@ -90,21 +84,53 @@ public class DecisionNavigatorItem {
         return onClick;
     }
 
+    public String getParentUUID() {
+        return parentUUID;
+    }
+
     @Override
     public boolean equals(final Object o) {
+
         if (this == o) {
             return true;
         }
+
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final DecisionNavigatorItem that = (DecisionNavigatorItem) o;
-        return Objects.equals(uuid, that.uuid);
+
+        final DecisionNavigatorItem item = (DecisionNavigatorItem) o;
+
+        return Objects.equals(uuid, item.uuid) &&
+                Objects.equals(label, item.label) &&
+                Objects.equals(parentUUID, item.parentUUID) &&
+                type == item.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid);
+        return Objects.hash(uuid, label, type, parentUUID);
+    }
+
+    @Override
+    public int compareTo(final Object o) {
+
+        if (o == null || getClass() != o.getClass()) {
+            return 1;
+        }
+
+        final DecisionNavigatorItem that = (DecisionNavigatorItem) o;
+
+        if (this.equals(that)) {
+            return 0;
+        } else {
+            return getOrderingName().compareTo(that.getOrderingName());
+        }
+    }
+
+    String getOrderingName() {
+        final String orderingLabel = getLabel() + getUUID();
+        return orderingLabel.toLowerCase();
     }
 
     public enum Type {

@@ -47,11 +47,11 @@ public class DecisionNavigatorObserver {
     }
 
     void onCanvasElementAdded(final @Observes CanvasElementAddedEvent event) {
-        getOptionalPresenter().ifPresent(p -> p.addElement(event.getElement()));
+        getOptionalPresenter().ifPresent(p -> p.addOrUpdateElement(event.getElement()));
     }
 
     void onCanvasElementUpdated(final @Observes CanvasElementUpdatedEvent event) {
-        getOptionalPresenter().ifPresent(p -> p.addElement(event.getElement()));
+        getOptionalPresenter().ifPresent(p -> p.addOrUpdateElement(event.getElement()));
     }
 
     void onCanvasElementRemoved(final @Observes CanvasElementRemovedEvent event) {
@@ -67,7 +67,7 @@ public class DecisionNavigatorObserver {
 
         final Node node = presenter.getGraph().getNode(getActiveParent().getUUID());
 
-        presenter.addElement(node);
+        presenter.updateElement(node);
 
         getActiveParent().getChildren().forEach(e -> {
             getTreePresenter().selectItem(e.getUUID());

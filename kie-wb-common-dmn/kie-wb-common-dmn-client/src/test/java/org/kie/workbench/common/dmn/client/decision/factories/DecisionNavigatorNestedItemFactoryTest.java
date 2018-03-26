@@ -78,7 +78,9 @@ public class DecisionNavigatorNestedItemFactoryTest {
         final String label = "label";
         final DecisionNavigatorItem.Type type = TABLE;
         final Command command = mock(Command.class);
+        final String parentUUID = "parentUUID";
 
+        when(node.getUUID()).thenReturn(parentUUID);
         doReturn(uuid).when(factory).getUUID(node);
         doReturn(label).when(factory).getLabel(node);
         doReturn(type).when(factory).getType(node);
@@ -90,6 +92,7 @@ public class DecisionNavigatorNestedItemFactoryTest {
         assertEquals(label, item.getLabel());
         assertEquals(type, item.getType());
         assertEquals(command, item.getOnClick());
+        assertEquals(parentUUID, item.getParentUUID());
     }
 
     @Test

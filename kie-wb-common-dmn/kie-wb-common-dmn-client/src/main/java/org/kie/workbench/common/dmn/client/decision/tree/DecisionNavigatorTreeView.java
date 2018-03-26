@@ -16,19 +16,20 @@
 
 package org.kie.workbench.common.dmn.client.decision.tree;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.Element;
 import elemental2.dom.HTMLDivElement;
 import elemental2.dom.HTMLElement;
 import elemental2.dom.HTMLUListElement;
-import elemental2.dom.Node;
 import elemental2.dom.Text;
 import org.jboss.errai.common.client.dom.elemental2.Elemental2DomUtil;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
@@ -89,19 +90,31 @@ public class DecisionNavigatorTreeView implements DecisionNavigatorTreePresenter
     }
 
     @Override
-    public void addItem(final DecisionNavigatorItem parent,
-                        final DecisionNavigatorItem item) {
+    public void addItem(final DecisionNavigatorItem item,
+                        final DecisionNavigatorItem nextItem) {
 
-        final String uuid = parent.getUUID();
-        final Optional<Element> parentElement = ofNullable(findTreeItemElement(uuid));
-        final Optional<Element> parentChildrenElement = ofNullable(findTreeItemChildrenElement(uuid));
+        final String uuid = item.getParentUUID();
+        final Element parentElement = findTreeItemElement(uuid);
+        final Element parentChildrenElement = findTreeItemChildrenElement(uuid);
+        final Element newChild = makeTreeItemElement(item);
+        final Element refChild = findItem(nextItem);
 
-        if (!parentElement.isPresent() || !parentChildrenElement.isPresent()) {
-            return;
-        }
+        parentElement.classList.add("parent-node");
+        parentChildrenElement.insertBefore(newChild, refChild);
+    }
 
-        parentElement.get().classList.add("parent-node");
-        parentChildrenElement.get().appendChild(makeTreeItemElement(item));
+    @Override
+    public void update(final DecisionNavigatorItem item,
+                       final DecisionNavigatorItem nextItem) {
+
+        final Element parentElement = findTreeItemChildrenElement(item.getParentUUID());
+        final Element oldChild = findItem(item);
+        final Element newChild = makeTreeItemElement(item);
+        final Element refChild = findItem(nextItem);
+
+        oldChild.remove();
+
+        parentElement.insertBefore(newChild, refChild);
     }
 
     @Override
@@ -110,30 +123,9 @@ public class DecisionNavigatorTreeView implements DecisionNavigatorTreePresenter
     }
 
     @Override
-    public void update(final DecisionNavigatorItem item) {
-
-        final Element oldItem = findItem(item);
-        final Element newItem = makeTreeItemElement(item);
-        final Node parentNode = oldItem.parentNode;
-
-        parentNode.replaceChild(newItem, oldItem);
-    }
-
-    @Override
     public void remove(final DecisionNavigatorItem item) {
-        findItem(item).remove();
-    }
-
-    @Override
-    public void removeChildren(final DecisionNavigatorItem item) {
-
-        final Element itemElement = findTreeItemElement(item.getUUID());
-        final Element itemChildrenElement = findTreeItemChildrenElement(item.getUUID());
-        final Element emptyElement = createElement("ul");
-
-        itemChildrenElement.remove();
-
-        itemElement.appendChild(emptyElement);
+        final Optional<Element> optionalElement = Optional.ofNullable(findItem(item));
+        optionalElement.ifPresent(Element::remove);
     }
 
     @Override
@@ -160,7 +152,7 @@ public class DecisionNavigatorTreeView implements DecisionNavigatorTreePresenter
         this.selectedElement = selectedElement;
     }
 
-    Element makeTree(final List<DecisionNavigatorItem> items) {
+    Element makeTree(final Collection<DecisionNavigatorItem> items) {
 
         final Element ulElement = createElement("ul");
 
@@ -171,8 +163,15 @@ public class DecisionNavigatorTreeView implements DecisionNavigatorTreePresenter
         return ulElement;
     }
 
-    Element findItem(final DecisionNavigatorItem item) {
-        return findTreeItemElement(item.getUUID());
+    Element findItem(final DecisionNavigatorItem decisionNavigatorItem) {
+
+        final Optional<DecisionNavigatorItem> item = Optional.ofNullable(decisionNavigatorItem);
+
+        if (item.isPresent()) {
+            return findTreeItemElement(item.get().getUUID());
+        }
+
+        return null;
     }
 
     Element makeTreeItemElement(final DecisionNavigatorItem item) {

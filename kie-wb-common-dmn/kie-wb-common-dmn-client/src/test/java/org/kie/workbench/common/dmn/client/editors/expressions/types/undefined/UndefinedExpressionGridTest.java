@@ -45,6 +45,7 @@ import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.HasListSel
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.HasListSelectorControl.ListSelectorTextItem;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.ListSelectorView;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.DMNGridData;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellTuple;
 import org.kie.workbench.common.dmn.client.widgets.layer.DMNGridLayer;
 import org.kie.workbench.common.dmn.client.widgets.panel.DMNGridPanel;
@@ -62,6 +63,7 @@ import org.uberfire.ext.wires.core.grids.client.model.impl.BaseGridCell;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.GridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.GridSelectionManager;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.impl.GridLayerRedrawManager;
+import org.uberfire.mocks.EventSourceMock;
 import org.uberfire.mvp.Command;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -142,6 +144,9 @@ public class UndefinedExpressionGridTest {
     @Mock
     private NodeMouseClickEvent mouseClickEvent;
 
+    @Mock
+    private EventSourceMock<ExpressionEditorChanged> editorSelectedEvent;
+
     @Captor
     private ArgumentCaptor<SetCellValueCommand> setCellValueCommandArgumentCaptor;
 
@@ -167,12 +172,14 @@ public class UndefinedExpressionGridTest {
                                                              sessionManager,
                                                              sessionCommandManager,
                                                              canvasCommandFactory,
+                                                             editorSelectedEvent,
                                                              cellEditorControls,
                                                              listSelector,
                                                              translationService,
                                                              expressionEditorDefinitionsSupplier);
 
         expression = definition.getModelClass();
+
         final ExpressionEditorDefinitions expressionEditorDefinitions = new ExpressionEditorDefinitions();
         expressionEditorDefinitions.add(definition);
         expressionEditorDefinitions.add(literalExpressionEditorDefinition);

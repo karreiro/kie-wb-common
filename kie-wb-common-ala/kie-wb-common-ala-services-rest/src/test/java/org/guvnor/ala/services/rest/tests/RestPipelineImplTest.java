@@ -89,6 +89,7 @@ import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.uberfire.commons.lifecycle.Disposable;
@@ -99,6 +100,7 @@ import static org.junit.Assert.*;
 /**
  * Test that shows how to work with the Pipeline
  */
+@Ignore
 @RunWith(Arquillian.class)
 public class RestPipelineImplTest {
 

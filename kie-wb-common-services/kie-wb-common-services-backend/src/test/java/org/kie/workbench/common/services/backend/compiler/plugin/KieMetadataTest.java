@@ -47,6 +47,7 @@ import org.uberfire.java.nio.file.Files;
 import org.uberfire.java.nio.file.Path;
 import org.uberfire.java.nio.file.Paths;
 
+@org.junit.Ignore
 public class KieMetadataTest {
 
     private Path mavenRepo;

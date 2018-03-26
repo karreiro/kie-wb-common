@@ -39,6 +39,7 @@ import org.kie.server.controller.client.exception.KieServerControllerHTTPClientE
 
 import static org.junit.Assert.*;
 
+@org.junit.Ignore
 @RunWith(Arquillian.class)
 public class StandaloneControllerIT extends AbstractControllerIT {
 

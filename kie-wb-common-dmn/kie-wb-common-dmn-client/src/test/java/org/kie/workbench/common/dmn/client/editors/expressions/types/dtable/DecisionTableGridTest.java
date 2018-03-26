@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javax.enterprise.event.Event;
+
 import com.ait.lienzo.test.LienzoMockitoTestRunner;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.junit.Before;
@@ -54,6 +56,7 @@ import org.kie.workbench.common.dmn.client.widgets.grid.columns.factory.TextBoxS
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.container.CellEditorControlsView;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.HasListSelectorControl;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.ListSelectorView;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellTuple;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellValueTuple;
 import org.kie.workbench.common.dmn.client.widgets.layer.DMNGridLayer;
@@ -81,6 +84,7 @@ import org.uberfire.ext.wires.core.grids.client.model.impl.BaseGridData;
 import org.uberfire.ext.wires.core.grids.client.model.impl.BaseHeaderMetaData;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.GridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.impl.GridLayerRedrawManager;
+import org.uberfire.mocks.EventSourceMock;
 import org.uberfire.mvp.Command;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -183,6 +187,9 @@ public class DecisionTableGridTest {
     @Mock
     private Command command;
 
+    @Mock
+    private EventSourceMock<ExpressionEditorChanged> editorSelectedEvent;
+
     @Captor
     private ArgumentCaptor<AddInputClauseCommand> addInputClauseCommandCaptor;
 
@@ -225,6 +232,7 @@ public class DecisionTableGridTest {
                                                             sessionManager,
                                                             sessionCommandManager,
                                                             canvasCommandFactory,
+                                                            editorSelectedEvent,
                                                             cellEditorControls,
                                                             listSelector,
                                                             translationService,

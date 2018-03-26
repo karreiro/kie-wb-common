@@ -42,6 +42,7 @@ import org.guvnor.ala.wildfly.access.WildflyClient;
 import org.guvnor.ala.wildfly.executor.tests.requirement.RequiresNotWindows;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.uberfire.java.nio.file.Path;
@@ -54,6 +55,7 @@ import static org.junit.Assert.*;
  * Test the Wildfly Provider by starting a docker image of wildfly and deploying
  * an application there.
  */
+@Ignore
 @RunWith(ArquillianConditionalRunner.class)
 @RequiresNotWindows
 public class WildflyRuntimeTest {

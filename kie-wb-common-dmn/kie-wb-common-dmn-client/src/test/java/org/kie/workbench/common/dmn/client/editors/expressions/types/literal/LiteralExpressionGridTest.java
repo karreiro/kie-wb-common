@@ -22,6 +22,8 @@ import java.util.Optional;
 
 import com.ait.lienzo.client.core.event.NodeMouseClickEvent;
 import com.ait.lienzo.client.core.event.NodeMouseClickHandler;
+import javax.enterprise.event.Event;
+
 import com.ait.lienzo.test.LienzoMockitoTestRunner;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.junit.Before;
@@ -44,6 +46,7 @@ import org.kie.workbench.common.dmn.client.widgets.grid.controls.container.CellE
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.HasListSelectorControl;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.ListSelectorView;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.DMNGridData;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellTuple;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellValueTuple;
 import org.kie.workbench.common.dmn.client.widgets.layer.DMNGridLayer;
@@ -67,6 +70,7 @@ import org.uberfire.ext.wires.core.grids.client.model.impl.BaseGridData;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.GridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.grid.impl.BaseGridWidget;
 import org.uberfire.ext.wires.core.grids.client.widget.layer.GridSelectionManager;
+import org.uberfire.mocks.EventSourceMock;
 import org.uberfire.mvp.Command;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -154,6 +158,10 @@ public class LiteralExpressionGridTest {
     @Mock
     private NodeMouseClickEvent mouseClickEvent;
 
+    @Mock
+    private EventSourceMock<ExpressionEditorChanged> editorSelectedEvent;
+
+
     private Optional<LiteralExpression> expression = Optional.empty();
 
     private Optional<HasName> hasName = Optional.empty();
@@ -173,6 +181,7 @@ public class LiteralExpressionGridTest {
                                                            sessionManager,
                                                            sessionCommandManager,
                                                            canvasCommandFactory,
+                                                           editorSelectedEvent,
                                                            cellEditorControls,
                                                            listSelector,
                                                            translationService);

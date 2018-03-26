@@ -16,6 +16,8 @@
 
 package org.kie.workbench.common.dmn.client.canvas.controls.toolbox;
 
+import java.util.Optional;
+
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.junit.Before;
 import org.junit.Test;

@@ -22,6 +22,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.ait.lienzo.client.core.event.NodeMouseClickHandler;
+import javax.enterprise.event.Event;
+
 import com.ait.lienzo.shared.core.types.EventPropagationMode;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.kie.workbench.common.dmn.api.definition.HasExpression;
@@ -38,6 +40,7 @@ import org.kie.workbench.common.dmn.client.widgets.grid.controls.container.CellE
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.HasListSelectorControl;
 import org.kie.workbench.common.dmn.client.widgets.grid.controls.list.ListSelectorView;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.DMNGridRow;
+import org.kie.workbench.common.dmn.client.widgets.grid.model.ExpressionEditorChanged;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellTuple;
 import org.kie.workbench.common.dmn.client.widgets.grid.model.GridCellValueTuple;
 import org.kie.workbench.common.dmn.client.widgets.layer.DMNGridLayer;
@@ -71,6 +74,7 @@ public class UndefinedExpressionGrid extends BaseExpressionGrid<Expression, Unde
                                    final SessionManager sessionManager,
                                    final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
                                    final CanvasCommandFactory<AbstractCanvasHandler> canvasCommandFactory,
+                                   final Event<ExpressionEditorChanged> editorSelectedEvent,
                                    final CellEditorControlsView.Presenter cellEditorControls,
                                    final ListSelectorView.Presenter listSelector,
                                    final TranslationService translationService,
@@ -88,6 +92,7 @@ public class UndefinedExpressionGrid extends BaseExpressionGrid<Expression, Unde
               sessionManager,
               sessionCommandManager,
               canvasCommandFactory,
+              editorSelectedEvent,
               cellEditorControls,
               listSelector,
               translationService,

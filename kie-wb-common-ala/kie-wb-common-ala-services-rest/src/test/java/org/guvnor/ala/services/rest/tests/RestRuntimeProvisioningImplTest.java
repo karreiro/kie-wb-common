@@ -67,6 +67,7 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Assume;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.uberfire.commons.lifecycle.Disposable;
@@ -76,6 +77,7 @@ import static org.junit.Assert.*;
 /**
  * Test that shows how to work with the Runtime Provisioning Service
  */
+@Ignore
 @RunWith(Arquillian.class)
 public class RestRuntimeProvisioningImplTest {
 

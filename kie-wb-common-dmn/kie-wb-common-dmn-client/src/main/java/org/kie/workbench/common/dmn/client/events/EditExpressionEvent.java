@@ -23,6 +23,7 @@ import org.kie.workbench.common.dmn.api.definition.HasExpression;
 import org.kie.workbench.common.dmn.api.definition.HasName;
 import org.kie.workbench.common.stunner.core.client.session.ClientSession;
 import org.kie.workbench.common.stunner.core.client.session.event.AbstractSessionEvent;
+import org.kie.workbench.common.stunner.core.graph.Node;
 
 @NonPortable
 public class EditExpressionEvent extends AbstractSessionEvent {

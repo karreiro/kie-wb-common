@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -136,8 +136,12 @@ public class DecisionNavigatorItem implements Comparable {
     public enum Type {
         ROOT,
         ITEM,
-        COLUMNS,
-        TABLE,
-        SUB_ITEM
+        CONTEXT,
+        DECISION_TABLE,
+        FUNCTION_DEFINITION,
+        INVOCATION,
+        LIST,
+        LITERAL_EXPRESSION,
+        RELATION
     }
 }

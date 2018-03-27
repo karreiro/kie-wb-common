@@ -22,8 +22,6 @@ import java.util.Optional;
 
 import com.ait.lienzo.client.core.event.NodeMouseClickEvent;
 import com.ait.lienzo.client.core.event.NodeMouseClickHandler;
-import javax.enterprise.event.Event;
-
 import com.ait.lienzo.test.LienzoMockitoTestRunner;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.junit.Before;
@@ -160,7 +158,6 @@ public class LiteralExpressionGridTest {
 
     @Mock
     private EventSourceMock<ExpressionEditorChanged> editorSelectedEvent;
-
 
     private Optional<LiteralExpression> expression = Optional.empty();
 

@@ -16,10 +16,14 @@
 
 [data-i18n-prefix="DecisionNavigatorTreeView."] {
 
+  hr {
+    margin: 0;
+  }
+
   /* ~ Tree ~ */
 
   [data-field="items"] {
-    padding: 0 3em;
+    padding: 1.5em 3em;
   }
 
   ul {
@@ -97,19 +101,47 @@
     }
 
     li.kie-item div > span:before {
-      content: "\f0c8";
+      content: "\f111";
     }
 
-    li.kie-sub-item div > span:before {
-      content: "\f16e";
+    li.kie-context div > span:before {
+      content: "\f192";
     }
 
-    li.kie-table div > span:before {
+    li.kie-decision-table div > span:before {
       content: "\f0ce";
     }
 
-    li.kie-columns div > span:before {
-      content: "\f0db";
+    li.kie-invocation div > span:before {
+      content: "\f0a1";
+    }
+
+    li.kie-list div > span:before {
+      content: "\f0ca";
+    }
+
+    li.kie-function-definition div > span:before {
+      content: "f ( )";
+      font-family: serif;
+      font-style: italic;
+      font-weight: bold;
+      font-size: 1.2em;
+      margin: -0.1em 0 0 -1.8em;
+    }
+
+    li.kie-literal-expression div > span:before {
+      content: "Σ";
+      font-family: sans-serif;
+      font-weight: bold;
+      font-size: 1.2em;
+      margin: 0 0 0 -1.15em;
+    }
+
+    li.kie-relation div > span:before {
+      content: "\f0c1";
+      font-size: 1.2em;
+      transform: rotate(-45deg);
+      margin: -0.15em 0 0 -1.45em;
     }
   }
 }

@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import com.ait.lienzo.client.core.event.NodeMouseClickHandler;
 import javax.enterprise.event.Event;
 
+import com.ait.lienzo.client.core.event.NodeMouseClickHandler;
 import com.ait.lienzo.shared.core.types.EventPropagationMode;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.kie.workbench.common.dmn.api.definition.HasExpression;

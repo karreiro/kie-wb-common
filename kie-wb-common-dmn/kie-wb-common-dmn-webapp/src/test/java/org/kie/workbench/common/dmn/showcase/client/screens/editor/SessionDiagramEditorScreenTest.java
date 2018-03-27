@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,8 +16,9 @@
 
 package org.kie.workbench.common.dmn.showcase.client.screens.editor;
 
+import java.util.function.Consumer;
+
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.client.decision.DecisionNavigatorDock;
@@ -26,16 +27,23 @@ import org.kie.workbench.common.dmn.showcase.client.perspectives.AuthoringPerspe
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenterFactory;
 import org.kie.workbench.common.stunner.client.widgets.views.session.ScreenPanelView;
+import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
+import org.kie.workbench.common.stunner.core.client.session.ClientFullSession;
+import org.kie.workbench.common.stunner.core.client.session.ClientSessionFactory;
 import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientFullSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.AbstractClientReadOnlySession;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.kie.workbench.common.stunner.core.diagram.Metadata;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.uberfire.mvp.Command;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -43,7 +51,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class SessionDiagramEditorScreenTest {
 
@@ -62,6 +69,15 @@ public class SessionDiagramEditorScreenTest {
     @Mock
     private ExpressionEditorView.Presenter expressionEditor;
 
+    @Mock
+    private SessionManager sessionManager;
+
+    @Mock
+    private ClientSessionFactory<ClientFullSession> sessionFactory;
+
+    @Captor
+    private ArgumentCaptor<Consumer<ClientFullSession>> clientFullSessionConsumer;
+
     private SessionDiagramEditorScreen editor;
 
     @Before
@@ -73,7 +89,7 @@ public class SessionDiagramEditorScreenTest {
         doReturn(presenter).when(presenter).displayNotifications(any());
         doNothing().when(presenter).open(any(), any(), any());
 
-        editor = spy(new SessionDiagramEditorScreen(null, null, null, null, null, sessionPresenterFactory, null, null, screenPanelView, null, expressionEditor, decisionNavigatorDock));
+        editor = spy(new SessionDiagramEditorScreen(null, null, null, sessionManager, null, sessionPresenterFactory, null, null, screenPanelView, null, expressionEditor, decisionNavigatorDock));
     }
 
     @Test
@@ -88,11 +104,17 @@ public class SessionDiagramEditorScreenTest {
 
         final Diagram diagram = mock(Diagram.class);
         final Command callback = mock(Command.class);
+        final Metadata metadata = mock(Metadata.class);
         final AbstractClientFullSession session = mock(AbstractClientFullSession.class);
 
-//        doReturn(session).when(editor).newSession(diagram);
-//
-//        editor.openDiagram(diagram, callback);
+        when(diagram.getMetadata()).thenReturn(metadata);
+        when(sessionManager.getSessionFactory(metadata, ClientFullSession.class)).thenReturn(sessionFactory);
+
+        editor.openDiagram(diagram, callback);
+
+        verify(sessionFactory).newSession(eq(metadata), clientFullSessionConsumer.capture());
+
+        clientFullSessionConsumer.getValue().accept(session);
 
         verify(editor).openDock(session);
     }

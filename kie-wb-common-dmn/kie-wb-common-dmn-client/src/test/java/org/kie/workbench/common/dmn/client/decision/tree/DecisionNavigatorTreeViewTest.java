@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -42,7 +42,7 @@ import org.uberfire.mvp.Command;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.SUB_ITEM;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.CONTEXT;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -488,10 +488,10 @@ public class DecisionNavigatorTreeViewTest {
 
         final String uuid = "uuid";
         final String label = "label";
-        final DecisionNavigatorItem.Type subItem = SUB_ITEM;
+        final DecisionNavigatorItem.Type subItem = CONTEXT;
         final Command onClick = () -> {
         };
-        final String expectedCSSClass = "kie-sub-item";
+        final String expectedCSSClass = "kie-context";
         final String actualCSSClass = treeItem.getCSSClass(new DecisionNavigatorItem(uuid, label, subItem, onClick, null));
 
         assertEquals(expectedCSSClass, actualCSSClass);

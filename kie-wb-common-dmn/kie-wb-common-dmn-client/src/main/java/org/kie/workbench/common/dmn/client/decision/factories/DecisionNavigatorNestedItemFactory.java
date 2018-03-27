@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,22 +45,26 @@ import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.uberfire.mvp.Command;
 
-import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.COLUMNS;
-import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.SUB_ITEM;
-import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.TABLE;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.CONTEXT;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.DECISION_TABLE;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.FUNCTION_DEFINITION;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.INVOCATION;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.LIST;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.LITERAL_EXPRESSION;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.RELATION;
 
 @Dependent
 public class DecisionNavigatorNestedItemFactory {
 
     private static final Map<Class<? extends Expression>, DecisionNavigatorItem.Type> ITEM_TYPE_BY_EXPRESSION =
             new HashMap<Class<? extends Expression>, DecisionNavigatorItem.Type>() {{
-                put(Context.class, SUB_ITEM);
-                put(DecisionTable.class, TABLE);
-                put(FunctionDefinition.class, SUB_ITEM);
-                put(Invocation.class, SUB_ITEM);
-                put(List.class, COLUMNS);
-                put(LiteralExpression.class, SUB_ITEM);
-                put(Relation.class, COLUMNS);
+                put(Context.class, CONTEXT);
+                put(DecisionTable.class, DECISION_TABLE);
+                put(FunctionDefinition.class, FUNCTION_DEFINITION);
+                put(Invocation.class, INVOCATION);
+                put(List.class, LIST);
+                put(LiteralExpression.class, LITERAL_EXPRESSION);
+                put(Relation.class, RELATION);
             }};
 
     private final SessionManager sessionManager;

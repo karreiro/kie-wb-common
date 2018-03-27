@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,7 +45,7 @@ import org.uberfire.mvp.Command;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.TABLE;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.DECISION_TABLE;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -76,7 +76,7 @@ public class DecisionNavigatorNestedItemFactoryTest {
 
         final String uuid = "uuid";
         final String label = "label";
-        final DecisionNavigatorItem.Type type = TABLE;
+        final DecisionNavigatorItem.Type type = DECISION_TABLE;
         final Command command = mock(Command.class);
         final String parentUUID = "parentUUID";
 
@@ -161,7 +161,7 @@ public class DecisionNavigatorNestedItemFactoryTest {
     public void testGetType() {
 
         final DecisionTable expression = new DecisionTable();
-        final DecisionNavigatorItem.Type expectedType = TABLE;
+        final DecisionNavigatorItem.Type expectedType = DECISION_TABLE;
 
         doReturn(expression).when(factory).getExpression(node);
 

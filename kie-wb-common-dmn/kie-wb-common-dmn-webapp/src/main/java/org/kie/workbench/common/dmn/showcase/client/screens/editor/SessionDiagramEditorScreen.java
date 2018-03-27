@@ -293,8 +293,8 @@ public class SessionDiagramEditorScreen {
                                   });
     }
 
-    private void openDiagram(final Diagram diagram,
-                             final Command callback) {
+    void openDiagram(final Diagram diagram,
+                     final Command callback) {
 
         sessionManager.getSessionFactory(diagram.getMetadata(),
                                          ClientFullSession.class)

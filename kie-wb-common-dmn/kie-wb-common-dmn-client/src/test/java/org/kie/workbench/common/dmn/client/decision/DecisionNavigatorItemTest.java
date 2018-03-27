@@ -25,8 +25,8 @@ import org.uberfire.mvp.Command;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.ITEM;
 import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.CONTEXT;
+import static org.kie.workbench.common.dmn.client.decision.DecisionNavigatorItem.Type.ITEM;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 

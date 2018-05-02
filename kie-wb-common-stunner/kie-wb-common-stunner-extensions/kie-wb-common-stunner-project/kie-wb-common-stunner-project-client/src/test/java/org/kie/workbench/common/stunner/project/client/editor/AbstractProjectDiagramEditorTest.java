@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwtmockito.GwtMockitoTestRunner;
@@ -32,6 +33,7 @@ import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.guvnor.common.services.shared.metadata.model.Metadata;
 import org.guvnor.common.services.shared.metadata.model.Overview;
 import org.guvnor.messageconsole.client.console.widget.button.AlertsButtonMenuItemBuilder;
+import org.jboss.errai.common.client.api.Caller;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,6 +83,10 @@ import org.kie.workbench.common.stunner.project.client.screens.ProjectMessagesLi
 import org.kie.workbench.common.stunner.project.client.service.ClientProjectDiagramService;
 import org.kie.workbench.common.stunner.project.diagram.ProjectDiagram;
 import org.kie.workbench.common.stunner.project.diagram.ProjectMetadata;
+import org.kie.workbench.common.stunner.project.editor.ProjectDiagramResource;
+import org.kie.workbench.common.stunner.project.editor.impl.ProjectDiagramResourceImpl;
+import org.kie.workbench.common.stunner.project.service.ProjectDiagramResourceService;
+import org.kie.workbench.common.stunner.project.service.ProjectDiagramService;
 import org.kie.workbench.common.widgets.client.menu.FileMenuBuilderImpl;
 import org.kie.workbench.common.widgets.metadata.client.KieEditorWrapperView;
 import org.kie.workbench.common.widgets.metadata.client.validation.AssetUpdateValidator;
@@ -101,6 +107,7 @@ import org.uberfire.client.workbench.widgets.common.ErrorPopupPresenter;
 import org.uberfire.ext.editor.commons.client.file.popups.SavePopUpPresenter;
 import org.uberfire.ext.editor.commons.client.history.VersionRecordManager;
 import org.uberfire.ext.editor.commons.client.menu.BasicFileMenuBuilder;
+import org.uberfire.ext.editor.commons.service.support.SupportsSaveAndRename;
 import org.uberfire.ext.widgets.common.client.ace.AceEditorMode;
 import org.uberfire.ext.widgets.core.client.editors.texteditor.TextEditorView;
 import org.uberfire.mocks.EventSourceMock;
@@ -113,7 +120,11 @@ import org.uberfire.workbench.model.menu.MenuItem;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.kie.workbench.common.stunner.project.editor.ProjectDiagramResource.Type.DIAGRAM;
+import static org.kie.workbench.common.stunner.project.editor.ProjectDiagramResource.Type.XML;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -218,6 +229,9 @@ public class AbstractProjectDiagramEditorTest {
 
     @Mock
     protected StunnerPreferencesRegistry stunnerPreferencesRegistry;
+
+    @Mock
+    protected Caller<ProjectDiagramResourceService> projectDiagramResourceServiceCaller;
 
     @Mock
     protected AlertsButtonMenuItemBuilder alertsButtonMenuItemBuilder;
@@ -329,6 +343,9 @@ public class AbstractProjectDiagramEditorTest {
 
     @Mock
     protected MenuItem cutItem;
+
+    @Mock
+    protected Caller<ProjectDiagramService> diagramServiceCaller;
 
     @Captor
     protected ArgumentCaptor<Consumer<ClientFullSession>> clientFullSessionConsumerCaptor;
@@ -457,7 +474,8 @@ public class AbstractProjectDiagramEditorTest {
                                                                             diagramClientErrorHandler,
                                                                             translationService,
                                                                             xmlEditorView,
-                                                                            stunnerPreferencesRegistry) {
+                                                                            stunnerPreferencesRegistry,
+                                                                            projectDiagramResourceServiceCaller) {
             {
                 place = AbstractProjectDiagramEditorTest.this.placeRequest;
                 fileMenuBuilder = AbstractProjectDiagramEditorTest.this.fileMenuBuilder;
@@ -510,16 +528,19 @@ public class AbstractProjectDiagramEditorTest {
 
     @Test
     public void testMakeMenuBar() {
+
+        final Command saveAndRenameCommand = mock(Command.class);
+
         doReturn(Optional.of(mock(WorkspaceProject.class))).when(workbenchContext).getActiveWorkspaceProject();
         doReturn(true).when(projectController).canUpdateProject(any());
+        doReturn(saveAndRenameCommand).when(presenter).getSaveAndRename();
 
         presenter.makeMenuBar();
 
         verify(fileMenuBuilder).addSave(any(MenuItem.class));
         verify(fileMenuBuilder).addCopy(any(Path.class),
                                         any(AssetUpdateValidator.class));
-        verify(fileMenuBuilder).addRename(any(Path.class),
-                                          any(AssetUpdateValidator.class));
+        verify(fileMenuBuilder).addRename(saveAndRenameCommand);
         verify(fileMenuBuilder).addDelete(any(Path.class),
                                           any(AssetUpdateValidator.class));
         verify(fileMenuBuilder).addNewTopLevelMenu(alertsButtonMenuItem);
@@ -1088,5 +1109,85 @@ public class AbstractProjectDiagramEditorTest {
         presenter.hideLoadingViews();
 
         verify(view).hideBusyIndicator();
+    }
+
+    @Test
+    public void testProxyContentSupplierWhenXmlEditorIsMade() {
+
+        final ProjectDiagramEditorProxy editorProxy = presenter.makeXmlEditorProxy();
+        final Supplier<ProjectDiagramResource> contentSupplier = editorProxy.getContentSupplier();
+        final String content = "<xml>";
+
+        when(xmlEditorView.getContent()).thenReturn(content);
+
+        final ProjectDiagramResource resource = contentSupplier.get();
+
+        assertEquals(null, resource.getProjectDiagram());
+        assertEquals(content, resource.getDiagramXml());
+        assertEquals(XML, resource.getType());
+    }
+
+    @Test
+    public void testProxyContentSupplierWhenStunnerEditorIsMade() {
+
+        final ProjectDiagramEditorProxy editorProxy = presenter.makeStunnerEditorProxy();
+        final Supplier<ProjectDiagramResource> contentSupplier = editorProxy.getContentSupplier();
+        final ProjectDiagram diagram = mock(ProjectDiagram.class);
+
+        doReturn(diagram).when(presenter).getDiagram();
+
+        final ProjectDiagramResource resource = contentSupplier.get();
+
+        assertEquals(diagram, resource.getProjectDiagram());
+        assertEquals(null, resource.getDiagramXml());
+        assertEquals(DIAGRAM, resource.getType());
+    }
+
+    @Test
+    public void testProxyContentSupplierWhenNoEditorIsMade() {
+
+        final Supplier<ProjectDiagramResource> contentSupplier = presenter.editorProxy.getContentSupplier();
+        final ProjectDiagramResource resource = contentSupplier.get();
+
+        assertNotNull(contentSupplier);
+        assertNull(resource);
+    }
+
+    @Test
+    public void testGetSaveAndRenameServiceCaller() {
+
+        final Caller<ProjectDiagramResourceService> expectedCaller = this.projectDiagramResourceServiceCaller;
+
+        final Caller<? extends SupportsSaveAndRename<ProjectDiagramResource, Metadata>> actualCaller = presenter.getSaveAndRenameServiceCaller();
+
+        assertEquals(expectedCaller, actualCaller);
+    }
+
+    @Test
+    public void testGetContentSupplier() {
+
+        final ProjectDiagram expectedProjectDiagram = mock(ProjectDiagram.class);
+        final ProjectDiagramEditorProxy editorProxy = mock(ProjectDiagramEditorProxy.class);
+        final ProjectDiagramResource expectedResource = new ProjectDiagramResourceImpl(expectedProjectDiagram);
+
+        doReturn(editorProxy).when(presenter).getEditorProxy();
+
+        when(editorProxy.getContentSupplier()).thenReturn(() -> expectedResource);
+
+        final ProjectDiagramResource actualResource = presenter.getContentSupplier().get();
+
+        assertEquals(expectedResource, actualResource);
+    }
+
+    @Test
+    public void testGetCurrentContentHash() {
+
+        final Integer expectedContentHash = 42;
+
+        doReturn(expectedContentHash).when(presenter).getCurrentDiagramHash();
+
+        final Integer actualContentHash = presenter.getCurrentContentHash();
+
+        assertEquals(expectedContentHash, actualContentHash);
     }
 }

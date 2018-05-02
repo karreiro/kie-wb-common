@@ -21,6 +21,7 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import org.jboss.errai.common.client.api.Caller;
 import org.kie.workbench.common.stunner.bpmn.factory.BPMNGraphFactory;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenterFactory;
@@ -42,6 +43,7 @@ import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramFoc
 import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramLoseFocusEvent;
 import org.kie.workbench.common.stunner.project.client.screens.ProjectMessagesListener;
 import org.kie.workbench.common.stunner.project.client.service.ClientProjectDiagramService;
+import org.kie.workbench.common.stunner.project.service.ProjectDiagramResourceService;
 import org.uberfire.backend.vfs.ObservablePath;
 import org.uberfire.client.annotations.WorkbenchEditor;
 import org.uberfire.client.annotations.WorkbenchMenu;
@@ -87,7 +89,8 @@ public class CaseManagementDiagramEditor extends AbstractProjectDiagramEditor<Ca
                                        final DiagramClientErrorHandler diagramClientErrorHandler,
                                        final ClientTranslationService translationService,
                                        final TextEditorView xmlEditorView,
-                                       final StunnerPreferencesRegistry stunnerPreferencesRegistry) {
+                                       final StunnerPreferencesRegistry stunnerPreferencesRegistry,
+                                       final Caller<ProjectDiagramResourceService> projectDiagramResourceServiceCaller) {
         super(view,
               placeManager,
               errorPopupPresenter,
@@ -105,7 +108,8 @@ public class CaseManagementDiagramEditor extends AbstractProjectDiagramEditor<Ca
               diagramClientErrorHandler,
               translationService,
               xmlEditorView,
-              stunnerPreferencesRegistry);
+              stunnerPreferencesRegistry,
+              projectDiagramResourceServiceCaller);
     }
 
     @OnStartup

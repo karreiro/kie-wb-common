@@ -82,6 +82,7 @@ public class DMNDiagramEditorTest extends AbstractProjectDiagramEditorTest {
                                                  translationService,
                                                  xmlEditorView,
                                                  stunnerPreferencesRegistry,
+                                                 projectDiagramResourceServiceCaller,
                                                  decisionNavigatorDock) {
             {
                 place = DMNDiagramEditorTest.this.placeRequest;

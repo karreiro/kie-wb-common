@@ -22,6 +22,7 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import org.jboss.errai.common.client.api.Caller;
 import org.kie.workbench.common.dmn.api.factory.DMNGraphFactory;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.decision.DecisionNavigatorDock;
@@ -43,6 +44,7 @@ import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramFoc
 import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramLoseFocusEvent;
 import org.kie.workbench.common.stunner.project.client.screens.ProjectMessagesListener;
 import org.kie.workbench.common.stunner.project.client.service.ClientProjectDiagramService;
+import org.kie.workbench.common.stunner.project.service.ProjectDiagramResourceService;
 import org.kie.workbench.common.workbench.client.PerspectiveIds;
 import org.uberfire.backend.vfs.ObservablePath;
 import org.uberfire.client.annotations.WorkbenchEditor;
@@ -92,6 +94,7 @@ public class DMNDiagramEditor extends AbstractProjectDiagramEditor<DMNDiagramRes
                             final ClientTranslationService translationService,
                             final TextEditorView xmlEditorView,
                             final StunnerPreferencesRegistry stunnerPreferencesRegistry,
+                            final Caller<ProjectDiagramResourceService> projectDiagramResourceServiceCaller,
                             final DecisionNavigatorDock decisionNavigatorDock) {
         super(view,
               placeManager,
@@ -110,7 +113,8 @@ public class DMNDiagramEditor extends AbstractProjectDiagramEditor<DMNDiagramRes
               diagramClientErrorHandler,
               translationService,
               xmlEditorView,
-              stunnerPreferencesRegistry);
+              stunnerPreferencesRegistry,
+              projectDiagramResourceServiceCaller);
         this.decisionNavigatorDock = decisionNavigatorDock;
     }
 

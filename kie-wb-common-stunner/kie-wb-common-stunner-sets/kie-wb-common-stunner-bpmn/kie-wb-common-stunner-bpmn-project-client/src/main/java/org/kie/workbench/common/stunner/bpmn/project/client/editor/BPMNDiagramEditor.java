@@ -23,6 +23,7 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.stunner.bpmn.client.forms.util.ContextUtils;
 import org.kie.workbench.common.stunner.bpmn.factory.BPMNGraphFactory;
@@ -51,6 +52,7 @@ import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramFoc
 import org.kie.workbench.common.stunner.project.client.editor.event.OnDiagramLoseFocusEvent;
 import org.kie.workbench.common.stunner.project.client.screens.ProjectMessagesListener;
 import org.kie.workbench.common.stunner.project.client.service.ClientProjectDiagramService;
+import org.kie.workbench.common.stunner.project.service.ProjectDiagramResourceService;
 import org.kie.workbench.common.widgets.client.menu.FileMenuBuilder;
 import org.uberfire.backend.vfs.ObservablePath;
 import org.uberfire.client.annotations.WorkbenchEditor;
@@ -115,6 +117,7 @@ public class BPMNDiagramEditor extends AbstractProjectDiagramEditor<BPMNDiagramR
                              final BPMNDiagramEditorMenuItemsBuilder bpmnDiagramEditorMenuItemsBuilder,
                              final ClientTranslationService translationService,
                              final StunnerPreferencesRegistry stunnerPreferencesRegistry,
+                             final Caller<ProjectDiagramResourceService> projectDiagramResourceServiceCaller,
                              final Event<BPMNMigrateDiagramEvent> migrateDiagramEvent,
                              final PopupUtil popupUtil,
                              final TextEditorView xmlEditorView) {
@@ -135,7 +138,8 @@ public class BPMNDiagramEditor extends AbstractProjectDiagramEditor<BPMNDiagramR
               diagramClientErrorHandler,
               translationService,
               xmlEditorView,
-              stunnerPreferencesRegistry);
+              stunnerPreferencesRegistry,
+              projectDiagramResourceServiceCaller);
         this.generateProcessFormSessionCommands = generateProcessFormSessionCommands;
         this.generateDiagramFormsSessionCommands = generateDiagramFormsSessionCommands;
         this.generateSelectedFormsSessionCommands = generateSelectedFormsSessionCommands;

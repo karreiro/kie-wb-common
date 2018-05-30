@@ -124,6 +124,17 @@ public class DecisionNavigatorNestedItemFactoryTest {
 
         verify(canvasSelectionEvent).fire(event);
         verify(editExpressionEvent).fire(expressionEvent);
+        verify(factory).makeCanvasSelectionEvent(canvasHandler, uuid);
+    }
+
+    @Test
+    public void testMakeCanvasSelectionEvent() {
+        final CanvasHandler canvasHandler = mock(CanvasHandler.class);
+        final String uuid = "uuid";
+
+        final CanvasSelectionEvent event = factory.makeCanvasSelectionEvent(canvasHandler, uuid);
+        assertEquals(canvasHandler, event.getCanvasHandler());
+        assertEquals(uuid, event.getIdentifiers().iterator().next());
     }
 
     @Test

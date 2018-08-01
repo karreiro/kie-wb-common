@@ -18,6 +18,7 @@ package org.kie.workbench.common.dmn.client.editors.types.common;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -92,7 +93,7 @@ public class DataTypeFactory {
     public boolean isDefaultDefault(final String type) {
         return Stream
                 .of(BuiltInType.values())
-                .anyMatch(dataType -> dataType.getName().equals(type));
+                .anyMatch(dataType -> Objects.equals(dataType.getName(), type));
     }
 
     private List<DataType> extractSubDataTypes(final ItemDefinition itemDefinition) {

@@ -62,7 +62,7 @@ public class DataTypeTreeGrid {
         gridItem.setupDataType(dataType, level);
         gridItems.add(gridItem);
 
-        if (!subDataTypes.isEmpty()) {
+        if (subDataTypes != null) {
             for (final DataType subDataType : subDataTypes) {
                 gridItems.addAll(makeTreeGridItems(subDataType, level + 1));
             }

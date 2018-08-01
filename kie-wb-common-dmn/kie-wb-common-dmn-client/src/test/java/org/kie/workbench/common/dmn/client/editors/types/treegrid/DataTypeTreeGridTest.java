@@ -29,8 +29,11 @@ import org.mockito.Mock;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -74,6 +77,29 @@ public class DataTypeTreeGridTest {
         treeGrid.setupItems(dataType);
 
         verify(view).setupGridItems(gridItems);
+        verify(treeGrid, never()).makeTreeGridItems(any(DataType.class), eq(2));
+    }
+
+    @Test
+    public void testSetupItemsSubItems() {
+
+        final DataType subDataType = makeDataType("subItem", "subItemType");
+        final DataType dataType = makeDataType("item", "iITem", subDataType);
+
+        treeGrid.setupItems(dataType);
+
+        verify(treeGrid).makeTreeGridItems(eq(subDataType), eq(2));
+    }
+
+    @Test
+    public void testSetupItemsNullSubItems() {
+
+        final DataType dataType = makeDataType("item", "iITem");
+        doReturn(null).when(dataType).getSubDataTypes();
+
+        treeGrid.setupItems(dataType);
+
+        verify(treeGrid, never()).makeTreeGridItems(any(DataType.class), eq(2));
     }
 
     @Test

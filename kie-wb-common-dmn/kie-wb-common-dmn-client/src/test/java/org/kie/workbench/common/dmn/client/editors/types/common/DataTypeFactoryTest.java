@@ -103,6 +103,7 @@ public class DataTypeFactoryTest {
         assertEquals("tPerson", tPerson.getName());
         assertEquals("(Structure)", tPerson.getType());
         assertEquals(3, tPerson.getSubDataTypes().size());
+        assertFalse(tPerson.isDefault());
         assertFalse(tPerson.isBasic());
         assertTrue(tPerson.hasSubDataTypes());
         assertFalse(tPerson.isExternal());
@@ -173,6 +174,21 @@ public class DataTypeFactoryTest {
         assertFalse(dataType.hasSubDataTypes());
         assertFalse(dataType.isExternal());
         assertTrue(dataType.isDefault());
+    }
+
+    @Test
+    public void testIsDefaultDefaultNull() {
+        assertFalse(factory.isDefaultDefault(null));
+    }
+
+    @Test
+    public void testIsDefaultDefaultUnknown() {
+        assertFalse(factory.isDefaultDefault("unknown"));
+    }
+
+    @Test
+    public void testIsDefaultDefault() {
+        assertTrue(factory.isDefaultDefault(BuiltInType.ANY.getName()));
     }
 
     private ItemDefinition makeItem(final String itemName,

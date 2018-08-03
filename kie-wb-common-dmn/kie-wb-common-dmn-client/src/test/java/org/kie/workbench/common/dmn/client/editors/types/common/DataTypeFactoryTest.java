@@ -103,6 +103,7 @@ public class DataTypeFactoryTest {
         assertEquals("tPerson", tPerson.getName());
         assertEquals("(Structure)", tPerson.getType());
         assertEquals(3, tPerson.getSubDataTypes().size());
+        assertFalse(tPerson.isDefault());
         assertFalse(tPerson.isBasic());
         assertTrue(tPerson.hasSubDataTypes());
         assertFalse(tPerson.isExternal());

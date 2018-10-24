@@ -88,10 +88,10 @@ public class DataTypeSelectView implements DataTypeSelect.View {
 
     @Override
     public void setupDropdown() {
-        setupDropdownItems();
-        setupSelectPicker();
-        hideSelectPicker();
-        setupSelectPickerOnChangeHandler();
+//        setupDropdownItems();
+//        setupSelectPicker();
+//        hideSelectPicker();
+//        setupSelectPickerOnChangeHandler();
     }
 
     void setupDropdownItems() {

@@ -92,7 +92,7 @@ public class DataTypeListItemTest {
     @Before
     public void setup() {
         dataTypeManager = spy(new DataTypeManager(null, null, itemDefinitionStore, null, null, null, null, null));
-        listItem = spy(new DataTypeListItem(view, dataTypeSelectComponent, dataTypeConstraintComponent, dataTypeCollectionComponent, dataTypeManager, confirmation));
+        listItem = spy(new DataTypeListItem(view, dataTypeSelectComponent, dataTypeConstraintComponent, dataTypeCollectionComponent, confirmation));
         listItem.init(dataTypeList);
     }
 

@@ -72,106 +72,88 @@ public class DataTypeListItemView implements DataTypeListItem.View {
     @DataField("view")
     private final HTMLDivElement view;
 
-    @DataField("arrow-button")
-    private final HTMLElement arrow;
-
-    @DataField("name-text")
-    private final HTMLElement nameText;
-
-    @DataField("constraint-text")
-    private final HTMLElement constraintText;
-
-    @DataField(NAME_DATA_FIELD)
-    private final HTMLInputElement nameInput;
-
-    @DataField("type")
-    private final HTMLElement type;
-
-    @DataField("constraint")
-    private final HTMLDivElement constraint;
-
-    @DataField("collection-container")
-    private final HTMLDivElement collectionContainer;
-
-    @DataField("collection-yes")
-    private final HTMLDivElement collectionYes;
-
-    @DataField("constraint-container")
-    private final HTMLDivElement constraintContainer;
-
-    @DataField("edit-button")
-    private final HTMLButtonElement editButton;
-
-    @DataField("save-button")
-    private final HTMLButtonElement saveButton;
-
-    @DataField("close-button")
-    private final HTMLButtonElement closeButton;
-
-    @DataField("remove-button")
-    private final HTMLAnchorElement removeButton;
-
-    @DataField("insert-field-above")
-    private final HTMLAnchorElement insertFieldAbove;
-
-    @DataField("insert-field-below")
-    private final HTMLAnchorElement insertFieldBelow;
-
-    @DataField("insert-nested-field")
-    private final HTMLAnchorElement insertNestedField;
-
-    @DataField("kebab-menu")
-    private final HTMLDivElement kebabMenu;
-
-    private final TranslationService translationService;
+//    @DataField("arrow-button")
+//    private final HTMLElement arrow;
+//
+//    @DataField("name-text")
+//    private final HTMLElement nameText;
+//
+//    @DataField("constraint-text")
+//    private final HTMLElement constraintText;
+//
+//    @DataField(NAME_DATA_FIELD)
+//    private final HTMLInputElement nameInput;
+//
+//    @DataField("type")
+//    private final HTMLElement type;
+//
+//    @DataField("constraint")
+//    private final HTMLDivElement constraint;
+//
+//    @DataField("collection-container")
+//    private final HTMLDivElement collectionContainer;
+//
+//    @DataField("collection-yes")
+//    private final HTMLDivElement collectionYes;
+//
+//    @DataField("constraint-container")
+//    private final HTMLDivElement constraintContainer;
+//
+//    @DataField("edit-button")
+//    private final HTMLButtonElement editButton;
+//
+//    @DataField("save-button")
+//    private final HTMLButtonElement saveButton;
+//
+//    @DataField("close-button")
+//    private final HTMLButtonElement closeButton;
+//
+//    @DataField("remove-button")
+//    private final HTMLAnchorElement removeButton;
+//
+//    @DataField("insert-field-above")
+//    private final HTMLAnchorElement insertFieldAbove;
+//
+//    @DataField("insert-field-below")
+//    private final HTMLAnchorElement insertFieldBelow;
+//
+//    @DataField("insert-nested-field")
+//    private final HTMLAnchorElement insertNestedField;
+//
+//    @DataField("kebab-menu")
+//    private final HTMLDivElement kebabMenu;
+//
+//    private final TranslationService translationService;
 
     private DataTypeListItem presenter;
 
     @Inject
-    public DataTypeListItemView(final HTMLDivElement view,
-                                final @Named("span") HTMLElement arrow,
-                                final @Named("span") HTMLElement nameText,
-                                final @Named("span") HTMLElement constraintText,
-                                final HTMLInputElement nameInput,
-                                final @Named("span") HTMLElement type,
-                                final HTMLDivElement collectionContainer,
-                                final HTMLDivElement collectionYes,
-                                final HTMLDivElement constraint,
-                                final HTMLDivElement constraintContainer,
-                                final HTMLButtonElement editButton,
-                                final HTMLButtonElement saveButton,
-                                final HTMLButtonElement closeButton,
-                                final HTMLAnchorElement removeButton,
-                                final HTMLAnchorElement insertFieldAbove,
-                                final HTMLAnchorElement insertFieldBelow,
-                                final HTMLAnchorElement insertNestedField,
-                                final HTMLDivElement kebabMenu,
-                                final TranslationService translationService) {
+    public DataTypeListItemView(final HTMLDivElement view) {
         this.view = view;
-        this.arrow = arrow;
-        this.nameText = nameText;
-        this.constraintText = constraintText;
-        this.nameInput = nameInput;
-        this.type = type;
-        this.collectionContainer = collectionContainer;
-        this.collectionYes = collectionYes;
-        this.constraint = constraint;
-        this.constraintContainer = constraintContainer;
-        this.editButton = editButton;
-        this.saveButton = saveButton;
-        this.closeButton = closeButton;
-        this.removeButton = removeButton;
-        this.insertFieldAbove = insertFieldAbove;
-        this.insertFieldBelow = insertFieldBelow;
-        this.insertNestedField = insertNestedField;
-        this.kebabMenu = kebabMenu;
-        this.translationService = translationService;
+//        this.arrow = arrow;
+//        this.nameText = nameText;
+//        this.constraintText = constraintText;
+//        this.nameInput = nameInput;
+//        this.type = type;
+//        this.collectionContainer = collectionContainer;
+//        this.collectionYes = collectionYes;
+//        this.constraint = constraint;
+//        this.constraintContainer = constraintContainer;
+//        this.editButton = editButton;
+//        this.saveButton = saveButton;
+//        this.closeButton = closeButton;
+//        this.removeButton = removeButton;
+//        this.insertFieldAbove = insertFieldAbove;
+//        this.insertFieldBelow = insertFieldBelow;
+//        this.insertNestedField = insertNestedField;
+//        this.kebabMenu = kebabMenu;
+//        this.translationService = translationService;
     }
 
-    @PostConstruct
-    public void setupKebabElement() {
-        new KebabMenuInitializer(kebabMenu).init();
-    }
+//    @PostConstruct
+//    public void setupKebabElement() {
+//        new KebabMenuInitializer(kebabMenu).init();
+//    }
 
     @Override
     public void init(final DataTypeListItem presenter) {
@@ -224,7 +206,7 @@ public class DataTypeListItemView implements DataTypeListItem.View {
     }
 
     void setupReadOnly(final DataType dataType) {
-        hide(nameInput);
+//        hide(nameInput);
         setName(dataType.getName());
         setConstraint(dataType.getConstraint());
     }
@@ -235,11 +217,11 @@ public class DataTypeListItemView implements DataTypeListItem.View {
 
     @Override
     public void toggleArrow(final boolean show) {
-        if (show) {
-            show(arrow);
-        } else {
-            hide(arrow);
-        }
+//        if (show) {
+//            show(arrow);
+//        } else {
+//            hide(arrow);
+//        }
     }
 
     @Override
@@ -265,54 +247,54 @@ public class DataTypeListItemView implements DataTypeListItem.View {
 
     @Override
     public void showEditButton() {
-        show(editButton);
-        hide(saveButton);
-        hide(closeButton);
+//        show(editButton);
+//        hide(saveButton);
+//        hide(closeButton);
     }
 
     @Override
     public void showSaveButton() {
-        hide(editButton);
-        show(saveButton);
-        show(closeButton);
+//        hide(editButton);
+//        show(saveButton);
+//        show(closeButton);
     }
 
-    @EventHandler("edit-button")
+//    @EventHandler("edit-button")
     public void onEditClick(final ClickEvent e) {
         presenter.enableEditMode();
     }
 
-    @EventHandler("save-button")
+//    @EventHandler("save-button")
     public void onSaveClick(final ClickEvent e) {
         presenter.saveAndCloseEditMode();
     }
 
-    @EventHandler("close-button")
+//    @EventHandler("close-button")
     public void onCloseClick(final ClickEvent e) {
         presenter.disableEditMode();
     }
 
-    @EventHandler("arrow-button")
+//    @EventHandler("arrow-button")
     public void onArrowClickEvent(final ClickEvent e) {
         presenter.expandOrCollapseSubTypes();
     }
 
-    @EventHandler("insert-field-above")
+//    @EventHandler("insert-field-above")
     public void onInsertFieldAbove(final ClickEvent e) {
         presenter.insertFieldAbove();
     }
 
-    @EventHandler("insert-field-below")
+//    @EventHandler("insert-field-below")
     public void onInsertFieldBelow(final ClickEvent e) {
         presenter.insertFieldBelow();
     }
 
-    @EventHandler("insert-nested-field")
+//    @EventHandler("insert-nested-field")
     public void onInsertNestedField(final ClickEvent e) {
         presenter.insertNestedField();
     }
 
-    @EventHandler("remove-button")
+//    @EventHandler("remove-button")
     public void onRemoveButton(final ClickEvent e) {
         presenter.remove();
     }
@@ -325,7 +307,7 @@ public class DataTypeListItemView implements DataTypeListItem.View {
         asFocusedDataType(rowElement);
         forEachChildElement(rowElement, ListItemViewCssHelper::asFocusedDataType);
 
-        nameInput.select();
+//        nameInput.select();
     }
 
     @Override
@@ -339,58 +321,58 @@ public class DataTypeListItemView implements DataTypeListItem.View {
 
     @Override
     public String getName() {
-        return nameInput.value;
+        return ""; // nameInput.value;
     }
 
     @Override
     public void setName(final String name) {
-        nameText.textContent = name;
-        nameInput.value = name;
+//        nameText.textContent = name;
+//        nameInput.value = name;
     }
 
     @Override
     public void setConstraint(final String constraint) {
-        if (isEmpty(constraint)) {
-            constraintText.textContent = "";
-            hide(constraintText);
-        } else {
-            constraintText.textContent = translationService.format(DataTypeListItemView_Constraints, constraint);
-            show(constraintText);
-        }
+//        if (isEmpty(constraint)) {
+//            constraintText.textContent = "";
+//            hide(constraintText);
+//        } else {
+//            constraintText.textContent = translationService.format(DataTypeListItemView_Constraints, constraint);
+//            show(constraintText);
+//        }
     }
 
     @Override
     public void showDataTypeNameInput() {
-        hide(nameText);
-        show(nameInput);
+//        hide(nameText);
+//        show(nameInput);
     }
 
     @Override
     public void hideDataTypeNameInput() {
 
-        nameText.textContent = nameInput.value.isEmpty() ? "-" : nameInput.value;
-
-        hide(nameInput);
-        show(nameText);
+//        nameText.textContent = nameInput.value.isEmpty() ? "-" : nameInput.value;
+//
+//        hide(nameInput);
+//        show(nameText);
     }
 
     @Override
     public void setupSelectComponent(final DataTypeSelect typeSelect) {
-        type.innerHTML = "";
-        type.appendChild(typeSelect.getElement());
+//        type.innerHTML = "";
+//        type.appendChild(typeSelect.getElement());
     }
 
     @Override
     public void setupConstraintComponent(final DataTypeConstraint dataTypeConstraintComponent) {
-        constraint.innerHTML = "";
-        constraint.appendChild(dataTypeConstraintComponent.getElement());
+//        constraint.innerHTML = "";
+//        constraint.appendChild(dataTypeConstraintComponent.getElement());
     }
 
     @Override
     public void setupCollectionComponent(final SmallSwitchComponent dataTypeCollectionComponent) {
-        collectionContainer.innerHTML = "";
-        collectionContainer.appendChild(collectionTextNode());
-        collectionContainer.appendChild(dataTypeCollectionComponent.getElement());
+//        collectionContainer.innerHTML = "";
+//        collectionContainer.appendChild(collectionTextNode());
+//        collectionContainer.appendChild(dataTypeCollectionComponent.getElement());
     }
 
     Text collectionTextNode() {
@@ -399,44 +381,44 @@ public class DataTypeListItemView implements DataTypeListItem.View {
 
     @Override
     public void showConstraintContainer() {
-        show(constraintContainer);
+//        show(constraintContainer);
     }
 
     @Override
     public void hideConstraintContainer() {
-        hide(constraintContainer);
+//        hide(constraintContainer);
     }
 
     @Override
     public void showCollectionContainer() {
-        show(collectionContainer);
+//        show(collectionContainer);
     }
 
     @Override
     public void hideCollectionContainer() {
-        hide(collectionContainer);
+//        hide(collectionContainer);
     }
 
     @Override
     public void showCollectionYesLabel() {
-        show(collectionYes);
+//        show(collectionYes);
     }
 
     @Override
     public void hideCollectionYesLabel() {
-        hide(collectionYes);
+//        hide(collectionYes);
     }
 
     @Override
     public void showConstraintText() {
-        if (!isEmpty(constraintText.textContent)) {
-            show(constraintText);
-        }
+//        if (!isEmpty(constraintText.textContent)) {
+//            show(constraintText);
+//        }
     }
 
     @Override
     public void hideConstraintText() {
-        hide(constraintText);
+//        hide(constraintText);
     }
 
     @Override
@@ -445,7 +427,7 @@ public class DataTypeListItemView implements DataTypeListItem.View {
     }
 
     HTMLElement getArrow() {
-        return arrow;
+        return null; // arrow;
     }
 
     Element getRowElement(final DataType dataType) {
@@ -504,6 +486,6 @@ public class DataTypeListItemView implements DataTypeListItem.View {
     }
 
     private String collection() {
-        return translationService.format(DataTypeListItemView_Collection);
+        return ""; // translationService.format(DataTypeListItemView_Collection);
     }
 }

@@ -39,15 +39,15 @@ public class DataTypeListItem {
 
     private final View view;
 
-    private final DataTypeSelect dataTypeSelectComponent;
+    private DataTypeSelect dataTypeSelectComponent;
 
-    private final DataTypeConstraint dataTypeConstraintComponent;
+    private DataTypeConstraint dataTypeConstraintComponent;
 
-    private final SmallSwitchComponent dataTypeCollectionComponent;
+    private SmallSwitchComponent dataTypeCollectionComponent;
 
-    private final DataTypeManager dataTypeManager;
+    private DataTypeConfirmation confirmation;
 
-    private final DataTypeConfirmation confirmation;
+    private DataTypeManager _dataTypeManager;
 
     private DataType dataType;
 
@@ -64,17 +64,19 @@ public class DataTypeListItem {
     private boolean oldIsCollection;
 
     @Inject
-    public DataTypeListItem(final View view,
-                            final DataTypeSelect dataTypeSelectComponent,
-                            final DataTypeConstraint dataTypeConstraintComponent,
-                            final SmallSwitchComponent dataTypeCollectionComponent,
-                            final DataTypeManager dataTypeManager,
-                            final DataTypeConfirmation confirmation) {
+    public DataTypeListItem(final View view) {
+        this.view = view;
+    }
+
+    DataTypeListItem(final View view,
+                     final DataTypeSelect dataTypeSelectComponent,
+                     final DataTypeConstraint dataTypeConstraintComponent,
+                     final SmallSwitchComponent dataTypeCollectionComponent,
+                     final DataTypeConfirmation confirmation) {
         this.view = view;
         this.dataTypeSelectComponent = dataTypeSelectComponent;
         this.dataTypeConstraintComponent = dataTypeConstraintComponent;
         this.dataTypeCollectionComponent = dataTypeCollectionComponent;
-        this.dataTypeManager = dataTypeManager;
         this.confirmation = confirmation;
     }
 
@@ -210,7 +212,7 @@ public class DataTypeListItem {
     }
 
     List<DataType> persist(final DataType dataType) {
-        return dataTypeManager
+        return getDataTypeManager()
                 .from(dataType)
                 .withSubDataTypes(dataTypeSelectComponent.getSubDataTypes())
                 .get()
@@ -219,7 +221,7 @@ public class DataTypeListItem {
 
     void discardNewDataType() {
 
-        view.setDataType(dataTypeManager
+        view.setDataType(getDataTypeManager()
                                  .withDataType(getDataType())
                                  .withName(getOldName())
                                  .withType(getOldType())
@@ -230,6 +232,14 @@ public class DataTypeListItem {
         setupCollectionComponent();
         setupSelectComponent();
         refreshSubItems(getDataType().getSubDataTypes());
+    }
+
+    DataTypeManager getDataTypeManager() {
+//        if (_dataTypeManager == null) {
+//            _dataTypeManager = dataTypeManagers.get();
+//        }
+
+        return _dataTypeManager;
     }
 
     void closeEditMode() {
@@ -281,7 +291,7 @@ public class DataTypeListItem {
     }
 
     DataType updateProperties(final DataType dataType) {
-        return dataTypeManager
+        return getDataTypeManager()
                 .from(dataType)
                 .withName(view.getName())
                 .withType(dataTypeSelectComponent.getValue())
@@ -349,7 +359,7 @@ public class DataTypeListItem {
     }
 
     private DataType newDataType() {
-        return dataTypeManager.fromNew().get();
+        return getDataTypeManager().fromNew().get();
     }
 
     public interface View extends UberElemental<DataTypeListItem> {

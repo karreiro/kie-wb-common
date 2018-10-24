@@ -25,11 +25,14 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
+import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.jboss.errai.ui.client.local.api.elemental2.IsElement;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataTypeManager;
+import org.kie.workbench.common.dmn.client.editors.types.listview.common.SmallSwitchComponent;
 import org.uberfire.client.mvp.UberElemental;
 
 @ApplicationScoped
@@ -107,7 +110,13 @@ public class DataTypeList {
     }
 
     DataTypeListItem makeListItem() {
+
+        final double t0 = DomGlobal.performance.now();
         final DataTypeListItem listItem = listItems.get();
+        final double t1 = DomGlobal.performance.now();
+
+        GWT.log("=====> " + (t1 - t0));
+
         listItem.init(this);
         return listItem;
     }

@@ -22,6 +22,7 @@ import java.util.List;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
+import elemental2.dom.DomGlobal;
 import org.kie.workbench.common.dmn.api.definition.v1_1.ItemDefinition;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataTypeManager;
@@ -88,7 +89,6 @@ public class DataTypeUpdateHandler extends DataTypeHandler {
                     } else {
                         affectedDataTypes.addAll(handleTopLevelDataTypeUpdate(topLevelUpdate, topLevelUpdate.getName()));
                     }
-
                     affectedDataTypes.add(topLevelUpdate);
                 });
 

@@ -31,6 +31,7 @@ import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.jboss.errai.ui.client.local.api.elemental2.IsElement;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataTypeManager;
+import org.kie.workbench.common.dmn.client.editors.types.persistence.DataTypeStore;
 import org.kie.workbench.common.dmn.client.editors.types.search.DataTypeSearchBar;
 import org.uberfire.client.mvp.UberElemental;
 
@@ -44,7 +45,8 @@ public class DataTypeList {
     private final DataTypeManager dataTypeManager;
 
     private final DataTypeSearchBar searchBar;
-
+    @Inject
+    DataTypeStore store;
     private List<DataTypeListItem> items;
 
     @Inject
@@ -90,9 +92,14 @@ public class DataTypeList {
             gridItems.addAll(makeTreeListItems(subDataType, level + 1));
         }
 
-        refreshItemsList(subDataTypes, gridItems);
-
+        view.cleanSubTypes(dataType);
         view.addSubItems(dataType, gridItems);
+
+        for (DataTypeListItem gridItem : gridItems) {
+            dataTypeManager.from(gridItem.getDataType()).withIndexedItemDefinition();
+        }
+
+        getItems().addAll(gridItems);
     }
 
     List<DataTypeListItem> makeTreeListItems(final DataType dataType,
@@ -118,18 +125,19 @@ public class DataTypeList {
         return listItem;
     }
 
-    void refreshItemsList(final List<DataType> subDataTypes,
-                          final List<DataTypeListItem> gridItems) {
-
-        getItems().removeIf(item -> subDataTypes.stream().anyMatch(dataType -> {
-            return Objects.equals(item.getDataType().getUUID(), dataType.getUUID());
-        }));
-
-        getItems().addAll(gridItems);
+    void removeItem(final DataType dataType) {
+        removeItem(dataType.getUUID());
+        view.removeItem(dataType);
     }
 
-    void removeItem(final DataType dataType) {
-        view.removeItem(dataType);
+    void removeItem(final String uuid) {
+        items.removeIf(listItem -> {
+            final boolean removed = Objects.equals(uuid, listItem.getDataType().getUUID());
+            if (removed) {
+//                store.unIndex(uuid);
+            }
+            return removed;
+        });
     }
 
     void refreshItemsByUpdatedDataTypes(final List<DataType> updateDataTypes) {
@@ -175,6 +183,7 @@ public class DataTypeList {
 
         dataType.create();
 
+        searchBar.reset();
         view.addSubItem(listItem);
 
         listItem.enableEditMode();
@@ -213,11 +222,16 @@ public class DataTypeList {
     }
 
     void expandAll() {
-        getItems().forEach(DataTypeListItem::expand);
+        if (!searchBar.isEnabled()) {
+            getItems().forEach(DataTypeListItem::expand);
+        }
     }
 
     void collapseAll() {
-        getItems().forEach(DataTypeListItem::collapse);
+//        if (!searchBar.isEnabled()) {
+//            getItems().forEach(DataTypeListItem::collapse);
+//        }
+        store.printAll();
     }
 
     DataTypeSearchBar getSearchBar() {
@@ -237,6 +251,8 @@ public class DataTypeList {
         void addSubItem(final DataTypeListItem listItem);
 
         void removeItem(final DataType dataType);
+
+        void cleanSubTypes(DataType dataType);
 
         void insertBelow(final DataTypeListItem listItem,
                          final DataType reference);

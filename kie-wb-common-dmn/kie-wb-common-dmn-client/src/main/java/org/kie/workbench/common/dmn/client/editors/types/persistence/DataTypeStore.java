@@ -20,10 +20,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import elemental2.dom.DomGlobal;
 import org.kie.workbench.common.dmn.client.editors.types.DataTypesPage;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
 
@@ -43,6 +45,7 @@ public class DataTypeStore {
 
     public void index(final String uuid,
                       final DataType dataType) {
+        log("indexing -> " + uuid);
         dataTypes.put(uuid, dataType);
     }
 
@@ -64,5 +67,25 @@ public class DataTypeStore {
 
     public void unIndex(final String uuid) {
         dataTypes.remove(uuid);
+        subDataTypesUUID(uuid).forEach(this::unIndex);
+    }
+
+    private List<String> subDataTypesUUID(final String uuid) {
+        return dataTypes.values()
+                .stream()
+                .filter(dt -> Objects.equals(dt.getParentUUID(), uuid))
+                .map(DataType::getUUID)
+                .collect(Collectors.toList());
+    }
+
+    public void printAll() {
+        for (DataType value : dataTypes.values()) {
+            log("  " + value.getUUID() + "   -   " + value.getParentUUID() + "   -   " + value.getName());
+        }
+        log("==========================================================================");
+    }
+
+    private void log(final String value) {
+        DomGlobal.console.log(value);
     }
 }

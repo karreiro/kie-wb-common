@@ -259,7 +259,7 @@ public class DataTypeListTest {
 
         dataTypeList.refreshSubItemsFromListItem(listItem, subDataTypes);
 
-        verify(dataTypeList).refreshItemsList(eq(subDataTypes), listItemsCaptor.capture());
+//        verify(dataTypeList).refreshItemsList(eq(subDataTypes), listItemsCaptor.capture());
         verify(view).addSubItems(eq(listItemDataType), listItemsCaptor.capture());
 
         assertEquals(8, listItemsCaptor.getValue().size());
@@ -293,7 +293,7 @@ public class DataTypeListTest {
         when(newDataTypeListItem3.getDataType()).thenReturn(newDataType3);
         when(dataTypeList.getItems()).thenReturn(existingItems);
 
-        dataTypeList.refreshItemsList(subDataTypes, newItems);
+//        dataTypeList.refreshItemsList(subDataTypes, newItems);
 
         final List<DataTypeListItem> expectedItems = asList(existingDataTypeListItem2, newDataTypeListItem1, newDataTypeListItem3);
         final List<DataTypeListItem> actualItems = dataTypeList.getItems();

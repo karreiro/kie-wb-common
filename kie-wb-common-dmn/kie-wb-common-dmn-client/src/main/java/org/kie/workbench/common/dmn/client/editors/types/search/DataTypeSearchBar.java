@@ -22,6 +22,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import com.google.gwt.core.client.GWT;
 import elemental2.dom.HTMLElement;
 import org.jboss.errai.ui.client.local.api.elemental2.IsElement;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
@@ -64,6 +65,7 @@ public class DataTypeSearchBar {
     }
 
     public void reset() {
+        setCurrentSearch("");
         dataTypeList.showListItems();
         view.resetSearchBar();
     }
@@ -100,6 +102,10 @@ public class DataTypeSearchBar {
         } else {
             dataTypeList.showListItems();
         }
+    }
+
+    public boolean isEnabled() {
+        return !isEmpty(getCurrentSearch());
     }
 
     public interface View extends UberElemental<DataTypeSearchBar>,

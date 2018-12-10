@@ -29,6 +29,7 @@ import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataTypeManager;
 import org.kie.workbench.common.dmn.client.editors.types.listview.common.SmallSwitchComponent;
 import org.kie.workbench.common.dmn.client.editors.types.listview.confirmation.DataTypeConfirmation;
+import org.kie.workbench.common.dmn.client.editors.types.persistence.DataTypeStore;
 import org.uberfire.client.mvp.UberElemental;
 import org.uberfire.mvp.Command;
 
@@ -50,19 +51,14 @@ public class DataTypeListItem {
     private final DataTypeManager dataTypeManager;
 
     private final DataTypeConfirmation confirmation;
-
+    @Inject
+    DataTypeStore store;
     private DataType dataType;
-
     private int level;
-
     private DataTypeList dataTypeList;
-
     private String oldName;
-
     private String oldType;
-
     private String oldConstraint;
-
     private boolean oldIsCollection;
 
     @Inject
@@ -273,11 +269,15 @@ public class DataTypeListItem {
 
     List<DataType> removeTopLevelDataTypes(final List<DataType> destroyedDataTypes) {
 
-        final String destroyedType = getDataType().getName();
+        return destroyedDataTypes.stream()
+                .filter(dataType -> {
 
-        return destroyedDataTypes
-                .stream()
-                .filter(dt -> dt.isTopLevel() && (Objects.equals(dt.getName(), destroyedType) || Objects.equals(dt.getType(), destroyedType)))
+                    final boolean dataTypeIsTopLevel = dataType.isTopLevel();
+                    final boolean dataTypeIsDestroyedDataType = Objects.equals(dataType.getUUID(), getDataType().getUUID());
+                    final boolean dataTypeIsAReferenceToDestroyedDataType = getDataType().isTopLevel() && Objects.equals(dataType.getType(), getDataType().getName());
+
+                    return dataTypeIsTopLevel && (dataTypeIsDestroyedDataType || dataTypeIsAReferenceToDestroyedDataType);
+                })
                 .peek(dataTypeList::removeItem)
                 .collect(Collectors.toList());
     }

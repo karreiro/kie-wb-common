@@ -157,6 +157,18 @@ public class DataTypeConstraintModalTest {
     }
 
     @Test
+    public void testPrepareViewWhenConstraintValueSimilarToRange() {
+
+        final String constraint = "..";
+        final String type = "string";
+
+        modal.prepareView(type, constraint);
+
+        verify(view).setType(type);
+        verify(view).loadComponent(ENUMERATION.name());
+    }
+
+    @Test
     public void testSetupComponentWhenConstraintTypeIsEnumeration() {
 
         final String type = ENUMERATION.name();

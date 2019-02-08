@@ -20,12 +20,16 @@ import com.google.gwt.core.client.JavaScriptObject;
 import elemental2.dom.Element;
 import elemental2.dom.NodeList;
 import jsinterop.annotations.JsMethod;
+import jsinterop.annotations.JsProperty;
 import jsinterop.annotations.JsType;
 
 import static jsinterop.annotations.JsPackage.GLOBAL;
 
 @JsType(isNative = true)
 public abstract class JQueryTooltip {
+
+    @JsProperty(namespace = GLOBAL, name = "jQuery")
+    public static JQueryTooltip $;
 
     @JsMethod(namespace = GLOBAL, name = "jQuery")
     public native static JQueryTooltip $(final Element selector);
@@ -36,4 +40,6 @@ public abstract class JQueryTooltip {
     public native JQueryTooltip tooltip(final JavaScriptObject properties);
 
     public native JQueryTooltip tooltip();
+
+    public native boolean contains(final Element container, final Element contained); // TODO: AppFormer
 }

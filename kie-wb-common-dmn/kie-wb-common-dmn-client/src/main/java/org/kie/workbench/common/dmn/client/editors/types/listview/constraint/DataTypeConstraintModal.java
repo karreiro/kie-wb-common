@@ -77,6 +77,8 @@ public class DataTypeConstraintModal extends Elemental2Modal<DataTypeConstraintM
         superSetup();
         setWidth(WIDTH);
 
+        this.constraintRange.setModal(this);
+
         getView().init(this);
     }
 
@@ -114,6 +116,10 @@ public class DataTypeConstraintModal extends Elemental2Modal<DataTypeConstraintM
         constraintType = Optional.ofNullable(type).orElse(inferComponentType(getConstraintValue()));
         currentComponent = getComponentByType(constraintType);
         currentComponent.setValue(getConstraintValue());
+
+        if (constraintType != RANGE) {
+            enableOkButton();
+        }
     }
 
     String getConstraintValue() {
@@ -224,6 +230,14 @@ public class DataTypeConstraintModal extends Elemental2Modal<DataTypeConstraintM
         super.setWidth(width);
     }
 
+    public void enableOkButton() {
+        getView().enableOkButton();
+    }
+
+    public void disableOkButton() {
+        getView().disableOkButton();
+    }
+
     public interface View extends Elemental2Modal.View<DataTypeConstraintModal> {
 
         void setType(final String type);
@@ -235,5 +249,9 @@ public class DataTypeConstraintModal extends Elemental2Modal<DataTypeConstraintM
         void onShow();
 
         void showConstraintWarningMessage();
+
+        void enableOkButton();
+
+        void disableOkButton();
     }
 }

@@ -40,6 +40,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -74,6 +75,7 @@ public class DataTypeConstraintModalTest {
 
         modal.setup();
 
+        verify(constraintRange).setModal(modal);
         verify(modal).superSetup();
         verify(modal).setWidth(WIDTH);
         verify(view).init(modal);
@@ -183,6 +185,7 @@ public class DataTypeConstraintModalTest {
 
         assertEquals(constraintEnumeration, modal.getCurrentComponent());
         verify(constraintEnumeration).setValue(constraint);
+        verify(modal).enableOkButton();
     }
 
     @Test
@@ -197,6 +200,7 @@ public class DataTypeConstraintModalTest {
 
         assertEquals(constraintExpression, modal.getCurrentComponent());
         verify(constraintExpression).setValue(constraint);
+        verify(modal).enableOkButton();
     }
 
     @Test
@@ -211,6 +215,21 @@ public class DataTypeConstraintModalTest {
 
         assertEquals(constraintRange, modal.getCurrentComponent());
         verify(constraintRange).setValue(constraint);
+    }
+
+    @Test
+    public void testSetupComponentWhenConstraintTypeIsRangeAndValueIsEmpty() {
+
+        final ConstraintType type = RANGE;
+        final String constraint = "";
+
+        doReturn(constraint).when(modal).getConstraintValue();
+
+        modal.setupComponent(type);
+
+        assertEquals(constraintRange, modal.getCurrentComponent());
+        verify(constraintRange).setValue(constraint);
+        verify(modal, never()).enableOkButton();
     }
 
     @Test
@@ -277,5 +296,17 @@ public class DataTypeConstraintModalTest {
         modal.onDataTypeConstraintParserWarningEvent(mock(DataTypeConstraintParserWarningEvent.class));
 
         verify(view).showConstraintWarningMessage();
+    }
+
+    @Test
+    public void testEnableOkButton() {
+        modal.enableOkButton();
+        verify(view).enableOkButton();
+    }
+
+    @Test
+    public void testDisableOkButton() {
+        modal.disableOkButton();
+        verify(view).disableOkButton();
     }
 }

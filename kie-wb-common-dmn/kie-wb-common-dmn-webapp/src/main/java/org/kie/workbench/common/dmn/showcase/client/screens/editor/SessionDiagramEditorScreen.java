@@ -378,7 +378,7 @@ public class SessionDiagramEditorScreen implements KieEditorWrapperView.KieEdito
     }
 
     void setupDiagram(final Diagram diagram) {
-        decisionNavigatorDock.setupDiagram(diagram);
+//        decisionNavigatorDock.setupDiagram(diagram);
     }
 
     void setupCanvasHandler(final EditorSession session) {

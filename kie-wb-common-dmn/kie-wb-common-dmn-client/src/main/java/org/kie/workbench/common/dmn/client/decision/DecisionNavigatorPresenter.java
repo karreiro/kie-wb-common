@@ -105,7 +105,7 @@ public class DecisionNavigatorPresenter {
     }
 
     public Diagram getDiagram() {
-        return diagram;
+        return handler.getDiagram();
     }
 
     public void setDiagram(final Diagram diagram) {

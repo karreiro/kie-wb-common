@@ -26,7 +26,7 @@ public class DMNIncludeModel {
 
     private String modelPackage;
 
-    private final String path;
+    private String path;
 
     private String namespace;
 

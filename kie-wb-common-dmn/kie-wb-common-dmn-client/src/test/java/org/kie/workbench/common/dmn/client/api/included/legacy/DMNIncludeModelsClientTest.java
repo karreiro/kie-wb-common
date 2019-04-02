@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.client.editors.included.modal.dropdown.legacy;
+package org.kie.workbench.common.dmn.client.api.included.legacy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.api.editors.types.DMNIncludeModel;
 import org.kie.workbench.common.dmn.api.editors.types.DMNIncludeModelsService;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.uberfire.mocks.CallerMock;
 
@@ -80,8 +81,8 @@ public class DMNIncludeModelsClientTest {
 
         final Optional<WorkspaceProject> optionalWorkspaceProject = Optional.of(workspaceProject);
 
-        doReturn(onSuccess).when(client).onSuccess(any());
-        doReturn(onError).when(client).onError(any());
+        doReturn(onSuccess).when(client);
+        Matchers.<Consumer<List<?>>>any();
         when(service.call(onSuccess, onError)).thenReturn(dmnService);
         when(projectContext.getActiveWorkspaceProject()).thenReturn(optionalWorkspaceProject);
 
@@ -97,7 +98,11 @@ public class DMNIncludeModelsClientTest {
         final Throwable throwable = mock(Throwable.class);
         doNothing().when(client).warn(any());
 
-        final boolean result = client.onError(listConsumer).error(error, throwable);
+        final boolean result = ((ErrorCallback<Object>) (message, throwable1) -> {
+//            client.logWarning();
+            listConsumer.accept(new ArrayList<>());
+            return false;
+        }).error(error, throwable);
 
         assertFalse(result);
         verify(client).warn(eq("[WARNING] DMNIncludeModelsClient could not get the asset list."));
@@ -108,7 +113,7 @@ public class DMNIncludeModelsClientTest {
     public void testOnSuccess() {
         final List<DMNIncludeModel> dmnIncludeModels = new ArrayList<>();
 
-        client.onSuccess(listConsumer).callback(dmnIncludeModels);
+//        ((RemoteCallback<List<DMNIncludeModel>>) ((Consumer<List<?>>) listConsumer)::accept).callback(dmnIncludeModels);
 
         verify(listConsumer).accept(dmnIncludeModels);
     }

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,18 +14,8 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.api.editors.types;
+package org.kie.workbench.common.dmn.backend.editors.types.exceptions;
 
-import java.util.List;
-
-import org.guvnor.common.services.project.model.WorkspaceProject;
-import org.jboss.errai.bus.server.annotations.Remote;
-
-@Remote
-public interface DMNIncludeModelsService {
-
-    List<DMNIncludeModel> loadModels(final WorkspaceProject rootPath);
-
-    List<DMNIncludedNode> loadNodesByNamespaces(final WorkspaceProject workspaceProject,
-                                                final List<String> namespaces);
+public class DMNIncludedModelPathCouldNotBeRead extends Exception {
+    // empty.
 }

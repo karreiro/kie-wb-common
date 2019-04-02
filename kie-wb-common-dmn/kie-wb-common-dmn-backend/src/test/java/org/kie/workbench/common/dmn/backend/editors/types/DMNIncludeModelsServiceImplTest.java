@@ -23,6 +23,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.api.editors.types.DMNIncludeModel;
+import org.kie.workbench.common.dmn.backend.editors.types.common.DMNIncludeModelFactory;
+import org.kie.workbench.common.dmn.backend.editors.types.common.DMNNodesTransform;
 import org.kie.workbench.common.dmn.backend.editors.types.exceptions.DMNIncludeModelCouldNotBeCreatedException;
 import org.kie.workbench.common.services.refactoring.backend.server.query.RefactoringQueryServiceImpl;
 import org.kie.workbench.common.services.refactoring.model.query.RefactoringPageRequest;
@@ -56,6 +58,9 @@ public class DMNIncludeModelsServiceImplTest {
     private DMNIncludeModelFactory includeModelFactory;
 
     @Mock
+    private DMNNodesTransform nodesTransform;
+
+    @Mock
     private LookupResponse<DiagramRepresentation> lookupResponse;
 
     @Mock
@@ -65,7 +70,7 @@ public class DMNIncludeModelsServiceImplTest {
 
     @Before
     public void setup() {
-        service = spy(new DMNIncludeModelsServiceImpl(refactoringQueryService, diagramLookupService, includeModelFactory));
+        service = spy(new DMNIncludeModelsServiceImpl(refactoringQueryService, diagramLookupService, includeModelFactory, nodesTransform));
     }
 
     @Test

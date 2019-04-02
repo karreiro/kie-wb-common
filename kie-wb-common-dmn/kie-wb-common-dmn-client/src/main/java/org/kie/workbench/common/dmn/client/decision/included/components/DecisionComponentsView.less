@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,18 +14,26 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.api.editors.types;
+[data-i18n-prefix="DecisionComponentsView."] {
 
-import java.util.List;
+  & > label {
+    width: 100%;
 
-import org.guvnor.common.services.project.model.WorkspaceProject;
-import org.jboss.errai.bus.server.annotations.Remote;
+    & > .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+      width: 100%;
+    }
+  }
 
-@Remote
-public interface DMNIncludeModelsService {
+  .form-control {
+    margin-bottom: 15px;
+  }
 
-    List<DMNIncludeModel> loadModels(final WorkspaceProject rootPath);
+  .spinner {
+    margin: 40px auto;
+  }
 
-    List<DMNIncludedNode> loadNodesByNamespaces(final WorkspaceProject workspaceProject,
-                                                final List<String> namespaces);
+  [data-field="empty-state"] {
+    opacity: .75;
+    padding-top: 5px
+  }
 }

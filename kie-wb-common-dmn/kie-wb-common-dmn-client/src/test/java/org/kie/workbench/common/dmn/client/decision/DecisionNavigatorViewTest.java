@@ -37,13 +37,16 @@ public class DecisionNavigatorViewTest {
     private HTMLDivElement divMainTree;
 
     @Mock
+    private HTMLDivElement decisionComponents;
+
+    @Mock
     private DecisionNavigatorTreePresenter.View treeView;
 
     private DecisionNavigatorView view;
 
     @Before
     public void setup() {
-        view = spy(new DecisionNavigatorView(divMainTree));
+        view = spy(new DecisionNavigatorView(divMainTree, decisionComponents));
     }
 
     @Test

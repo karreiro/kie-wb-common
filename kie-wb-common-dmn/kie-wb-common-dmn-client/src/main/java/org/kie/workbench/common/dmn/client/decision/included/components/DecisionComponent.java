@@ -58,12 +58,20 @@ public class DecisionComponent {
         return drgElementName;
     }
 
+    public String getId() {
+        return drgElementId;
+    }
+
     public Class<? extends DRGElement> getDrgElementClass() {
         return drgElementClass;
     }
 
     public ImageDataUriGlyph getIcon() {
         return PALETTE_MAP.get(drgElementClass);
+    }
+
+    public String getClassName() {
+        return drgElementClass.getName();
     }
 
     private static Map<Class<?>, ImageDataUriGlyph> buildPaletteMap() {

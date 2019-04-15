@@ -51,9 +51,17 @@ public class DecisionComponentsItem {
     }
 
     private void setupView() {
+<<<<<<< HEAD
         view.setIcon(getDecisionComponent().getIcon().getUri().asString());
         view.setName(getDecisionComponent().getName());
         view.setFile(getDecisionComponent().getFile());
+=======
+        view.setIcon(decisionComponent.getIcon().getUri().asString());
+        view.setName(decisionComponent.getName());
+        view.setFile(decisionComponent.getFile());
+        view.setClass(decisionComponent.getClassName());
+        view.setObjectId(decisionComponent.getId());
+>>>>>>> de58440bce... fun
     }
 
     DecisionComponent getDecisionComponent() {
@@ -76,5 +84,9 @@ public class DecisionComponentsItem {
         void setName(final String name);
 
         void setFile(final String includedModelName);
+
+        void setClass(final String className);
+
+        void setObjectId(final String id);
     }
 }

@@ -26,6 +26,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
+import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.jboss.errai.ui.client.local.api.elemental2.IsElement;
@@ -79,7 +80,18 @@ public class DecisionComponents {
         clearDecisionComponents();
         startLoading();
 
-        client.loadNodesFromImports(getDMNIncludedModels(diagram), getNodesConsumer());
+        final List<DMNIncludedNode> nodes = new ArrayList<>(); // includedModelsState.getIncludedNodes();
+
+        DomGlobal.console.log("========> " + nodes.size());
+
+        view.setComponentsCounter(nodes.size());
+        view.hideLoading();
+        if (!nodes.isEmpty()) {
+            nodes.forEach(this::addComponent);
+            view.enableFilterInputs();
+        } else {
+            view.showEmptyState();
+        }
     }
 
     Consumer<List<DMNIncludedNode>> getNodesConsumer() {

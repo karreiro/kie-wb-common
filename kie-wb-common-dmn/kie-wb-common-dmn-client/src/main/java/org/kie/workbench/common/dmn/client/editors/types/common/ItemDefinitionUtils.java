@@ -16,6 +16,7 @@
 
 package org.kie.workbench.common.dmn.client.editors.types.common;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -50,8 +51,10 @@ public class ItemDefinitionUtils {
     public List<ItemDefinition> all() {
         if (dmnGraphUtils.getDefinitions() != null) {
             return dmnGraphUtils.getDefinitions().getItemDefinition();
+            // check all uses of this to return properly item def.
+            // a service most hold on all the editor to load the imported content
         } else {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
     }
 

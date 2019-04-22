@@ -42,6 +42,7 @@ import javax.xml.namespace.QName;
 
 import org.jboss.errai.marshalling.server.ServerMarshalling;
 import org.kie.dmn.backend.marshalling.v1x.DMNMarshallerFactory;
+import org.kie.dmn.model.api.Import;
 import org.kie.dmn.model.api.dmndi.Bounds;
 import org.kie.dmn.model.api.dmndi.Color;
 import org.kie.dmn.model.api.dmndi.DMNDecisionServiceDividerLine;
@@ -64,6 +65,7 @@ import org.kie.workbench.common.dmn.api.definition.v1_1.Decision;
 import org.kie.workbench.common.dmn.api.definition.v1_1.DecisionService;
 import org.kie.workbench.common.dmn.api.definition.v1_1.Definitions;
 import org.kie.workbench.common.dmn.api.definition.v1_1.InputData;
+import org.kie.workbench.common.dmn.api.definition.v1_1.ItemDefinition;
 import org.kie.workbench.common.dmn.api.definition.v1_1.KnowledgeSource;
 import org.kie.workbench.common.dmn.api.definition.v1_1.TextAnnotation;
 import org.kie.workbench.common.dmn.api.property.background.BackgroundSet;
@@ -82,6 +84,7 @@ import org.kie.workbench.common.dmn.backend.definition.v1_1.DecisionConverter;
 import org.kie.workbench.common.dmn.backend.definition.v1_1.DecisionServiceConverter;
 import org.kie.workbench.common.dmn.backend.definition.v1_1.DefinitionsConverter;
 import org.kie.workbench.common.dmn.backend.definition.v1_1.InputDataConverter;
+import org.kie.workbench.common.dmn.backend.definition.v1_1.ItemDefinitionPropertyConverter;
 import org.kie.workbench.common.dmn.backend.definition.v1_1.KnowledgeSourceConverter;
 import org.kie.workbench.common.dmn.backend.definition.v1_1.TextAnnotationConverter;
 import org.kie.workbench.common.dmn.backend.definition.v1_1.dd.ColorUtils;
@@ -198,7 +201,8 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
             }
         };
 
-        org.kie.dmn.model.api.Definitions dmnXml = marshaller.unmarshal(new InputStreamReader(input));
+        final org.kie.dmn.model.api.Definitions dmnXml = marshaller.unmarshal(new InputStreamReader(input));
+        final Map<Import, org.kie.dmn.model.api.Definitions> importDefinitions = getImportDefinitions(metadata, dmnXml);
 
         Map<String, Entry<org.kie.dmn.model.api.DRGElement, Node>> elems = dmnXml.getDrgElement().stream().collect(Collectors.toMap(org.kie.dmn.model.api.DRGElement::getId,
                                                                                                                                     dmn -> new SimpleEntry<>(dmn,
@@ -383,6 +387,9 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
 
         Node<?, ?> dmnDiagramRoot = findDMNDiagramRoot(graph);
         Definitions definitionsStunnerPojo = DefinitionsConverter.wbFromDMN(dmnXml);
+
+        loadImportedItemDefinitions(definitionsStunnerPojo, importDefinitions);
+
         ((View<DMNDiagram>) dmnDiagramRoot.getContent()).getDefinition().setDefinitions(definitionsStunnerPojo);
 
         //Only connect Nodes to the Diagram that are not referenced by DecisionServices
@@ -418,6 +425,32 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
         });
 
         return graph;
+    }
+
+    private void loadImportedItemDefinitions(final Definitions definitions,
+                                             final Map<Import, org.kie.dmn.model.api.Definitions> importDefinitions) {
+        definitions.getItemDefinition().addAll(getWbImportedItemDefinitions(importDefinitions));
+    }
+
+    private void cleanImportedItemDefinitions(final Definitions definitions) {
+        definitions.getItemDefinition().removeIf(ItemDefinition::isOnlyVisualChangeAllowed);
+    }
+
+    private List<org.kie.workbench.common.dmn.api.definition.v1_1.ItemDefinition> getWbImportedItemDefinitions(final Map<Import, org.kie.dmn.model.api.Definitions> importDefinitions) {
+        return dmnMarshallerImportsHelper
+                .getImportedItemDefinitions(importDefinitions)
+                .stream()
+                .map(ItemDefinitionPropertyConverter::wbFromDMN)
+                .peek(itemDefinition -> itemDefinition.setAllowOnlyVisualChange(true))
+                .collect(Collectors.toList());
+    }
+
+    private List<org.kie.dmn.model.api.DRGElement> getImportedDRGElements(final Map<Import, org.kie.dmn.model.api.Definitions> importDefinitions) {
+        return dmnMarshallerImportsHelper.getImportedDRGElements(importDefinitions);
+    }
+
+    private Map<Import, org.kie.dmn.model.api.Definitions> getImportDefinitions(final Metadata metadata, final org.kie.dmn.model.api.Definitions dmnXml) {
+        return dmnMarshallerImportsHelper.getImportDefinitions(metadata, dmnXml.getImport());
     }
 
     List<org.kie.dmn.model.api.DRGElement> getImportedDRGElements(final Metadata metadata,
@@ -471,7 +504,7 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
             return decisionServiceConverter.nodeFromDMN((org.kie.dmn.model.api.DecisionService) dmn,
                                                         hasComponentWidthsConsumer);
         } else {
-            throw new UnsupportedOperationException("TODO"); // TODO 
+            throw new UnsupportedOperationException("TODO"); // TODO
         }
     }
 
@@ -583,6 +616,7 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
 
         Node<View<DMNDiagram>, ?> dmnDiagramRoot = (Node<View<DMNDiagram>, ?>) findDMNDiagramRoot(g);
         Definitions definitionsStunnerPojo = dmnDiagramRoot.getContent().getDefinition().getDefinitions();
+        cleanImportedItemDefinitions(definitionsStunnerPojo);
         org.kie.dmn.model.api.Definitions definitions = DefinitionsConverter.dmnFromWB(definitionsStunnerPojo);
         if (definitions.getExtensionElements() == null) {
             if (definitions instanceof org.kie.dmn.model.v1_1.KieDMNModelInstrumentedBase) {
@@ -679,7 +713,7 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
                             }
 
                             DMNEdge dmnEdge = new org.kie.dmn.model.v1_2.dmndi.DMNEdge();
-                            // DMNDI edge elementRef is uuid of Stunner edge, 
+                            // DMNDI edge elementRef is uuid of Stunner edge,
                             // with the only exception when edge contains as content a DMN Association (Association is an edge)
                             String uuid = e.getUUID();
                             if (e.getContent() instanceof View<?>) {

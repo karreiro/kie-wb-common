@@ -19,7 +19,10 @@ package org.kie.workbench.common.dmn.backend;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -28,6 +31,7 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.xml.namespace.QName;
 
 import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.guvnor.common.services.project.service.WorkspaceProjectService;
@@ -35,6 +39,8 @@ import org.kie.dmn.api.marshalling.DMNMarshaller;
 import org.kie.dmn.model.api.DRGElement;
 import org.kie.dmn.model.api.Definitions;
 import org.kie.dmn.model.api.Import;
+import org.kie.dmn.model.api.ItemDefinition;
+import org.kie.workbench.common.dmn.api.property.dmn.types.BuiltInType;
 import org.kie.workbench.common.dmn.backend.common.DMNPathsHelper;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.uberfire.backend.server.util.Paths;
@@ -69,6 +75,49 @@ public class DMNMarshallerImportsHelper {
         this.marshaller = marshaller;
     }
 
+    public Map<Import, Definitions> getImportDefinitions(final Metadata metadata,
+                                                         final List<Import> imports) {
+
+        final Map<Import, Definitions> importDefinitions = new HashMap<>();
+
+        if (imports.size() > 0) {
+            for (final Definitions definitions : getOtherDMNDiagramsDefinitions(metadata)) {
+
+                final Optional<Import> anImport = findImportByDefinitions(definitions, imports);
+                final boolean isDiagramAnImport = anImport.isPresent();
+
+                if (isDiagramAnImport) {
+                    importDefinitions.put(anImport.get(), definitions);
+                }
+            }
+        }
+
+        return importDefinitions;
+    }
+
+    public List<ItemDefinition> getImportedItemDefinitions(final Map<Import, Definitions> importDefinitions) {
+
+        final List<ItemDefinition> itemDefinitions = new ArrayList<>();
+
+        importDefinitions.forEach((anImport, definitions) -> {
+            itemDefinitions.addAll(getItemDefinitionsWithNamespace(definitions, anImport));
+        });
+
+        return itemDefinitions;
+    }
+
+    public List<DRGElement> getImportedDRGElements(final Map<Import, Definitions> importDefinitions) {
+
+        final List<DRGElement> importedNodes = new ArrayList<>();
+
+        importDefinitions.forEach((anImport, definitions) -> {
+            importedNodes.addAll(getDrgElementsWithNamespace(definitions, anImport));
+        });
+
+        return importedNodes;
+    }
+
+    @Deprecated
     public List<DRGElement> getImportedDRGElements(final Metadata metadata,
                                                    final List<Import> imports) {
 
@@ -87,6 +136,59 @@ public class DMNMarshallerImportsHelper {
         }
 
         return importedNodes;
+    }
+
+    private List<ItemDefinition> getItemDefinitionsWithNamespace(final Definitions definitions,
+                                                                 final Import anImport) {
+
+        final List<ItemDefinition> itemDefinitions = definitions.getItemDefinition();
+        final String namespace = anImport.getName();
+
+        return setItemDefinitionsNamespace(itemDefinitions, namespace);
+    }
+
+    private List<ItemDefinition> setItemDefinitionsNamespace(final List<ItemDefinition> itemDefinitions,
+                                                             final String namespace) {
+        return itemDefinitions
+                .stream()
+                .peek(itemDefinition -> setItemDefinitionNamespace(itemDefinition, namespace))
+                .collect(Collectors.toList());
+    }
+
+    private void setItemDefinitionNamespace(final ItemDefinition itemDefinition,
+                                            final String namespace) {
+
+        final String nameWithNamespace = namespace + "." + itemDefinition.getName();
+        final List<ItemDefinition> itemComponents = itemDefinition.getItemComponent();
+
+        if (itemDefinition.getTypeRef() != null && !isBuiltInType(itemDefinition.getTypeRef())) {
+            itemDefinition.setTypeRef(makeQNameWithNamespace(itemDefinition.getTypeRef(), namespace));
+        }
+
+        itemDefinition.setName(nameWithNamespace);
+        setItemDefinitionsNamespace(itemComponents, namespace);
+    }
+
+    private boolean isBuiltInType(final QName typeRef) {
+        return Arrays
+                .stream(BuiltInType.values())
+                .anyMatch(builtInType -> {
+
+                    final String builtInTypeName = builtInType.getName();
+                    final String typeRefName = typeRef.getLocalPart();
+
+                    return Objects.equals(builtInTypeName, typeRefName);
+                });
+    }
+
+    private QName makeQNameWithNamespace(final QName qName,
+                                         final String namespace) {
+
+        final String namespaceURI = qName.getNamespaceURI();
+        final String localPart = namespace + "." + qName.getLocalPart();
+        final String prefix = qName.getPrefix();
+
+        return new QName(namespaceURI, localPart, prefix);
     }
 
     List<DRGElement> getDrgElementsWithNamespace(final Definitions definitions,

@@ -252,6 +252,11 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
             org.kie.dmn.model.api.DRGElement elem = kv.getKey();
             Node currentNode = kv.getValue();
 
+            // For imported nodes, we don't have its connections
+            if (elem.getId().contains(":")) {
+                continue;
+            }
+
             // DMN spec table 2: Requirements connection rules
             if (elem instanceof org.kie.dmn.model.api.Decision) {
                 org.kie.dmn.model.api.Decision decision = (org.kie.dmn.model.api.Decision) elem;

@@ -23,7 +23,6 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.AbstractMap;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -71,9 +70,11 @@ import org.kie.dmn.api.core.ast.BusinessKnowledgeModelNode;
 import org.kie.dmn.backend.marshalling.v1x.DMNMarshallerFactory;
 import org.kie.dmn.core.util.DMNRuntimeUtil;
 import org.kie.dmn.core.util.KieHelper;
+import org.kie.dmn.model.api.DRGElement;
 import org.kie.dmn.model.api.DecisionTable;
 import org.kie.dmn.model.api.Definitions;
 import org.kie.dmn.model.api.FunctionKind;
+import org.kie.dmn.model.api.Import;
 import org.kie.dmn.model.api.dmndi.Bounds;
 import org.kie.dmn.model.api.dmndi.Color;
 import org.kie.dmn.model.api.dmndi.DMNEdge;
@@ -107,6 +108,7 @@ import org.kie.workbench.common.dmn.api.definition.v1_1.LiteralExpression;
 import org.kie.workbench.common.dmn.api.definition.v1_1.TextAnnotation;
 import org.kie.workbench.common.dmn.api.property.dmn.Id;
 import org.kie.workbench.common.dmn.api.property.dmn.types.BuiltInType;
+import org.kie.workbench.common.dmn.backend.common.DMNMarshallerImportsHelper;
 import org.kie.workbench.common.dmn.backend.definition.v1_1.DecisionConverter;
 import org.kie.workbench.common.dmn.backend.definition.v1_1.InputDataConverter;
 import org.kie.workbench.common.dmn.backend.definition.v1_1.TextAnnotationConverter;
@@ -158,6 +160,7 @@ import org.slf4j.LoggerFactory;
 import org.uberfire.commons.uuid.UUID;
 import org.xml.sax.InputSource;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -201,6 +204,9 @@ public class DMNMarshallerTest {
 
     @Mock
     DefinitionsCacheRegistry definitionsRegistry;
+
+    @Mock
+    DMNMarshallerImportsHelper dmnMarshallerImportsHelper;
 
     EdgeFactory<Object> connectionEdgeFactory;
     NodeFactory<Object> viewNodeFactory;
@@ -333,8 +339,7 @@ public class DMNMarshallerTest {
     @Test
     public void testLoan() throws IOException {
         roundTripUnmarshalMarshalThenUnmarshalDMN(getClass().getResourceAsStream("/Loan Pre-Qualification.dmn"));
-        DMNMarshaller m = new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(),
-                                            applicationFactoryManager);
+        DMNMarshaller m = getDMNMarshaller();
         Graph<?, ?> g = m.unmarshall(null, this.getClass().getResourceAsStream("/Loan Pre-Qualification.dmn"));
         DiagramImpl diagram = new DiagramImpl("", null);
         diagram.setGraph(g);
@@ -386,8 +391,7 @@ public class DMNMarshallerTest {
                                                this::checkDiamondGraph);
 
         // additionally, check the marshalled is still DMN executable as expected
-        DMNMarshaller m = new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(),
-                                            applicationFactoryManager);
+        DMNMarshaller m = getDMNMarshaller();
         Graph<?, ?> g = m.unmarshall(null,
                                      this.getClass().getResourceAsStream("/diamondDMN12.dmn"));
         DiagramImpl diagram = new DiagramImpl("",
@@ -468,20 +472,20 @@ public class DMNMarshallerTest {
 
     private static DMNShape findShapeByDMNI(org.kie.dmn.model.api.dmndi.DMNDiagram root, String id) {
         return root.getDMNDiagramElement().stream()
-                .filter(DMNShape.class::isInstance)
-                .map(DMNShape.class::cast)
-                .filter(shape -> shape.getDmnElementRef().getLocalPart().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new UnsupportedOperationException("There is no DMNShape with id '" + id + "' in DMNDiagram " + root));
+                   .filter(DMNShape.class::isInstance)
+                   .map(DMNShape.class::cast)
+                   .filter(shape -> shape.getDmnElementRef().getLocalPart().equals(id))
+                   .findFirst()
+                   .orElseThrow(() -> new UnsupportedOperationException("There is no DMNShape with id '" + id + "' in DMNDiagram " + root));
     }
 
     private static DMNEdge findEdgeByDMNI(org.kie.dmn.model.api.dmndi.DMNDiagram root, String id) {
         return root.getDMNDiagramElement().stream()
-                .filter(DMNEdge.class::isInstance)
-                .map(DMNEdge.class::cast)
-                .filter(shape -> shape.getDmnElementRef().getLocalPart().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new UnsupportedOperationException("There is no DMNEdge with id '" + id + "' in DMNDiagram " + root));
+                   .filter(DMNEdge.class::isInstance)
+                   .map(DMNEdge.class::cast)
+                   .filter(shape -> shape.getDmnElementRef().getLocalPart().equals(id))
+                   .findFirst()
+                   .orElseThrow(() -> new UnsupportedOperationException("There is no DMNEdge with id '" + id + "' in DMNDiagram " + root));
     }
 
     @Test
@@ -540,8 +544,7 @@ public class DMNMarshallerTest {
 
     @Test
     public void test_decisionservice_1outputDecision() throws IOException {
-        final DMNMarshaller m = new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(),
-                                                  applicationFactoryManager);
+        final DMNMarshaller m = getDMNMarshaller();
         @SuppressWarnings("unchecked")
         final Graph<?, Node<?, ?>> g = m.unmarshall(null, this.getClass().getResourceAsStream("/DROOLS-3372.dmn"));
         Node<?, ?> nodeDS = g.getNode("_659a06e2-ae80-496c-8783-f790a640bb49");
@@ -571,8 +574,7 @@ public class DMNMarshallerTest {
 
     @Test
     public void test_decisionservice_1outputDecision1encapsulatedDecision() throws IOException {
-        final DMNMarshaller m = new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(),
-                                                  applicationFactoryManager);
+        final DMNMarshaller m = getDMNMarshaller();
         @SuppressWarnings("unchecked")
         final Graph<?, Node<?, ?>> g = m.unmarshall(null, this.getClass().getResourceAsStream("/DROOLS-3372.dmn"));
         Node<?, ?> nodeDS = g.getNode("_659a06e2-ae80-496c-8783-f790a640bb49");
@@ -606,8 +608,7 @@ public class DMNMarshallerTest {
 
     @Test
     public void test_decisionservice2_1outputDecision1encapsulatedDecision() throws IOException {
-        final DMNMarshaller m = new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(),
-                                                  applicationFactoryManager);
+        final DMNMarshaller m = getDMNMarshaller();
         @SuppressWarnings("unchecked")
         final Graph<?, Node<?, ?>> g = m.unmarshall(null, this.getClass().getResourceAsStream("/DROOLS-3372bis.dmn"));
         Node<?, ?> nodeDS = g.getNode("_659a06e2-ae80-496c-8783-f790a640bb49");
@@ -645,8 +646,7 @@ public class DMNMarshallerTest {
 
     @Test
     public void test_decisionservice2_remove_1outputDecision1encapsulatedDecision() throws IOException {
-        final DMNMarshaller m = new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(),
-                                                  applicationFactoryManager);
+        final DMNMarshaller m = getDMNMarshaller();
         @SuppressWarnings("unchecked")
         final Graph<?, Node<?, ?>> g = m.unmarshall(null, this.getClass().getResourceAsStream("/DROOLS-3372bis.dmn"));
         Node<?, ?> nodeDS = g.getNode("_659a06e2-ae80-496c-8783-f790a640bb49");
@@ -831,8 +831,7 @@ public class DMNMarshallerTest {
 
     public void roundTripUnmarshalThenMarshalUnmarshal(InputStream dmnXmlInputStream,
                                                        Consumer<Graph<?, Node<?, ?>>> checkGraphConsumer) throws IOException {
-        DMNMarshaller m = new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(),
-                                            applicationFactoryManager);
+        DMNMarshaller m = getDMNMarshaller();
 
         // first unmarshal from DMN XML to Stunner DMN Graph
         @SuppressWarnings("unchecked")
@@ -932,13 +931,13 @@ public class DMNMarshallerTest {
         assertEquals("literalExpression1's parent-parent is contextNode",
                      "_0f38d114-5d6e-40dd-aa9c-9f031f9b0571",
                      ((DMNElement) (literalExpression1).getParent()
-                             .getParent()).getId().getValue());
+                                       .getParent()).getId().getValue());
 
         Expression literalExpression2 = context.getContextEntry().get(1).getExpression();
         assertEquals("literalExpression2's parent-parent is contextNode",
                      "_0f38d114-5d6e-40dd-aa9c-9f031f9b0571",
                      ((DMNElement) (literalExpression2).getParent()
-                             .getParent()).getId().getValue());
+                                       .getParent()).getId().getValue());
     }
 
     private void checkDecisionWithContextWithDefaultResult(Graph<?, Node<?, ?>> g) {
@@ -957,7 +956,7 @@ public class DMNMarshallerTest {
         assertEquals("defaultResultExpression's parent-parent is contextNode",
                      "_0f38d114-5d6e-40dd-aa9c-9f031f9b0571",
                      ((DMNElement) (defaultResultExpression).getParent()
-                             .getParent()).getId().getValue());
+                                       .getParent()).getId().getValue());
     }
 
     private void checkDecisionWithContextWithoutDefaultResult(Graph<?, Node<?, ?>> g) {
@@ -1289,8 +1288,7 @@ public class DMNMarshallerTest {
                      0,
                      runtime0.getModels().get(0).getMessages(DMNMessage.Severity.ERROR).size());
 
-        DMNMarshaller m = new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(),
-                                            applicationFactoryManager);
+        DMNMarshaller m = getDMNMarshaller();
 
         // first unmarshal from DMN XML to Stunner DMN Graph
         @SuppressWarnings("unchecked")
@@ -1351,8 +1349,7 @@ public class DMNMarshallerTest {
         assertTrue("The DMN XML content did NOT result in compilation errors and this test method expected errors to be detected. If this was intentional use test method roundTripUnmarshalMarshalThenUnmarshalDMN",
                    messages0.stream().filter(m -> m.getLevel().equals(Message.Level.ERROR)).count() > 0);
 
-        DMNMarshaller m = new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(),
-                                            applicationFactoryManager);
+        DMNMarshaller m = getDMNMarshaller();
 
         // first unmarshal from DMN XML to Stunner DMN Graph
         @SuppressWarnings("unchecked")
@@ -1440,8 +1437,7 @@ public class DMNMarshallerTest {
 
     @Test
     public void test_function_java_WB_model() throws IOException {
-        final DMNMarshaller m = new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(),
-                                                  applicationFactoryManager);
+        final DMNMarshaller m = getDMNMarshaller();
 
         @SuppressWarnings("unchecked")
         final Graph<?, Node<?, ?>> g = m.unmarshall(null,
@@ -1450,11 +1446,11 @@ public class DMNMarshallerTest {
         final Stream<Node<?, ?>> stream = StreamSupport.stream(Spliterators.spliteratorUnknownSize(g.nodes().iterator(), Spliterator.ORDERED),
                                                                false);
         final Optional<Decision> wbDecision = stream
-                .filter(n -> n.getContent() instanceof ViewImpl)
-                .map(n -> (ViewImpl) n.getContent())
-                .filter(n -> n.getDefinition() instanceof Decision)
-                .map(n -> (Decision) n.getDefinition())
-                .findFirst();
+                                                  .filter(n -> n.getContent() instanceof ViewImpl)
+                                                  .map(n -> (ViewImpl) n.getContent())
+                                                  .filter(n -> n.getDefinition() instanceof Decision)
+                                                  .map(n -> (Decision) n.getDefinition())
+                                                  .findFirst();
 
         wbDecision.ifPresent(d -> {
             assertTrue(d.getExpression() instanceof FunctionDefinition);
@@ -1544,7 +1540,7 @@ public class DMNMarshallerTest {
         assertEquals("", ((org.kie.dmn.model.api.LiteralExpression) contextEntryValue).getText()); // DROOLS-3152
 
         // -- Stunner side.
-        DMNMarshaller m = new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(), applicationFactoryManager);
+        DMNMarshaller m = getDMNMarshaller();
         Graph<?, ?> g = m.unmarshall(null, this.getClass().getResourceAsStream("/wrong_context.dmn"));
 
         Node<?, ?> decisionNode = g.getNode("_653b3426-933a-4050-9568-ab2a66b43c36");
@@ -1582,7 +1578,7 @@ public class DMNMarshallerTest {
         assertEquals("", ((org.kie.dmn.model.api.LiteralExpression) d0le).getText()); // DROOLS-3152
 
         // -- Stunner side.
-        DMNMarshaller m = new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(), applicationFactoryManager);
+        DMNMarshaller m = getDMNMarshaller();
         Graph<?, ?> g = m.unmarshall(null, this.getClass().getResourceAsStream("/wrong_decision.dmn"));
 
         Node<?, ?> decisionNode = g.getNode("_cce32679-9395-444d-a4bf-96af8ee727a0");
@@ -1600,17 +1596,17 @@ public class DMNMarshallerTest {
     @Test
     public void testOtherElements() throws IOException, XPathExpressionException {
         String original = new Scanner(this.getClass().getResourceAsStream("/dummy.dmn")).useDelimiter("\\A").next();
-        DMNMarshaller marshaller = new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(), applicationFactoryManager);
+        DMNMarshaller marshaller = getDMNMarshaller();
         DiagramImpl diagram = new DiagramImpl("", null);
         diagram.setGraph(marshaller.unmarshall(null, getClass().getResourceAsStream("/dummy.dmn")));
         String roundtripped = marshaller.marshall(diagram);
         LOG.debug(roundtripped);
         XPath xpathOriginal = namespaceAwareXPath(
-                new AbstractMap.SimpleEntry<>("semantic", "http://www.omg.org/spec/DMN/20151101/dmn.xsd"),
-                new AbstractMap.SimpleEntry<>("drools", "http://www.drools.org/kie/dmn/1.1"));
+            new AbstractMap.SimpleEntry<>("semantic", "http://www.omg.org/spec/DMN/20151101/dmn.xsd"),
+            new AbstractMap.SimpleEntry<>("drools", "http://www.drools.org/kie/dmn/1.1"));
         XPath xpathRountripped = namespaceAwareXPath(
-                new AbstractMap.SimpleEntry<>("semantic", "http://www.omg.org/spec/DMN/20180521/MODEL/"),
-                new AbstractMap.SimpleEntry<>("drools", "http://www.drools.org/kie/dmn/1.2")
+            new AbstractMap.SimpleEntry<>("semantic", "http://www.omg.org/spec/DMN/20180521/MODEL/"),
+            new AbstractMap.SimpleEntry<>("drools", "http://www.drools.org/kie/dmn/1.2")
         );
         assertXPathEquals(xpathOriginal, xpathRountripped, "boolean(/semantic:definitions/semantic:extensionElements)", original, roundtripped);
 
@@ -1668,8 +1664,7 @@ public class DMNMarshallerTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testContextEntryDataType() throws Exception {
-        final DMNMarshaller marshaller = new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(),
-                                                           applicationFactoryManager);
+        final DMNMarshaller marshaller = getDMNMarshaller();
 
         final Context context = new Context();
         context.setTypeRef(BuiltInType.DATE_TIME.asQName());
@@ -1752,8 +1747,7 @@ public class DMNMarshallerTest {
         DMNMarshaller.connectRootWithChild(diagramRoot, inputDataNode);
         DMNMarshaller.connectRootWithChild(diagramRoot, decisionNode);
 
-        DMNMarshaller m = new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(),
-                                            applicationFactoryManager);
+        DMNMarshaller m = getDMNMarshaller();
         String output = m.marshall(diagram);
         LOG.debug(output);
 
@@ -1813,8 +1807,7 @@ public class DMNMarshallerTest {
         DMNMarshaller.connectRootWithChild(diagramRoot, inputDataNode);
         DMNMarshaller.connectRootWithChild(diagramRoot, textAnnotationNode);
 
-        DMNMarshaller m = new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(),
-                                            applicationFactoryManager);
+        DMNMarshaller m = getDMNMarshaller();
         String output = m.marshall(diagram);
         LOG.debug(output);
 
@@ -1828,6 +1821,25 @@ public class DMNMarshallerTest {
     public void test_ExpressionComponentWidthPersistence() throws IOException {
         roundTripUnmarshalThenMarshalUnmarshal(this.getClass().getResourceAsStream("/DROOLS-2262.dmn"),
                                                this::checkComponentWidths);
+    }
+
+    @Test
+    public void testGetImportedDRGElements() {
+
+        final Metadata metadata = mock(Metadata.class);
+        final org.kie.dmn.model.api.Definitions dmnXml = mock(org.kie.dmn.model.api.Definitions.class);
+        final List<Import> imports = asList(mock(Import.class), mock(Import.class));
+        final DMNMarshaller marshaller = getDMNMarshaller();
+        final List<DRGElement> expectedDRGElements = asList(mock(DRGElement.class), mock(DRGElement.class), mock(DRGElement.class));
+        final Map<Import, Definitions> definitions = mock(Map.class);
+
+        when(dmnXml.getImport()).thenReturn(imports);
+        when(dmnMarshallerImportsHelper.getImportDefinitions(metadata, imports)).thenReturn(definitions);
+        when(dmnMarshallerImportsHelper.getImportedDRGElements(definitions)).thenReturn(expectedDRGElements);
+
+        final List<DRGElement> actualDRGElements = marshaller.getImportedDRGElements(metadata, dmnXml);
+
+        assertEquals(expectedDRGElements, actualDRGElements);
     }
 
     @SuppressWarnings("unchecked")
@@ -1872,7 +1884,7 @@ public class DMNMarshallerTest {
         doReturn(decision).when(decisionView).getDefinition();
         decision.setExpression(expression);
 
-        doReturn(Arrays.asList(diagramNode, decisionNode)).when(graph).nodes();
+        doReturn(asList(diagramNode, decisionNode)).when(graph).nodes();
         ((DiagramImpl) diagram).setGraph(graph);
 
         return diagram;
@@ -1893,8 +1905,8 @@ public class DMNMarshallerTest {
 
     private static Node<View, ?> nodeOfDefinition(final Iterator<Node<View, ?>> nodesIterator, final Class aClass) {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(nodesIterator, Spliterator.NONNULL), false)
-                .filter(node -> aClass.isInstance(node.getContent().getDefinition()))
-                .findFirst().get();
+                   .filter(node -> aClass.isInstance(node.getContent().getDefinition()))
+                   .findFirst().get();
     }
 
     @SafeVarargs
@@ -1928,6 +1940,12 @@ public class DMNMarshallerTest {
             }
         });
         return result;
+    }
+
+    private DMNMarshaller getDMNMarshaller() {
+        return new DMNMarshaller(new XMLEncoderDiagramMetadataMarshaller(),
+                                 applicationFactoryManager,
+                                 dmnMarshallerImportsHelper);
     }
 
     private void assertXPathEquals(XPath xpathOriginal, XPath xpathRoundtrip, String xpathExpression, String expectedXml, String actualXml) throws XPathExpressionException {

@@ -70,11 +70,9 @@ import org.kie.dmn.api.core.ast.BusinessKnowledgeModelNode;
 import org.kie.dmn.backend.marshalling.v1x.DMNMarshallerFactory;
 import org.kie.dmn.core.util.DMNRuntimeUtil;
 import org.kie.dmn.core.util.KieHelper;
-import org.kie.dmn.model.api.DRGElement;
 import org.kie.dmn.model.api.DecisionTable;
 import org.kie.dmn.model.api.Definitions;
 import org.kie.dmn.model.api.FunctionKind;
-import org.kie.dmn.model.api.Import;
 import org.kie.dmn.model.api.dmndi.Bounds;
 import org.kie.dmn.model.api.dmndi.Color;
 import org.kie.dmn.model.api.dmndi.DMNEdge;
@@ -1824,22 +1822,33 @@ public class DMNMarshallerTest {
     }
 
     @Test
-    public void testGetImportedDRGElements() {
+    public void testGetImportedDrgElementsByShape() {
+        // TODO
+    }
 
-        final Metadata metadata = mock(Metadata.class);
-        final org.kie.dmn.model.api.Definitions dmnXml = mock(org.kie.dmn.model.api.Definitions.class);
-        final List<Import> imports = asList(mock(Import.class), mock(Import.class));
-        final DMNMarshaller marshaller = getDMNMarshaller();
-        final List<DRGElement> expectedDRGElements = asList(mock(DRGElement.class), mock(DRGElement.class), mock(DRGElement.class));
-        final Map<Import, Definitions> definitions = mock(Map.class);
+    @Test
+    public void testGetDmnElementRef() {
+        // TODO
+    }
 
-        when(dmnXml.getImport()).thenReturn(imports);
-        when(dmnMarshallerImportsHelper.getImportDefinitions(metadata, imports)).thenReturn(definitions);
-        when(dmnMarshallerImportsHelper.getImportedDRGElements(definitions)).thenReturn(expectedDRGElements);
+    @Test
+    public void testGetUniqueDMNShapes() {
+        // TODO
+    }
 
-        final List<DRGElement> actualDRGElements = marshaller.getImportedDRGElements(metadata, dmnXml);
+    @Test
+    public void testSetAllowOnlyVisualChange() {
+        // TODO
+    }
 
-        assertEquals(expectedDRGElements, actualDRGElements);
+    @Test
+    public void testIsImportedDRGElementWithDmnDRGElement() {
+        // TODO
+    }
+
+    @Test
+    public void testIsImportedDRGElementWithWbDRGElement() {
+        // TODO
     }
 
     @SuppressWarnings("unchecked")

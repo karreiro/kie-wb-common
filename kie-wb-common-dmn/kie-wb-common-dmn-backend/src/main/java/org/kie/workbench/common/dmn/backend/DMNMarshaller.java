@@ -115,6 +115,8 @@ import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
 import org.kie.workbench.common.stunner.core.graph.impl.EdgeImpl;
 import org.kie.workbench.common.stunner.core.util.UUID;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toMap;
 import static org.kie.workbench.common.dmn.backend.definition.v1_1.dd.PointUtils.heightOfShape;
 import static org.kie.workbench.common.dmn.backend.definition.v1_1.dd.PointUtils.lowerRightBound;
 import static org.kie.workbench.common.dmn.backend.definition.v1_1.dd.PointUtils.upperLeftBound;
@@ -202,43 +204,25 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
             }
         };
 
-        org.kie.dmn.model.api.Definitions dmnXml = marshaller.unmarshal(new InputStreamReader(input));
+        final org.kie.dmn.model.api.Definitions dmnXml = marshaller.unmarshal(new InputStreamReader(input));
+        final List<org.kie.dmn.model.api.DRGElement> diagramDrgElements = dmnXml.getDrgElement();
+        final Optional<org.kie.dmn.model.api.dmndi.DMNDiagram> dmnDDDiagram = findDMNDiagram(dmnXml);
 
-        final List<org.kie.dmn.model.api.DRGElement> importedDRGElements = getImportedDRGElements(metadata, dmnXml);
+        // Get external model information
+        final Map<Import, org.kie.dmn.model.api.Definitions> importDefinitions = dmnMarshallerImportsHelper.getImportDefinitions(metadata, dmnXml.getImport());
 
+        // Map external DRGElements
+        final List<DMNShape> dmnShapes = dmnDDDiagram.map(this::getUniqueDMNShapes).orElse(emptyList());
+        final List<org.kie.dmn.model.api.DRGElement> importedDrgElements = getImportedDrgElementsByShape(dmnShapes, importDefinitions);
+
+        // Group DRGElements
         final List<org.kie.dmn.model.api.DRGElement> drgElements = new ArrayList<>();
+        drgElements.addAll(diagramDrgElements);
+        drgElements.addAll(importedDrgElements);
 
-        drgElements.addAll(dmnXml.getDrgElement());
-
-        Optional<org.kie.dmn.model.api.dmndi.DMNDiagram> dmnDDDiagram = findDMNDiagram(dmnXml);
-
-        if (dmnDDDiagram.isPresent()) {
-            final org.kie.dmn.model.api.dmndi.DMNDiagram diagram = dmnDDDiagram.get();
-            List<org.kie.dmn.model.api.dmndi.DiagramElement> existingElements = diagram.getDMNDiagramElement();
-            for (org.kie.dmn.model.api.dmndi.DiagramElement existingElement : existingElements) {
-
-                if (existingElement instanceof DMNShape) {
-                    final DMNShape shape = (DMNShape) existingElement;
-                    final QName reference = shape.getDmnElementRef();
-                    if (reference != null) {
-                        final String referenced = reference.getLocalPart();
-                        if (!drgElements.stream().anyMatch(d -> referenced.equals(d.getId()))) {
-                            Optional<org.kie.dmn.model.api.DRGElement> ref = importedDRGElements.stream().filter(d -> referenced.equals(d.getId())).findFirst();
-                            if (ref.isPresent()) {
-                                drgElements.add(ref.get());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        Map<String, Entry<org.kie.dmn.model.api.DRGElement, Node>> elems = drgElements.stream().collect(Collectors.toMap(org.kie.dmn.model.api.DRGElement::getId,
-                                                                                                                         dmn -> new SimpleEntry<>(dmn,
-                                                                                                                                                  dmnToStunner(dmn,
-                                                                                                                                                               hasComponentWidthsConsumer))));
-
-
+        Map<String, Entry<org.kie.dmn.model.api.DRGElement, Node>> elems = drgElements.stream().collect(toMap(org.kie.dmn.model.api.DRGElement::getId,
+                                                                                                              dmn -> new SimpleEntry<>(dmn,
+                                                                                                                                       dmnToStunner(dmn, hasComponentWidthsConsumer, importedDrgElements))));
 
         Set<org.kie.dmn.model.api.DecisionService> dmnDecisionServices = new HashSet<>();
 
@@ -253,7 +237,7 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
             Node currentNode = kv.getValue();
 
             // For imported nodes, we don't have its connections
-            if (elem.getId().contains(":")) {
+            if (isImportedDRGElement(importedDrgElements, elem)) {
                 continue;
             }
 
@@ -445,7 +429,7 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
             //This condition is required because a node with ComponentsWidthsExtension
             //can be imported from another diagram but the extension is not imported or present in this diagram.
             //TODO: This will be fixed in this JIRA: https://issues.jboss.org/browse/DROOLS-3934
-            if (extension.get().getComponentsWidths() != null) {
+            if (componentsWidthsExtension.getComponentsWidths() != null) {
                 hasComponentWidthsMap.entrySet().forEach(es -> {
                     componentsWidthsExtension
                         .getComponentsWidths()
@@ -464,11 +448,39 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
         return graph;
     }
 
-    List<org.kie.dmn.model.api.DRGElement> getImportedDRGElements(final Metadata metadata,
-                                                                  final org.kie.dmn.model.api.Definitions dmnXml) {
+    List<org.kie.dmn.model.api.DRGElement> getImportedDrgElementsByShape(final List<DMNShape> dmnShapes,
+                                                                         final Map<Import, org.kie.dmn.model.api.Definitions> importDefinitions) {
 
-        final Map<Import, org.kie.dmn.model.api.Definitions> importDefinitions = dmnMarshallerImportsHelper.getImportDefinitions(metadata, dmnXml.getImport());
-        return dmnMarshallerImportsHelper.getImportedDRGElements(importDefinitions);
+        final List<org.kie.dmn.model.api.DRGElement> importedDRGElements = dmnMarshallerImportsHelper.getImportedDRGElements(importDefinitions);
+
+        return dmnShapes
+                .stream()
+                .map(shape -> {
+
+                    final String dmnElementRef = getDmnElementRef(shape);
+                    final Optional<org.kie.dmn.model.api.DRGElement> ref = importedDRGElements.stream().filter(drgElement -> Objects.equals(dmnElementRef, drgElement.getId())).findFirst();
+
+                    return ref.orElse(null);
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    String getDmnElementRef(final DMNShape dmnShape) {
+        return Optional
+                .ofNullable(dmnShape.getDmnElementRef())
+                .map(QName::getLocalPart)
+                .orElse("");
+    }
+
+    List<DMNShape> getUniqueDMNShapes(final org.kie.dmn.model.api.dmndi.DMNDiagram dmnDDDiagram) {
+        return new ArrayList<>(dmnDDDiagram
+                                       .getDMNDiagramElement()
+                                       .stream()
+                                       .filter(diagramElements -> diagramElements instanceof DMNShape)
+                                       .map(d -> (DMNShape) d)
+                                       .collect(toMap(DMNShape::getId, shape -> shape, (shape1, shape2) -> shape1))
+                                       .values());
     }
 
     /**
@@ -499,11 +511,12 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
         return href.contains("#") ? href.substring(href.indexOf('#') + 1) : href;
     }
 
-    private Node dmnToStunner(org.kie.dmn.model.api.DRGElement dmn,
-                              final BiConsumer<String, HasComponentWidths> hasComponentWidthsConsumer) {
+    private Node dmnToStunner(final org.kie.dmn.model.api.DRGElement dmn,
+                              final BiConsumer<String, HasComponentWidths> hasComponentWidthsConsumer,
+                              final List<org.kie.dmn.model.api.DRGElement> importedDrgElements) {
 
         final Node node = createNode(dmn, hasComponentWidthsConsumer);
-        return setAllowOnlyVisualChange(node);
+        return setAllowOnlyVisualChange(importedDrgElements, node);
     }
 
     private Node createNode(org.kie.dmn.model.api.DRGElement dmn,
@@ -528,21 +541,47 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
         }
     }
 
-    private Node setAllowOnlyVisualChange(final Node node) {
+    Node setAllowOnlyVisualChange(final List<org.kie.dmn.model.api.DRGElement> importedDrgElements,
+                                  final Node node) {
 
-        final Object content = node.getContent();
-        if (content instanceof Definition) {
-            final Definition definition = (Definition) content;
-            final Object objectDefinition = definition.getDefinition();
-            if (objectDefinition instanceof DynamicReadOnly && objectDefinition instanceof DMNElement) {
-                final String id = ((DMNElement) objectDefinition).getId().getValue();
-                if (id.contains(":")) {
-                    ((DynamicReadOnly) objectDefinition).setAllowOnlyVisualChange(true);
-                }
+        getDRGElement(node).ifPresent(drgElement -> {
+            if (isImportedDRGElement(importedDrgElements, drgElement)) {
+                drgElement.setAllowOnlyVisualChange(true);
             }
-        }
+        });
 
         return node;
+    }
+
+    private Optional<DRGElement> getDRGElement(final Node node) {
+
+        final Object content = node.getContent();
+
+        if (content instanceof Definition) {
+            final Object objectDefinition = ((Definition) content).getDefinition();
+
+            if (objectDefinition instanceof DRGElement) {
+                return Optional.of((DRGElement) objectDefinition);
+            }
+        }
+        return Optional.empty();
+    }
+
+    boolean isImportedDRGElement(final List<org.kie.dmn.model.api.DRGElement> importedDrgElements,
+                                 final org.kie.dmn.model.api.DRGElement drgElement) {
+        return isImportedIdNode(importedDrgElements, drgElement.getId());
+    }
+
+    boolean isImportedDRGElement(final List<org.kie.dmn.model.api.DRGElement> importedDrgElements,
+                                 final DRGElement drgElement) {
+        return isImportedIdNode(importedDrgElements, drgElement.getId().getValue());
+    }
+
+    private boolean isImportedIdNode(final List<org.kie.dmn.model.api.DRGElement> importedDrgElements,
+                                     final String id) {
+        return importedDrgElements
+                .stream()
+                .anyMatch(drgElement -> Objects.equals(drgElement.getId(), id));
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

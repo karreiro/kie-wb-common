@@ -458,12 +458,17 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
                 .map(shape -> {
 
                     final String dmnElementRef = getDmnElementRef(shape);
-                    final Optional<org.kie.dmn.model.api.DRGElement> ref = importedDRGElements.stream().filter(drgElement -> Objects.equals(dmnElementRef, drgElement.getId())).findFirst();
+                    final Optional<org.kie.dmn.model.api.DRGElement> ref = getReference(importedDRGElements, dmnElementRef);
 
                     return ref.orElse(null);
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    Optional<org.kie.dmn.model.api.DRGElement> getReference(final List<org.kie.dmn.model.api.DRGElement> importedDRGElements,
+                                                            final String dmnElementRef){
+        return importedDRGElements.stream().filter(drgElement -> Objects.equals(dmnElementRef, drgElement.getId())).findFirst();
     }
 
     String getDmnElementRef(final DMNShape dmnShape) {
@@ -547,13 +552,15 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
         getDRGElement(node).ifPresent(drgElement -> {
             if (isImportedDRGElement(importedDrgElements, drgElement)) {
                 drgElement.setAllowOnlyVisualChange(true);
+            } else {
+                drgElement.setAllowOnlyVisualChange(false);
             }
         });
 
         return node;
     }
 
-    private Optional<DRGElement> getDRGElement(final Node node) {
+    Optional<DRGElement> getDRGElement(final Node node) {
 
         final Object content = node.getContent();
 

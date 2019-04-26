@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -70,14 +71,17 @@ import org.kie.dmn.api.core.ast.BusinessKnowledgeModelNode;
 import org.kie.dmn.backend.marshalling.v1x.DMNMarshallerFactory;
 import org.kie.dmn.core.util.DMNRuntimeUtil;
 import org.kie.dmn.core.util.KieHelper;
+import org.kie.dmn.model.api.DRGElement;
 import org.kie.dmn.model.api.DecisionTable;
 import org.kie.dmn.model.api.Definitions;
 import org.kie.dmn.model.api.FunctionKind;
+import org.kie.dmn.model.api.Import;
 import org.kie.dmn.model.api.dmndi.Bounds;
 import org.kie.dmn.model.api.dmndi.Color;
 import org.kie.dmn.model.api.dmndi.DMNEdge;
 import org.kie.dmn.model.api.dmndi.DMNShape;
 import org.kie.dmn.model.api.dmndi.DMNStyle;
+import org.kie.dmn.model.api.dmndi.DiagramElement;
 import org.kie.dmn.model.api.dmndi.Point;
 import org.kie.dmn.model.v1_2.TDecision;
 import org.kie.dmn.model.v1_2.TInputData;
@@ -105,6 +109,7 @@ import org.kie.workbench.common.dmn.api.definition.v1_1.KnowledgeSource;
 import org.kie.workbench.common.dmn.api.definition.v1_1.LiteralExpression;
 import org.kie.workbench.common.dmn.api.definition.v1_1.TextAnnotation;
 import org.kie.workbench.common.dmn.api.property.dmn.Id;
+import org.kie.workbench.common.dmn.api.property.dmn.QName;
 import org.kie.workbench.common.dmn.api.property.dmn.types.BuiltInType;
 import org.kie.workbench.common.dmn.backend.common.DMNMarshallerImportsHelper;
 import org.kie.workbench.common.dmn.backend.definition.v1_1.DecisionConverter;
@@ -173,6 +178,8 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -1823,32 +1830,150 @@ public class DMNMarshallerTest {
 
     @Test
     public void testGetImportedDrgElementsByShape() {
-        // TODO
+
+        final DMNMarshaller marshaller = spy(getDMNMarshaller());
+        final List<org.kie.dmn.model.api.DRGElement> importedDRGElements = mock(List.class);
+        final Map<Import, org.kie.dmn.model.api.Definitions> importDefinitions = mock(Map.class);
+
+        final org.kie.dmn.model.api.DRGElement ref1 = mock(org.kie.dmn.model.api.DRGElement.class);
+        final org.kie.dmn.model.api.DRGElement ref2 = mock(org.kie.dmn.model.api.DRGElement.class);
+        final org.kie.dmn.model.api.DRGElement ref3 = mock(org.kie.dmn.model.api.DRGElement.class);
+
+        final List<DMNShape> dmnShapes = new ArrayList<>();
+        final DMNShape shape1 = mock(DMNShape.class);
+        final DMNShape shape2 = mock(DMNShape.class);
+        final DMNShape shape3 = mock(DMNShape.class);
+        dmnShapes.add(shape1);
+        dmnShapes.add(shape2);
+        dmnShapes.add(shape3);
+
+        doReturn("REF1").when(marshaller).getDmnElementRef(shape1);
+        doReturn("REF2").when(marshaller).getDmnElementRef(shape2);
+        doReturn("REF3").when(marshaller).getDmnElementRef(shape3);
+
+        when(dmnMarshallerImportsHelper.getImportedDRGElements(importDefinitions)).thenReturn(importedDRGElements);
+
+        doReturn(Optional.of(ref1)).when(marshaller).getReference(importedDRGElements, "REF1");
+        doReturn(Optional.of(ref2)).when(marshaller).getReference(importedDRGElements, "REF2");
+        doReturn(Optional.of(ref3)).when(marshaller).getReference(importedDRGElements, "REF3");
+
+        final List<DRGElement> actual = marshaller.getImportedDrgElementsByShape(dmnShapes, importDefinitions);
+
+        assertEquals(ref1, actual.get(0));
+        assertEquals(ref2, actual.get(1));
+        assertEquals(ref3, actual.get(2));
+
     }
 
     @Test
     public void testGetDmnElementRef() {
-        // TODO
+
+        final DMNMarshaller marshaller = spy(getDMNMarshaller());
+        final String expected = "localPart";
+        final DMNShape shape = mock(DMNShape.class);
+        final javax.xml.namespace.QName ref = mock(javax.xml.namespace.QName.class);
+        when(ref.getLocalPart()).thenReturn(expected);
+        when(shape.getDmnElementRef()).thenReturn(ref);
+
+        final String actual = marshaller.getDmnElementRef(shape);
+
+        assertEquals(expected, actual);
     }
 
     @Test
     public void testGetUniqueDMNShapes() {
-        // TODO
+
+        final DMNMarshaller marshaller = spy(getDMNMarshaller());
+        final org.kie.dmn.model.api.dmndi.DMNDiagram diagram = mock(org.kie.dmn.model.api.dmndi.DMNDiagram.class);
+        final List<DiagramElement> elements = new ArrayList<>();
+
+        final DMNShape unique1 = mock(DMNShape.class);
+        when(unique1.getId()).thenReturn("unique1");
+
+        final DMNShape unique2 = mock(DMNShape.class);
+        when(unique2.getId()).thenReturn("unique2");
+
+        final DMNShape duplicate1 = mock(DMNShape.class);
+        when(duplicate1.getId()).thenReturn("duplicate");
+
+        final DMNShape duplicate2 = mock(DMNShape.class);
+        when(duplicate2.getId()).thenReturn("duplicate");
+
+        elements.add(unique1);
+        elements.add(unique2);
+        elements.add(duplicate1);
+        elements.add(duplicate2);
+
+        when(diagram.getDMNDiagramElement()).thenReturn(elements);
+
+        final List<DMNShape> actual = marshaller.getUniqueDMNShapes(diagram);
+
+        assertEquals(3, actual.size());
+        assertTrue(actual.contains(unique1));
+        assertTrue(actual.contains(unique2));
+        assertTrue(actual.contains(duplicate1) || actual.contains(duplicate2));
     }
 
     @Test
-    public void testSetAllowOnlyVisualChange() {
-        // TODO
+    public void testSetAllowOnlyVisualChangeToTrue() {
+        testSetAllowOnlyVisualChange(true);
+    }
+
+    @Test
+    public void testSetAllowOnlyVisualChangeToFalse() {
+        testSetAllowOnlyVisualChange(false);
+    }
+
+    private void testSetAllowOnlyVisualChange(final boolean expected) {
+
+        final DMNMarshaller marshaller = spy(getDMNMarshaller());
+        final List<org.kie.dmn.model.api.DRGElement> importedDrgElements = mock(List.class);
+        final Node node = mock(Node.class);
+        final org.kie.workbench.common.dmn.api.definition.v1_1.DRGElement element = mock(org.kie.workbench.common.dmn.api.definition.v1_1.DRGElement.class);
+        doReturn(Optional.of(element)).when(marshaller).getDRGElement(node);
+        doReturn(expected).when(marshaller).isImportedDRGElement(importedDrgElements, element);
+
+        marshaller.setAllowOnlyVisualChange(importedDrgElements, node);
+
+        verify(element).setAllowOnlyVisualChange(expected);
     }
 
     @Test
     public void testIsImportedDRGElementWithDmnDRGElement() {
-        // TODO
+
+        final DMNMarshaller marshaller = spy(getDMNMarshaller());
+        final List<org.kie.dmn.model.api.DRGElement> importedDrgElements = new ArrayList<>();
+
+        final org.kie.dmn.model.api.DRGElement imported = mock(org.kie.dmn.model.api.DRGElement.class);
+        when(imported.getId()).thenReturn("id");
+        importedDrgElements.add(imported);
+
+        final org.kie.dmn.model.api.DRGElement drgElement = mock(org.kie.dmn.model.api.DRGElement.class);
+        when(drgElement.getId()).thenReturn("id");
+
+        final boolean actual = marshaller.isImportedDRGElement(importedDrgElements, drgElement);
+
+        assertTrue(actual);
     }
 
     @Test
     public void testIsImportedDRGElementWithWbDRGElement() {
-        // TODO
+
+        final DMNMarshaller marshaller = spy(getDMNMarshaller());
+        final List<org.kie.dmn.model.api.DRGElement> importedDrgElements = new ArrayList<>();
+
+        final org.kie.dmn.model.api.DRGElement imported = mock(org.kie.dmn.model.api.DRGElement.class);
+        when(imported.getId()).thenReturn("id");
+        importedDrgElements.add(imported);
+
+        final org.kie.workbench.common.dmn.api.definition.v1_1.DRGElement drgElement = mock(org.kie.workbench.common.dmn.api.definition.v1_1.DRGElement.class);
+        final Id id = mock(Id.class);
+        when(id.getValue()).thenReturn("id");
+        when(drgElement.getId()).thenReturn(id);
+
+        final boolean actual = marshaller.isImportedDRGElement(importedDrgElements, drgElement);
+
+        assertTrue(actual);
     }
 
     @SuppressWarnings("unchecked")

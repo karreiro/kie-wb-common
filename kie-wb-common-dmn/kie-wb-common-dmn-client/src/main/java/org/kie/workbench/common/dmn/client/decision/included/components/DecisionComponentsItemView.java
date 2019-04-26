@@ -144,7 +144,7 @@ public class DecisionComponentsItemView implements DecisionComponentsItem.View {
                       mouseDownEvent.getY());
     }
 
-    void showDragProxy(int x, int y) {
+    void showDragProxy(final int x, final int y) {
 
         final ShapeFactory factory = dmnShapeSet.getShapeFactory();
         final Glyph glyph = factory.getGlyph(className);
@@ -170,20 +170,20 @@ public class DecisionComponentsItemView implements DecisionComponentsItem.View {
                                                              y,
                                                              new DragProxyCallback() {
                                                                  @Override
-                                                                 public void onStart(int x,
-                                                                                     int y) {
+                                                                 public void onStart(final int x,
+                                                                                     final int y) {
                                                                  }
 
                                                                  @Override
-                                                                 public void onMove(int x,
-                                                                                    int y) {
+                                                                 public void onMove(final int x,
+                                                                                    final int y) {
 
                                                                  }
 
                                                                  @SuppressWarnings("unchecked")
                                                                  @Override
-                                                                 public void onComplete(int x,
-                                                                                        int y) {
+                                                                 public void onComplete(final int x,
+                                                                                        final int y) {
 
                                                                      final Diagram diagram = sessionManager.getCurrentSession().getCanvasHandler().getDiagram();
                                                                      final Graph<?, Node> graph = diagram.getGraph();

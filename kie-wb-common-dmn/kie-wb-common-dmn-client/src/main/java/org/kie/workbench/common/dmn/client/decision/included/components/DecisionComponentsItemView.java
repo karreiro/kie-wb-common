@@ -16,6 +16,8 @@
 
 package org.kie.workbench.common.dmn.client.decision.included.components;
 
+import java.util.stream.StreamSupport;
+
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -40,9 +42,15 @@ import org.kie.workbench.common.stunner.core.client.canvas.controls.event.BuildC
 import org.kie.workbench.common.stunner.core.client.components.drag.DragProxy;
 import org.kie.workbench.common.stunner.core.client.components.drag.DragProxyCallback;
 import org.kie.workbench.common.stunner.core.client.components.glyph.ShapeGlyphDragHandler;
+import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.client.service.ClientFactoryService;
 import org.kie.workbench.common.stunner.core.client.shape.factory.ShapeFactory;
 import org.kie.workbench.common.stunner.core.definition.shape.Glyph;
+import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.kie.workbench.common.stunner.core.graph.Graph;
+import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.core.graph.content.view.View;
+import org.uberfire.workbench.events.NotificationEvent;
 
 @Dependent
 @Templated
@@ -67,8 +75,13 @@ public class DecisionComponentsItemView implements DecisionComponentsItem.View {
     private final ShapeGlyphDragHandler shapeGlyphDragHandler;
     private final Event<BuildCanvasShapeEvent> buildCanvasShapeEvent;
     private final ClientFactoryService clientFactoryServices;
+    private final Event<NotificationEvent> notificationEvent;
+    private final ClientTranslationService clientTranslationService;
+
     private String className;
     private String objectId;
+
+    static final String DUPLICATED_IMPORTED_NODE_KEY = "DecisionComponentsItemView.DuplicatedNode";
 
     @Inject
     public DecisionComponentsItemView(final HTMLImageElement icon,
@@ -79,7 +92,9 @@ public class DecisionComponentsItemView implements DecisionComponentsItem.View {
                                       final ShapeGlyphDragHandler shapeGlyphDragHandler,
                                       final Event<BuildCanvasShapeEvent> buildCanvasShapeEvent,
                                       final HTMLDivElement decisionComponentItem,
-                                      final ClientFactoryService clientFactoryServices) {
+                                      final ClientFactoryService clientFactoryServices,
+                                      final Event<NotificationEvent> notificationEvent,
+                                      final ClientTranslationService clientTranslationService) {
         this.icon = icon;
         this.name = name;
         this.file = file;
@@ -89,6 +104,8 @@ public class DecisionComponentsItemView implements DecisionComponentsItem.View {
         this.buildCanvasShapeEvent = buildCanvasShapeEvent;
         this.decisionComponentItem = decisionComponentItem;
         this.clientFactoryServices = clientFactoryServices;
+        this.notificationEvent = notificationEvent;
+        this.clientTranslationService = clientTranslationService;
     }
 
     @Override
@@ -163,9 +180,26 @@ public class DecisionComponentsItemView implements DecisionComponentsItem.View {
 
                                                                  }
 
+                                                                 @SuppressWarnings("unchecked")
                                                                  @Override
                                                                  public void onComplete(int x,
                                                                                         int y) {
+
+                                                                     final Diagram diagram = sessionManager.getCurrentSession().getCanvasHandler().getDiagram();
+                                                                     final Graph<?, Node> graph = diagram.getGraph();
+
+                                                                     if (StreamSupport
+                                                                             .stream(graph.nodes().spliterator(), false)
+                                                                             .filter(node -> node.getContent() instanceof View)
+                                                                             .map(node -> (View) node.getContent())
+                                                                             .filter(view -> view.getDefinition() instanceof DMNElement)
+                                                                             .map(view -> view.getDefinition())
+                                                                             .anyMatch(d -> ((DMNElement) d).getId().getValue().equals(objectId))) {
+
+                                                                         notificationEvent.fire(new NotificationEvent(clientTranslationService.getValue(DUPLICATED_IMPORTED_NODE_KEY),
+                                                                                                                      NotificationEvent.NotificationType.WARNING));
+                                                                         return;
+                                                                     }
 
                                                                      final Object definition = clientFactoryServices.getClientFactoryManager().newDefinition(className);
                                                                      final Name nameObject = getName();

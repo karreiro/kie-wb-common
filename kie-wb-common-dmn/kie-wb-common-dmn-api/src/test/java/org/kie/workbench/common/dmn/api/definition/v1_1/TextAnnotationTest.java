@@ -31,6 +31,10 @@ import static org.kie.workbench.common.forms.adf.definitions.DynamicReadOnly.Rea
 public class TextAnnotationTest {
 
     private TextAnnotation textAnnotation;
+    private static final String[] READONLY_FIELDS = {
+        "Description",
+        "Text",
+        "TextFormat"};
 
     @Before
     public void setup() {
@@ -49,9 +53,9 @@ public class TextAnnotationTest {
 
         textAnnotation.setAllowOnlyVisualChange(false);
 
-        checkIfItIsNotSet("Description");
-        checkIfItIsNotSet("Text");
-        checkIfItIsNotSet("TextFormat");
+        for (final String readonlyField : READONLY_FIELDS) {
+            checkIfItIsNotSet(readonlyField);
+        }
     }
 
     private void checkIfItIsNotSet(final String property) {
@@ -65,10 +69,9 @@ public class TextAnnotationTest {
     public void testGetReadOnlyWithReadOnlyValues() {
 
         textAnnotation.setAllowOnlyVisualChange(true);
-
-        checkIfIsReadOnly("Description");
-        checkIfIsReadOnly("Text");
-        checkIfIsReadOnly("TextFormat");
+        for (final String readonlyField : READONLY_FIELDS) {
+            checkIfIsReadOnly(readonlyField);
+        }
     }
 
     private void checkIfIsReadOnly(final String property) {

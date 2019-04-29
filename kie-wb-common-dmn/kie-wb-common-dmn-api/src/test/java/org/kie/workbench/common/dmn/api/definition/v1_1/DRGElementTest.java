@@ -34,6 +34,15 @@ import static org.mockito.Mockito.doCallRealMethod;
 @RunWith(MockitoJUnitRunner.class)
 public class DRGElementTest {
 
+    private static final String[] READONLY_FIELDS = {
+        "Name",
+        "AllowedAnswers",
+        "Description",
+        "Question",
+        "DataType",
+        "SourceType",
+        "LocationURI"};
+
     @Mock
     private DRGElement drgElement;
 
@@ -57,13 +66,9 @@ public class DRGElementTest {
 
         drgElement.setAllowOnlyVisualChange(false);
 
-        checkIfItIsNotSet("Name");
-        checkIfItIsNotSet("AllowedAnswers");
-        checkIfItIsNotSet("Description");
-        checkIfItIsNotSet("Question");
-        checkIfItIsNotSet("DataType");
-        checkIfItIsNotSet("SourceType");
-        checkIfItIsNotSet("LocationURI");
+        for (final String readonlyField : READONLY_FIELDS) {
+            checkIfItIsNotSet(readonlyField);
+        }
     }
 
     private void checkIfItIsNotSet(final String property) {
@@ -78,13 +83,9 @@ public class DRGElementTest {
 
         drgElement.setAllowOnlyVisualChange(true);
 
-        checkIfIsReadOnly("Name");
-        checkIfIsReadOnly("AllowedAnswers");
-        checkIfIsReadOnly("Description");
-        checkIfIsReadOnly("Question");
-        checkIfIsReadOnly("DataType");
-        checkIfIsReadOnly("SourceType");
-        checkIfIsReadOnly("LocationURI");
+        for (final String readonlyField : READONLY_FIELDS) {
+            checkIfIsReadOnly(readonlyField);
+        }
     }
 
     private void checkIfIsReadOnly(final String property) {

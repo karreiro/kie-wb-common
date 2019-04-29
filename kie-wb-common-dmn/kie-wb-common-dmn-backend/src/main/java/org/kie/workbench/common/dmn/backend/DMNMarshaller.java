@@ -104,7 +104,6 @@ import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.Bound;
-import org.kie.workbench.common.stunner.core.graph.content.definition.Definition;
 import org.kie.workbench.common.stunner.core.graph.content.relationship.Child;
 import org.kie.workbench.common.stunner.core.graph.content.view.Connection;
 import org.kie.workbench.common.stunner.core.graph.content.view.ControlPoint;
@@ -113,6 +112,7 @@ import org.kie.workbench.common.stunner.core.graph.content.view.Point2D;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.graph.content.view.ViewConnector;
 import org.kie.workbench.common.stunner.core.graph.impl.EdgeImpl;
+import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 import org.kie.workbench.common.stunner.core.util.UUID;
 
 import static java.util.Collections.emptyList;
@@ -562,15 +562,12 @@ public class DMNMarshaller implements DiagramMarshaller<Graph, Metadata, Diagram
 
     Optional<DRGElement> getDRGElement(final Node node) {
 
-        final Object content = node.getContent();
+        final Object objectDefinition = DefinitionUtils.getElementDefinition(node);
 
-        if (content instanceof Definition) {
-            final Object objectDefinition = ((Definition) content).getDefinition();
-
-            if (objectDefinition instanceof DRGElement) {
-                return Optional.of((DRGElement) objectDefinition);
-            }
+        if (objectDefinition instanceof DRGElement) {
+            return Optional.of((DRGElement) objectDefinition);
         }
+
         return Optional.empty();
     }
 

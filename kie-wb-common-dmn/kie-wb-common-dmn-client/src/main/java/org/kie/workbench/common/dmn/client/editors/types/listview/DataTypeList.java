@@ -27,6 +27,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLDivElement;
 import elemental2.dom.HTMLElement;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
@@ -35,6 +36,7 @@ import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataTypeManager;
 import org.kie.workbench.common.dmn.client.editors.types.listview.common.DataTypeEditModeToggleEvent;
 import org.kie.workbench.common.dmn.client.editors.types.listview.common.DataTypeStackHash;
+import org.kie.workbench.common.dmn.client.editors.types.listview.draganddrop.DragAndDropComponent;
 import org.kie.workbench.common.dmn.client.editors.types.search.DataTypeSearchBar;
 import org.uberfire.client.mvp.UberElemental;
 
@@ -58,6 +60,9 @@ public class DataTypeList {
     private DataTypeListItem currentEditingItem;
 
     @Inject
+    private DragAndDropComponent dragAndDropComponent;
+
+    @Inject
     public DataTypeList(final DataTypeList.View view,
                         final ManagedInstance<DataTypeListItem> listItems,
                         final DataTypeManager dataTypeManager,
@@ -76,7 +81,7 @@ public class DataTypeList {
     }
 
     public HTMLElement getElement() {
-        return view.getElement();
+        return dragAndDropComponent.getViewElement();
     }
 
     public void setupItems(final List<DataType> dataTypes) {

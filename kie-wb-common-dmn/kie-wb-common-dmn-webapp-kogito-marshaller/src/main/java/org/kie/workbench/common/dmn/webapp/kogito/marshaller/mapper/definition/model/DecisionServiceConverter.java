@@ -72,10 +72,10 @@ public class DecisionServiceConverter implements NodeConverter<JSITDecisionServi
         final Description description = DescriptionPropertyConverter.wbFromDMN(dmn.getDescription());
         final Name name = new Name(dmn.getName());
         final InformationItemPrimary informationItem = InformationItemPrimaryPropertyConverter.wbFromDMN(dmn.getVariable(), dmn);
-        final List<DMNElementReference> outputDecision = Stream.of(dmn.getOutputDecision().asArray()).map(DMNElementReferenceConverter::wbFromDMN).collect(Collectors.toList());
-        final List<DMNElementReference> encapsulatedDecision = Stream.of(dmn.getEncapsulatedDecision().asArray()).map(DMNElementReferenceConverter::wbFromDMN).collect(Collectors.toList());
-        final List<DMNElementReference> inputDecision = Stream.of(dmn.getInputDecision().asArray()).map(DMNElementReferenceConverter::wbFromDMN).collect(Collectors.toList());
-        final List<DMNElementReference> inputData = Stream.of(dmn.getInputData().asArray()).map(DMNElementReferenceConverter::wbFromDMN).collect(Collectors.toList());
+        final List<DMNElementReference> outputDecision = dmn.getOutputDecision().stream().map(DMNElementReferenceConverter::wbFromDMN).collect(Collectors.toList());
+        final List<DMNElementReference> encapsulatedDecision = dmn.getEncapsulatedDecision().stream().map(DMNElementReferenceConverter::wbFromDMN).collect(Collectors.toList());
+        final List<DMNElementReference> inputDecision = dmn.getInputDecision().stream().map(DMNElementReferenceConverter::wbFromDMN).collect(Collectors.toList());
+        final List<DMNElementReference> inputData = dmn.getInputData().stream().map(DMNElementReferenceConverter::wbFromDMN).collect(Collectors.toList());
         final DecisionService decisionService = new DecisionService(id,
                                                                     description,
                                                                     name,
@@ -178,10 +178,10 @@ public class DecisionServiceConverter implements NodeConverter<JSITDecisionServi
             candidate_inputDecision.removeIf(x -> x.getHref().equals(er.getHref()));
         }
 
-        reconcileExistingAndCandidate(ds.getInputData(), existing_inputData, candidate_inputData);
-        reconcileExistingAndCandidate(ds.getInputDecision(), existing_inputDecision, candidate_inputDecision);
-        reconcileExistingAndCandidate(ds.getEncapsulatedDecision(), existing_encapsulatedDecision, candidate_encapsulatedDecision);
-        reconcileExistingAndCandidate(ds.getOutputDecision(), existing_outputDecision, candidate_outputDecision);
+        reconcileExistingAndCandidate(ds.getNativeInputData(), existing_inputData, candidate_inputData);
+        reconcileExistingAndCandidate(ds.getNativeInputDecision(), existing_inputDecision, candidate_inputDecision);
+        reconcileExistingAndCandidate(ds.getNativeEncapsulatedDecision(), existing_encapsulatedDecision, candidate_encapsulatedDecision);
+        reconcileExistingAndCandidate(ds.getNativeOutputDecision(), existing_outputDecision, candidate_outputDecision);
 
         DMNExternalLinksToExtensionElements.loadExternalLinksIntoExtensionElements(source, ds);
 

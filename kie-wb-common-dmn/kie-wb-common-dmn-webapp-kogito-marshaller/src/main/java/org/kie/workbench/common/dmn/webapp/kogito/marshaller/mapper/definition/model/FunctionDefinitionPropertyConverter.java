@@ -76,7 +76,7 @@ public class FunctionDefinitionPropertyConverter {
                 break;
         }
 
-        for (JSITInformationItem ii : dmn.getFormalParameter().asArray()) {
+        for (JSITInformationItem ii : dmn.getFormalParameter()) {
             final InformationItem iiConverted = InformationItemPropertyConverter.wbFromDMN(ii);
             if (iiConverted != null) {
                 iiConverted.setParent(result);
@@ -161,7 +161,7 @@ public class FunctionDefinitionPropertyConverter {
             if (iiConverted != null) {
                 iiConverted.setParent(result);
             }
-            JsUtils.add(result.getFormalParameter(), iiConverted);
+            JsUtils.add(result.getNativeFormalParameter(), iiConverted);
         }
 
         return result;

@@ -80,7 +80,7 @@ public class ItemDefinitionPropertyConverter {
 
     static void setItemComponent(final ItemDefinition wb,
                                  final JSITItemDefinition dmn) {
-        Stream.of(dmn.getItemComponent().asArray()).forEach(dmnChild -> {
+        dmn.getItemComponent().forEach(dmnChild -> {
             wb.getItemComponent().add(wbChildFromDMN(wb, dmnChild));
         });
     }
@@ -131,7 +131,7 @@ public class ItemDefinitionPropertyConverter {
         for (ItemDefinition child : wb.getItemComponent()) {
             final JSITItemDefinition convertedChild = ItemDefinitionPropertyConverter.dmnFromWB(child);
             convertedChild.setParent(result);
-            JsUtils.add(result.getItemComponent(), convertedChild);
+            JsUtils.add(result.getNativeItemComponent(), convertedChild);
         }
 
         return result;

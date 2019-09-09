@@ -42,8 +42,8 @@ public class RelationPropertyConverter {
         final Description description = DescriptionPropertyConverter.wbFromDMN(dmn.getDescription());
         final QName typeRef = QNamePropertyConverter.wbFromDMN(dmn.getTypeRef(), dmn);
 
-        final List<JSITInformationItem> column = Arrays.asList(dmn.getColumn().asArray());
-        final List<JSITList> row = Arrays.asList(dmn.getRow().asArray());
+        final List<JSITInformationItem> column = dmn.getColumn();
+        final List<JSITList> row = dmn.getRow();
 
         final List<InformationItem> convertedColumn = column.stream().map(InformationItemPropertyConverter::wbFromDMN).collect(Collectors.toList());
         final List<org.kie.workbench.common.dmn.api.definition.model.List> convertedRow = row.stream().map(r -> ListPropertyConverter.wbFromDMN(r,
@@ -76,7 +76,7 @@ public class RelationPropertyConverter {
             if (iitemConverted != null) {
                 iitemConverted.setParent(result);
             }
-            JsUtils.add(result.getColumn(), iitemConverted);
+            JsUtils.add(result.getNativeColumn(), iitemConverted);
         }
 
         for (org.kie.workbench.common.dmn.api.definition.model.List list : wb.getRow()) {
@@ -84,7 +84,7 @@ public class RelationPropertyConverter {
             if (listConverted != null) {
                 listConverted.setParent(result);
             }
-            JsUtils.add(result.getRow(), listConverted);
+            JsUtils.add(result.getNativeRow(), listConverted);
         }
 
         return result;

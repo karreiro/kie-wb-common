@@ -36,14 +36,14 @@ public class DecisionRulePropertyConverter {
         result.setId(id);
         result.setDescription(description);
 
-        for (JSITUnaryTests ie : dmn.getInputEntry().asArray()) {
+        for (JSITUnaryTests ie : dmn.getInputEntry()) {
             final UnaryTests inputEntryConverted = UnaryTestsPropertyConverter.wbFromDMN(ie);
             if (inputEntryConverted != null) {
                 inputEntryConverted.setParent(result);
             }
             result.getInputEntry().add(inputEntryConverted);
         }
-        for (JSITLiteralExpression oe : dmn.getOutputEntry().asArray()) {
+        for (JSITLiteralExpression oe : dmn.getOutputEntry()) {
             final LiteralExpression outputEntryConverted = LiteralExpressionPropertyConverter.wbFromDMN(oe);
             if (outputEntryConverted != null) {
                 outputEntryConverted.setParent(result);
@@ -64,14 +64,14 @@ public class DecisionRulePropertyConverter {
             if (inputEntryConverted != null) {
                 inputEntryConverted.setParent(result);
             }
-            JsUtils.add(result.getInputEntry(), inputEntryConverted);
+            JsUtils.add(result.getNativeInputEntry(), inputEntryConverted);
         }
         for (LiteralExpression oe : wb.getOutputEntry()) {
             final JSITLiteralExpression outputEntryConverted = LiteralExpressionPropertyConverter.dmnFromWB(oe);
             if (outputEntryConverted != null) {
                 outputEntryConverted.setParent(result);
             }
-            JsUtils.add(result.getOutputEntry(), outputEntryConverted);
+            JsUtils.add(result.getNativeOutputEntry(), outputEntryConverted);
         }
 
         return result;

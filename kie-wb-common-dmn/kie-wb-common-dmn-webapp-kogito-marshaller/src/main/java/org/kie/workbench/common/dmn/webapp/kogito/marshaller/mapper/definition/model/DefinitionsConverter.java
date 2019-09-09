@@ -16,6 +16,7 @@
 
 package org.kie.workbench.common.dmn.webapp.kogito.marshaller.mapper.definition.model;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -80,11 +81,10 @@ public class DefinitionsConverter {
             }
         }
 
-        final JsArrayLike<JSITItemDefinition> wrappedItemDefinitions = dmn.getItemDefinition();
-        if (Objects.nonNull(wrappedItemDefinitions)) {
-            final JsArrayLike<JSITItemDefinition> jsiItemDefinitions = JsUtils.getUnwrappedElementsArray(wrappedItemDefinitions);
-            for (int i = 0; i < jsiItemDefinitions.getLength(); i++) {
-                final JSITItemDefinition jsiItemDefinition = Js.uncheckedCast(jsiItemDefinitions.getAt(i));
+        final List<JSITItemDefinition> jsiItemDefinitions = dmn.getItemDefinition();
+        if (Objects.nonNull(jsiItemDefinitions)) {
+            for (int i = 0; i < jsiItemDefinitions.size(); i++) {
+                final JSITItemDefinition jsiItemDefinition = Js.uncheckedCast(jsiItemDefinitions.get(i));
                 final ItemDefinition itemDefConverted = ItemDefinitionPropertyConverter.wbFromDMN(jsiItemDefinition);
                 if (Objects.nonNull(itemDefConverted)) {
                     itemDefConverted.setParent(result);
@@ -93,11 +93,10 @@ public class DefinitionsConverter {
             }
         }
 
-        final JsArrayLike<JSITImport> wrappedImports = dmn.getImport();
+        final List<JSITImport> wrappedImports = dmn.getImport();
         if (Objects.nonNull(wrappedImports)) {
-            final JsArrayLike<JSITImport> jsiImports = JsUtils.getUnwrappedElementsArray(wrappedImports);
-            for (int i = 0; i < jsiImports.getLength(); i++) {
-                final JSITImport jsiImport = Js.uncheckedCast(jsiImports.getAt(i));
+            for (int i = 0; i < jsiItemDefinitions.size(); i++) {
+                final JSITImport jsiImport = Js.uncheckedCast(jsiItemDefinitions.get(i));
                 final JSITDefinitions definitions = importDefinitions.get(jsiImport);
                 final PMMLDocumentMetadata pmmlDocument = pmmlDocuments.get(jsiImport);
                 final Import importConverted = ImportConverter.wbFromDMN(jsiImport, definitions, pmmlDocument);
@@ -137,7 +136,7 @@ public class DefinitionsConverter {
             if (itemDefConverted != null) {
                 itemDefConverted.setParent(result);
             }
-            JsUtils.add(result.getItemDefinition(), itemDefConverted);
+            JsUtils.add(result.getNativeItemDefinition(), itemDefConverted);
         }
 
         for (Import i : wb.getImport()) {
@@ -145,7 +144,7 @@ public class DefinitionsConverter {
             if (importConverted != null) {
                 importConverted.setParent(result);
             }
-            JsUtils.add(result.getImport(), importConverted);
+            JsUtils.add(result.getNativeImport(), importConverted);
         }
 
         return result;

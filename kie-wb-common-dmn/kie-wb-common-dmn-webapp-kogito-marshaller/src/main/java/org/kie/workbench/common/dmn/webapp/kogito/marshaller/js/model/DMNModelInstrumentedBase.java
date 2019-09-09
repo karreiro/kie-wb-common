@@ -19,44 +19,44 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import jsinterop.annotations.JsIgnore;
+import jsinterop.annotations.JsOverlay;
 import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
-@JsType(namespace = JsPackage.GLOBAL)
+@JsType(namespace = JsPackage.GLOBAL, isNative = true)
 public class DMNModelInstrumentedBase {
 
-    @JsIgnore
+    @JsOverlay
     public static final String URI_DMN = "http://www.omg.org/spec/DMN/20180521/MODEL/";
 
-    @JsIgnore
+    @JsOverlay
     public static final String URI_FEEL = "http://www.omg.org/spec/DMN/20180521/FEEL/";
 
-    @JsIgnore
+    @JsOverlay
     public static final String URI_KIE = "http://www.drools.org/kie/dmn/1.2";
 
-    @JsIgnore
+    @JsOverlay
     public static final String URI_DMNDI = "http://www.omg.org/spec/DMN/20180521/DMNDI/";
 
-    @JsIgnore
+    @JsOverlay
     public static final String URI_DI = "http://www.omg.org/spec/DMN/20180521/DI/";
 
-    @JsIgnore
+    @JsOverlay
     public static final String URI_DC = "http://www.omg.org/spec/DMN/20180521/DC/";
 
     private Map<String, String> nsContext;
     private DMNModelInstrumentedBase parent;
 
-    @JsIgnore
-    public Map<String, String> getNsContext() {
+    @JsOverlay
+    public final Map<String, String> getNsContext() {
         if (nsContext == null) {
             nsContext = new HashMap<>();
         }
         return nsContext;
     }
 
-    @JsIgnore
-    public String getNamespaceURI(final String prefix) {
+    @JsOverlay
+    public final String getNamespaceURI(final String prefix) {
         if (getNsContext().containsKey(prefix)) {
             return getNsContext().get(prefix);
         }
@@ -66,8 +66,8 @@ public class DMNModelInstrumentedBase {
         return null;
     }
 
-    @JsIgnore
-    public Optional<String> getPrefixForNamespaceURI(final String namespaceURI) {
+    @JsOverlay
+    public final Optional<String> getPrefixForNamespaceURI(final String namespaceURI) {
         if (getNsContext().containsValue(namespaceURI)) {
             return getNsContext().entrySet().stream().filter(kv -> kv.getValue().equals(namespaceURI)).findFirst().map(Map.Entry::getKey);
         }
@@ -77,13 +77,13 @@ public class DMNModelInstrumentedBase {
         return Optional.empty();
     }
 
-    @JsIgnore
-    public DMNModelInstrumentedBase getParent() {
+    @JsOverlay
+    public final DMNModelInstrumentedBase getParent() {
         return parent;
     }
 
-    @JsIgnore
-    public void setParent(final DMNModelInstrumentedBase parent) {
+    @JsOverlay
+    public final void setParent(final DMNModelInstrumentedBase parent) {
         this.parent = parent;
     }
 }

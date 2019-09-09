@@ -185,11 +185,11 @@ public class DMNMarshallerKogito {
         if (dmnXml.getDMNDI() == null) {
             return Optional.empty();
         }
-        final JsArrayLike<JSIDMNDiagram> elems = dmnXml.getDMNDI().getDMNDiagram();
-        if (elems.getLength() != 1) {
+        final List<JSIDMNDiagram> elems = dmnXml.getDMNDI().getDMNDiagram();
+        if (elems.size() != 1) {
             return Optional.empty();
         } else {
-            return Optional.of(Js.uncheckedCast(elems.getAt(0)));
+            return Optional.of(Js.uncheckedCast(elems.get(0)));
         }
     }
 
@@ -207,17 +207,17 @@ public class DMNMarshallerKogito {
             }
         };
 
-        final JsArrayLike<JSITDRGElement> jsitDRGElements = JSITDefinitions.getDrgElement(dmnXml);
-        final List<JSITDRGElement> diagramDrgElements = JsUtils.toList(jsitDRGElements);
+        final List<JSITDRGElement> diagramDrgElements = dmnXml.getDrgElement();
         final Optional<JSIDMNDiagram> dmnDDDiagram = findDMNDiagram(dmnXml);
 
         // Get external DMN model information
+        List<JSITImport> imports = dmnXml.getImport();
         final Map<JSITImport, JSITDefinitions> importDefinitions = dmnMarshallerImportsHelper.getImportDefinitions(metadata,
-                                                                                                                   JsUtils.toList(dmnXml.getImport()));
+                                                                                                                   imports);
 
         // Get external PMML model information
         final Map<JSITImport, PMMLDocumentMetadata> pmmlDocuments = dmnMarshallerImportsHelper.getPMMLDocuments(metadata,
-                                                                                                                JsUtils.toList(dmnXml.getImport()));
+                                                                                                                dmnXml.getImport());
 
         // Map external DRGElements
         final List<JSITDRGElement> importedDrgElements = new ArrayList<>();
@@ -261,13 +261,15 @@ public class DMNMarshallerKogito {
             }
 
             // DMN spec table 2: Requirements connection rules
-            if (JSITDecision.instanceOf(element)) {
+            if (JSITDecision.instanceJSITDecisionOf(element.getTYPE_NAME())) {
                 final JSITDecision decision = Js.uncheckedCast(element);
-                final JsArrayLike<JSITInformationRequirement> wrappedInformationRequirements = decision.getInformationRequirement();
-                if (Objects.nonNull(wrappedInformationRequirements)) {
-                    final JsArrayLike<JSITInformationRequirement> jsiInformationRequirements = JsUtils.getUnwrappedElementsArray(wrappedInformationRequirements);
-                    for (int i = 0; i < jsiInformationRequirements.getLength(); i++) {
-                        final JSITInformationRequirement ir = Js.uncheckedCast(jsiInformationRequirements.getAt(i));
+//                DomGlobal.console.log("=====e================> ", decision.asJSITDecisionClass().getClass().getCanonicalName());
+
+                final List<JSITInformationRequirement> jsiInformationRequirements = decision.getInformationRequirement();
+                if (Objects.nonNull(jsiInformationRequirements)) {
+
+                    for (int i = 0; i < jsiInformationRequirements.size(); i++) {
+                        final JSITInformationRequirement ir = Js.uncheckedCast(jsiInformationRequirements.get(i));
                         if (ir.getRequiredInput() != null) {
                             final String reqInputID = getId(ir.getRequiredInput());
                             final Node requiredNode = getRequiredNode(elems, reqInputID);
@@ -290,11 +292,10 @@ public class DMNMarshallerKogito {
                         }
                     }
                 }
-                final JsArrayLike<JSITKnowledgeRequirement> wrappedKnowledgeRequirements = decision.getKnowledgeRequirement();
-                if (Objects.nonNull(wrappedKnowledgeRequirements)) {
-                    final JsArrayLike<JSITKnowledgeRequirement> jsiKnowledgeRequirements = JsUtils.getUnwrappedElementsArray(wrappedKnowledgeRequirements);
-                    for (int i = 0; i < jsiKnowledgeRequirements.getLength(); i++) {
-                        final JSITKnowledgeRequirement kr = Js.uncheckedCast(jsiKnowledgeRequirements.getAt(i));
+                final List<JSITKnowledgeRequirement> jsiKnowledgeRequirements = decision.getKnowledgeRequirement();
+                if (Objects.nonNull(jsiKnowledgeRequirements)) {
+                    for (int i = 0; i < jsiKnowledgeRequirements.size(); i++) {
+                        final JSITKnowledgeRequirement kr = Js.uncheckedCast(jsiKnowledgeRequirements.get(i));
                         final String reqInputID = getId(kr.getRequiredKnowledge());
                         final Node requiredNode = getRequiredNode(elems, reqInputID);
                         final Edge myEdge = factoryManager.newElement(idOfDMNorWBUUID(kr),
@@ -305,11 +306,10 @@ public class DMNMarshallerKogito {
                         setConnectionMagnets(myEdge, kr.getId(), dmnXml);
                     }
                 }
-                final JsArrayLike<JSITAuthorityRequirement> wrappedAuthorityRequirements = decision.getAuthorityRequirement();
-                if (Objects.nonNull(wrappedAuthorityRequirements)) {
-                    final JsArrayLike<JSITAuthorityRequirement> jsiAuthorityRequirements = JsUtils.getUnwrappedElementsArray(wrappedAuthorityRequirements);
-                    for (int i = 0; i < jsiAuthorityRequirements.getLength(); i++) {
-                        final JSITAuthorityRequirement ar = Js.uncheckedCast(jsiAuthorityRequirements.getAt(i));
+                final List<JSITAuthorityRequirement> jsiAuthorityRequirements = decision.getAuthorityRequirement();
+                if (Objects.nonNull(jsiAuthorityRequirements)) {
+                    for (int i = 0; i < jsiAuthorityRequirements.size(); i++) {
+                        final JSITAuthorityRequirement ar = Js.uncheckedCast(jsiAuthorityRequirements.get(i));
                         final String reqInputID = getId(ar.getRequiredAuthority());
                         final Node requiredNode = getRequiredNode(elems, reqInputID);
                         final Edge myEdge = factoryManager.newElement(idOfDMNorWBUUID(ar),
@@ -320,13 +320,12 @@ public class DMNMarshallerKogito {
                         setConnectionMagnets(myEdge, ar.getId(), dmnXml);
                     }
                 }
-            } else if (JSITBusinessKnowledgeModel.instanceOf(element)) {
+            } else if (JSITBusinessKnowledgeModel.instanceJSITBusinessKnowledgeModelOf(element.getTYPE_NAME())) {
                 final JSITBusinessKnowledgeModel bkm = Js.uncheckedCast(element);
-                final JsArrayLike<JSITKnowledgeRequirement> wrappedKnowledgeRequirements = bkm.getKnowledgeRequirement();
+                final List<JSITKnowledgeRequirement> wrappedKnowledgeRequirements = bkm.getKnowledgeRequirement();
                 if (Objects.nonNull(wrappedKnowledgeRequirements)) {
-                    final JsArrayLike<JSITKnowledgeRequirement> jsiKnowledgeRequirements = JsUtils.getUnwrappedElementsArray(wrappedKnowledgeRequirements);
-                    for (int i = 0; i < jsiKnowledgeRequirements.getLength(); i++) {
-                        final JSITKnowledgeRequirement kr = Js.uncheckedCast(jsiKnowledgeRequirements.getAt(i));
+                    for (int i = 0; i < wrappedKnowledgeRequirements.size(); i++) {
+                        final JSITKnowledgeRequirement kr = Js.uncheckedCast(wrappedKnowledgeRequirements.get(i));
                         final String reqInputID = getId(kr.getRequiredKnowledge());
                         final Node requiredNode = getRequiredNode(elems, reqInputID);
                         final Edge myEdge = factoryManager.newElement(idOfDMNorWBUUID(kr),
@@ -337,11 +336,10 @@ public class DMNMarshallerKogito {
                         setConnectionMagnets(myEdge, kr.getId(), dmnXml);
                     }
                 }
-                final JsArrayLike<JSITAuthorityRequirement> wrappedAuthorityRequirements = bkm.getAuthorityRequirement();
+                final List<JSITAuthorityRequirement> wrappedAuthorityRequirements = bkm.getAuthorityRequirement();
                 if (Objects.nonNull(wrappedAuthorityRequirements)) {
-                    final JsArrayLike<JSITAuthorityRequirement> jsiAuthorityRequirements = JsUtils.getUnwrappedElementsArray(wrappedAuthorityRequirements);
-                    for (int i = 0; i < jsiAuthorityRequirements.getLength(); i++) {
-                        final JSITAuthorityRequirement ar = Js.uncheckedCast(jsiAuthorityRequirements.getAt(i));
+                    for (int i = 0; i < wrappedAuthorityRequirements.size(); i++) {
+                        final JSITAuthorityRequirement ar = Js.uncheckedCast(wrappedAuthorityRequirements.get(i));
                         final String reqInputID = getId(ar.getRequiredAuthority());
                         final Node requiredNode = getRequiredNode(elems, reqInputID);
                         final Edge myEdge = factoryManager.newElement(idOfDMNorWBUUID(ar),
@@ -352,13 +350,12 @@ public class DMNMarshallerKogito {
                         setConnectionMagnets(myEdge, ar.getId(), dmnXml);
                     }
                 }
-            } else if (JSITKnowledgeSource.instanceOf(element)) {
+            } else if (JSITKnowledgeSource.instanceJSITKnowledgeSourceOf(element.getTYPE_NAME())) {
                 final JSITKnowledgeSource ks = Js.uncheckedCast(element);
-                final JsArrayLike<JSITAuthorityRequirement> wrappedAuthorityRequirements = ks.getAuthorityRequirement();
+                final List<JSITAuthorityRequirement> wrappedAuthorityRequirements = ks.getAuthorityRequirement();
                 if (Objects.nonNull(wrappedAuthorityRequirements)) {
-                    final JsArrayLike<JSITAuthorityRequirement> jsiAuthorityRequirements = JsUtils.getUnwrappedElementsArray(wrappedAuthorityRequirements);
-                    for (int i = 0; i < jsiAuthorityRequirements.getLength(); i++) {
-                        final JSITAuthorityRequirement ar = Js.uncheckedCast(jsiAuthorityRequirements.getAt(i));
+                    for (int i = 0; i < wrappedAuthorityRequirements.size(); i++) {
+                        final JSITAuthorityRequirement ar = Js.uncheckedCast(wrappedAuthorityRequirements.get(i));
                         if (ar.getRequiredInput() != null) {
                             final String reqInputID = getId(ar.getRequiredInput());
                             final Node requiredNode = getRequiredNode(elems, reqInputID);
@@ -391,24 +388,22 @@ public class DMNMarshallerKogito {
                         }
                     }
                 }
-            } else if (JSITDecisionService.instanceOf(element)) {
+            } else if (JSITDecisionService.instanceJSITDecisionServiceOf(element.getTYPE_NAME())) {
                 final JSITDecisionService ds = Js.uncheckedCast(element);
                 dmnDecisionServices.add(ds);
-                final JsArrayLike<JSITDMNElementReference> wrappedEncapsulatedDecisions = ds.getEncapsulatedDecision();
+                final List<JSITDMNElementReference> wrappedEncapsulatedDecisions = ds.getEncapsulatedDecision();
                 if (Objects.nonNull(wrappedEncapsulatedDecisions)) {
-                    final JsArrayLike<JSITDMNElementReference> jsiEncapsulatedDecisions = JsUtils.getUnwrappedElementsArray(wrappedEncapsulatedDecisions);
-                    for (int i = 0; i < jsiEncapsulatedDecisions.getLength(); i++) {
-                        final JSITDMNElementReference er = Js.uncheckedCast(jsiEncapsulatedDecisions.getAt(i));
+                    for (int i = 0; i < wrappedEncapsulatedDecisions.size(); i++) {
+                        final JSITDMNElementReference er = Js.uncheckedCast(wrappedEncapsulatedDecisions.get(i));
                         final String reqInputID = getId(er);
                         final Node requiredNode = getRequiredNode(elems, reqInputID);
                         connectDSChildEdge(currentNode, requiredNode);
                     }
                 }
-                final JsArrayLike<JSITDMNElementReference> wrappedOutputDecisions = ds.getOutputDecision();
+                final List<JSITDMNElementReference> wrappedOutputDecisions = ds.getOutputDecision();
                 if (Objects.nonNull(wrappedOutputDecisions)) {
-                    final JsArrayLike<JSITDMNElementReference> jsiOutputDecisions = JsUtils.getUnwrappedElementsArray(wrappedOutputDecisions);
-                    for (int i = 0; i < jsiOutputDecisions.getLength(); i++) {
-                        final JSITDMNElementReference er = Js.uncheckedCast(jsiOutputDecisions.getAt(i));
+                    for (int i = 0; i < wrappedOutputDecisions.size(); i++) {
+                        final JSITDMNElementReference er = Js.uncheckedCast(wrappedOutputDecisions.get(i));
                         final String reqInputID = getId(er);
                         final Node requiredNode = getRequiredNode(elems, reqInputID);
                         connectDSChildEdge(currentNode, requiredNode);
@@ -418,12 +413,11 @@ public class DMNMarshallerKogito {
         }
 
         final Map<String, Node<View<TextAnnotation>, ?>> textAnnotations = new HashMap<>();
-        final JsArrayLike<JSITArtifact> wrappedArtifacts = dmnXml.getArtifact();
+        final List<JSITArtifact> wrappedArtifacts = dmnXml.getArtifact();
         if (Objects.nonNull(wrappedArtifacts)) {
-            final JsArrayLike<JSITArtifact> jsiArtifacts = JsUtils.getUnwrappedElementsArray(wrappedArtifacts);
-            for (int i = 0; i < jsiArtifacts.getLength(); i++) {
-                final JSITArtifact jsiArtifact = Js.uncheckedCast(jsiArtifacts.getAt(i));
-                if (JSITTextAnnotation.instanceOf(jsiArtifact)) {
+            for (int i = 0; i < wrappedArtifacts.size(); i++) {
+                final JSITArtifact jsiArtifact = Js.uncheckedCast(wrappedArtifacts.get(i));
+                if (JSITTextAnnotation.instanceJSITTextAnnotationOf(jsiArtifact.getTYPE_NAME())) {
                     final String id = jsiArtifact.getId();
                     final JSITTextAnnotation jsiTextAnnotation = Js.uncheckedCast(jsiArtifact);
                     final Node<View<TextAnnotation>, ?> textAnnotation = textAnnotationConverter.nodeFromDMN(jsiTextAnnotation,
@@ -437,10 +431,9 @@ public class DMNMarshallerKogito {
 
         final List<JSITAssociation> associations = new ArrayList<>();
         if (Objects.nonNull(wrappedArtifacts)) {
-            final JsArrayLike<JSITArtifact> jsiArtifacts = JsUtils.getUnwrappedElementsArray(wrappedArtifacts);
-            for (int i = 0; i < jsiArtifacts.getLength(); i++) {
-                final JSITArtifact jsiArtifact = Js.uncheckedCast(jsiArtifacts.getAt(i));
-                if (JSITAssociation.instanceOf(jsiArtifact)) {
+            for (int i = 0; i < wrappedArtifacts.size(); i++) {
+                final JSITArtifact jsiArtifact = Js.uncheckedCast(wrappedArtifacts.get(i));
+                if (JSITAssociation.instanceJSITAssociationOf(jsiArtifact.getTYPE_NAME())) {
                     final JSITAssociation jsiAssociation = Js.uncheckedCast(jsiArtifact);
                     associations.add(jsiAssociation);
                 }
@@ -486,8 +479,8 @@ public class DMNMarshallerKogito {
 
         //Only connect Nodes to the Diagram that are not referenced by DecisionServices
         final List<String> references = new ArrayList<>();
-        dmnDecisionServices.forEach(ds -> references.addAll(Arrays.stream(ds.getEncapsulatedDecision().asArray()).map(JSITDMNElementReference::getHref).collect(toList())));
-        dmnDecisionServices.forEach(ds -> references.addAll(Arrays.stream(ds.getOutputDecision().asArray()).map(JSITDMNElementReference::getHref).collect(toList())));
+        dmnDecisionServices.forEach(ds -> references.addAll(ds.getEncapsulatedDecision().stream().map(JSITDMNElementReference::getHref).collect(toList())));
+        dmnDecisionServices.forEach(ds -> references.addAll(ds.getOutputDecision().stream().map(JSITDMNElementReference::getHref).collect(toList())));
         final Map<JSITDRGElement, Node> elementsToConnectToRoot = new HashMap<>();
         for (Entry<JSITDRGElement, Node> kv : elems.values()) {
             final JSITDRGElement element = Js.uncheckedCast(kv.getKey());
@@ -613,10 +606,10 @@ public class DMNMarshallerKogito {
 
     private List<JSIDMNShape> getUniqueDMNShapes(final JSIDMNDiagram dmnDDDiagram) {
         final Map<String, JSIDMNShape> jsidmnShapes = new HashMap<>();
-        final JsArrayLike<JSIDiagramElement> unwrapped = JSIDMNDiagram.getDMNDiagramElement(dmnDDDiagram);
+        final JsArrayLike<JSIDiagramElement> unwrapped = getDMNDiagramElement(dmnDDDiagram);
         for (int i = 0; i < unwrapped.getLength(); i++) {
             final JSIDiagramElement jsiDiagramElement = Js.uncheckedCast(unwrapped.getAt(i));
-            if (JSIDMNShape.instanceOf(jsiDiagramElement)) {
+            if (JSIDMNShape.instanceJSIDMNShapeOf(jsiDiagramElement.getTYPE_NAME())) {
                 final JSIDMNShape jsidmnShape = Js.uncheckedCast(jsiDiagramElement);
                 if (!jsidmnShapes.containsKey(jsidmnShape.getId())) {
                     jsidmnShapes.put(jsidmnShape.getId(), jsidmnShape);
@@ -646,7 +639,7 @@ public class DMNMarshallerKogito {
 
     public static Node<?, ?> findDMNDiagramRoot(final Graph<?, Node<View, ?>> graph) {
         return StreamSupport.stream(graph.nodes().spliterator(),
-                                    false).filter(n -> n.getContent().getDefinition() instanceof DMNDiagram).findFirst().orElseThrow(() -> new UnsupportedOperationException("TODO"));
+                                    false).filter(n -> n.getContent().getDefinition() instanceof DMNDiagram).findFirst().orElseThrow(() -> new UnsupportedOperationException("TODO 1"));
     }
 
     private String getId(final JSITDMNElementReference er) {
@@ -664,23 +657,23 @@ public class DMNMarshallerKogito {
 
     private Node createNode(final JSITDRGElement dmn,
                             final BiConsumer<String, HasComponentWidths> hasComponentWidthsConsumer) {
-        if (JSITInputData.instanceOf(dmn)) {
+        if (JSITInputData.instanceJSITInputDataOf(dmn.getTYPE_NAME())) {
             return inputDataConverter.nodeFromDMN(Js.uncheckedCast(dmn),
                                                   hasComponentWidthsConsumer);
-        } else if (JSITDecision.instanceOf(dmn)) {
+        } else if (JSITDecision.instanceJSITDecisionOf(dmn.getTYPE_NAME())) {
             return decisionConverter.nodeFromDMN(Js.uncheckedCast(dmn),
                                                  hasComponentWidthsConsumer);
-        } else if (JSITBusinessKnowledgeModel.instanceOf(dmn)) {
+        } else if (JSITBusinessKnowledgeModel.instanceJSITBusinessKnowledgeModelOf(dmn.getTYPE_NAME())) {
             return bkmConverter.nodeFromDMN(Js.uncheckedCast(dmn),
                                             hasComponentWidthsConsumer);
-        } else if (JSITKnowledgeSource.instanceOf(dmn)) {
+        } else if (JSITKnowledgeSource.instanceJSITKnowledgeSourceOf(dmn.getTYPE_NAME())) {
             return knowledgeSourceConverter.nodeFromDMN(Js.uncheckedCast(dmn),
                                                         hasComponentWidthsConsumer);
-        } else if (JSITDecisionService.instanceOf(dmn)) {
+        } else if (JSITDecisionService.instanceJSITDecisionServiceOf(dmn.getTYPE_NAME())) {
             return decisionServiceConverter.nodeFromDMN(Js.uncheckedCast(dmn),
                                                         hasComponentWidthsConsumer);
         } else {
-            throw new UnsupportedOperationException("TODO"); // TODO
+            throw new UnsupportedOperationException("TODO 2"); // TODO
         }
     }
 
@@ -758,11 +751,10 @@ public class DMNMarshallerKogito {
         Optional<JSIDMNEdge> dmnEdge = Optional.empty();
         if (dmnDiagram.isPresent()) {
             final JSIDMNDiagram jsiDiagram = Js.uncheckedCast(dmnDiagram.get());
-            final JsArrayLike<JSIDiagramElement> wrapped = jsiDiagram.getDMNDiagramElement();
-            final JsArrayLike<JSIDiagramElement> jsiDiagramElements = JsUtils.getUnwrappedElementsArray(wrapped);
-            for (int i = 0; i < jsiDiagramElements.getLength(); i++) {
-                final JSIDiagramElement jsiDiagramElement = Js.uncheckedCast(jsiDiagramElements.getAt(i));
-                if (JSIDMNEdge.instanceOf(jsiDiagramElement)) {
+            final List<JSIDiagramElement> wrapped = jsiDiagram.getDMNDiagramElement();
+            for (int i = 0; i < wrapped.size(); i++) {
+                final JSIDiagramElement jsiDiagramElement = Js.uncheckedCast(wrapped.get(i));
+                if (JSIDMNEdge.instanceJSIDMNEdgeOf(jsiDiagramElement.getTYPE_NAME())) {
                     final JSIDMNEdge jsiEdge = Js.uncheckedCast(jsiDiagramElement);
                     if (Objects.equals(jsiEdge.getDmnElementRef().getLocalPart(), dmnEdgeElementRef)) {
                         dmnEdge = Optional.of(jsiEdge);
@@ -773,23 +765,23 @@ public class DMNMarshallerKogito {
         }
         if (dmnEdge.isPresent()) {
             final JSIDMNEdge e = Js.uncheckedCast(dmnEdge.get());
-            final JSIPoint source = Js.uncheckedCast(e.getWaypoint().getAt(0));
+            final JSIPoint source = Js.uncheckedCast(e.getWaypoint().get(0));
             final Node<View<?>, Edge> sourceNode = edge.getSourceNode();
             if (null != sourceNode) {
                 setConnectionMagnet(sourceNode,
                                     source,
                                     connectionContent::setSourceConnection);
             }
-            final JSIPoint target = Js.uncheckedCast(e.getWaypoint().getAt(e.getWaypoint().getLength() - 1));
+            final JSIPoint target = Js.uncheckedCast(e.getWaypoint().get(e.getWaypoint().size() - 1));
             final Node<View<?>, Edge> targetNode = edge.getTargetNode();
             if (null != targetNode) {
                 setConnectionMagnet(targetNode,
                                     target,
                                     connectionContent::setTargetConnection);
             }
-            if (e.getWaypoint().getLength() > 2) {
-                connectionContent.setControlPoints(Arrays.asList(e.getWaypoint().asArray())
-                                                           .subList(1, e.getWaypoint().getLength() - 1)
+            if (e.getWaypoint().size() > 2) {
+                connectionContent.setControlPoints(e.getWaypoint()
+                                                           .subList(1, e.getWaypoint().size() - 1)
                                                            .stream()
                                                            .map(p -> ControlPoint.build(PointUtils.dmndiPointToPoint2D(p)))
                                                            .toArray(ControlPoint[]::new));
@@ -884,7 +876,7 @@ public class DMNMarshallerKogito {
             final JsArrayLike<JSIDMNDiagram> diagrams = JavaScriptObject.createArray().cast();
             definitions.getDMNDI().setDMNDiagram(diagrams);
         }
-        JsUtils.add(definitions.getDMNDI().getDMNDiagram(), dmnDDDMNDiagram);
+        definitions.getDMNDI().getDMNDiagram().add(dmnDDDMNDiagram);
 
         //Convert relative positioning to absolute
         for (Node<?, ?> node : graph.nodes()) {
@@ -929,8 +921,7 @@ public class DMNMarshallerKogito {
                         final JsArrayLike<JSIDiagramElement> elements = JavaScriptObject.createArray().cast();
                         dmnDDDMNDiagram.setDMNDiagramElement(elements);
                     }
-                    JsUtils.add(dmnDDDMNDiagram.getDMNDiagramElement(),
-                                stunnerToDDExt((View<? extends DMNElement>) view));
+                    dmnDDDMNDiagram.getDMNDiagramElement().add(stunnerToDDExt((View<? extends DMNElement>) view));
                 } else if (view.getDefinition() instanceof TextAnnotation) {
                     final TextAnnotation textAnnotation = (TextAnnotation) view.getDefinition();
                     textAnnotations.put(textAnnotation.getId().getValue(),
@@ -940,13 +931,12 @@ public class DMNMarshallerKogito {
                         final JsArrayLike<JSIDiagramElement> elements = JavaScriptObject.createArray().cast();
                         dmnDDDMNDiagram.setDMNDiagramElement(elements);
                     }
-                    JsUtils.add(dmnDDDMNDiagram.getDMNDiagramElement(),
-                                stunnerToDDExt((View<? extends DMNElement>) view));
+                    dmnDDDMNDiagram.getDMNDiagramElement().add(stunnerToDDExt((View<? extends DMNElement>) view));
 
                     final List<JSITAssociation> associations = AssociationConverter.dmnFromWB((Node<View<TextAnnotation>, ?>) node);
                     final JSITAssociation[] aAssociations = new JSITAssociation[]{};
                     associations.toArray(aAssociations);
-                    JsUtils.addAll(definitions.getArtifact(), aAssociations);
+                    definitions.getArtifact().addAll(Arrays.asList(aAssociations));
                 }
 
                 // DMNDI Edge management.
@@ -1005,11 +995,11 @@ public class DMNMarshallerKogito {
                                                                uuid,
                                                                XMLConstants.DEFAULT_NS_PREFIX));
 
-                            JsUtils.add(dmnEdge.getWaypoint(), PointUtils.point2dToDMNDIPoint(sourcePoint));
+                            dmnEdge.getWaypoint().add(PointUtils.point2dToDMNDIPoint(sourcePoint));
                             for (ControlPoint cp : connectionContent.getControlPoints()) {
-                                JsUtils.add(dmnEdge.getWaypoint(), PointUtils.point2dToDMNDIPoint(cp.getLocation()));
+                                dmnEdge.getWaypoint().add(PointUtils.point2dToDMNDIPoint(cp.getLocation()));
                             }
-                            JsUtils.add(dmnEdge.getWaypoint(), PointUtils.point2dToDMNDIPoint(targetPoint));
+                            dmnEdge.getWaypoint().add(PointUtils.point2dToDMNDIPoint(targetPoint));
                             dmnEdges.add(dmnEdge);
                         }
                     }
@@ -1023,18 +1013,18 @@ public class DMNMarshallerKogito {
         }
         nodes.values().forEach(n -> {
             n.setParent(definitions);
-            JsUtils.add(definitions.getDrgElement(), n);
+            definitions.getDrgElement().add(n);
         });
         if (Objects.isNull(definitions.getArtifact())) {
             final JsArrayLike<JSITArtifact> artifacts = JavaScriptObject.createArray().cast();
             definitions.setArtifact(artifacts);
         }
-        textAnnotations.values().forEach(text -> JsUtils.add(definitions.getArtifact(), text));
+        textAnnotations.values().forEach(text -> definitions.getArtifact().add(text));
 
         // add DMNEdge last.
         final JSIDMNEdge[] aDMNEdges = new JSIDMNEdge[]{};
         dmnEdges.toArray(aDMNEdges);
-        JsUtils.addAll(dmnDDDMNDiagram.getDMNDiagramElement(), aDMNEdges);
+        dmnDDDMNDiagram.getDMNDiagramElement().addAll(Arrays.asList(aDMNEdges));
 
         return definitions;
     }
@@ -1064,13 +1054,12 @@ public class DMNMarshallerKogito {
         }
 
         final JSIDMNDiagram jsiDiagram = Js.uncheckedCast(dmnDDDiagram.get());
-        final JsArrayLike<JSIDiagramElement> wrapped = jsiDiagram.getDMNDiagramElement();
-        final JsArrayLike<JSIDiagramElement> jsiDiagramElements = JsUtils.getUnwrappedElementsArray(wrapped);
+        final List<JSIDiagramElement> jsiDiagramElements = jsiDiagram.getDMNDiagramElement();
 
         final List<JSIDMNShape> drgShapes = new ArrayList<>();
-        for (int i = 0; i < jsiDiagramElements.getLength(); i++) {
-            final JSIDiagramElement jsiDiagramElement = Js.uncheckedCast(jsiDiagramElements.getAt(i));
-            if (JSIDMNShape.instanceOf(jsiDiagramElement)) {
+        for (int i = 0; i < jsiDiagramElements.size(); i++) {
+            final JSIDiagramElement jsiDiagramElement = Js.uncheckedCast(jsiDiagramElements.get(i));
+            if (JSIDMNShape.instanceJSIDMNShapeOf(jsiDiagramElement.getTYPE_NAME())) {
                 drgShapes.add(Js.uncheckedCast(jsiDiagramElement));
             }
         }
@@ -1188,7 +1177,7 @@ public class DMNMarshallerKogito {
         }
 
         final JSIStyle drgStyle = Js.uncheckedCast(JsUtils.getUnwrappedElement(drgShape.getStyle()));
-        final JSIDMNStyle dmnStyleOfDrgShape = JSIDMNStyle.instanceOf(drgStyle) ? Js.uncheckedCast(drgStyle) : null;
+        final JSIDMNStyle dmnStyleOfDrgShape = JSIDMNStyle.instanceJSIDMNStyleOf(drgStyle.getTYPE_NAME()) ? Js.uncheckedCast(drgStyle) : null;
         if (Objects.nonNull(dmnStyleOfDrgShape)) {
             if (Objects.nonNull(dmnStyleOfDrgShape.getFillColor())) {
                 bgset.setBgColour(new BgColour(ColorUtils.wbFromDMN(dmnStyleOfDrgShape.getFillColor())));
@@ -1206,17 +1195,17 @@ public class DMNMarshallerKogito {
             final JSIDMNShape jsiLabel = Js.uncheckedCast(drgShape.getDMNLabel());
             final JSIDiagramElement jsiLabelStyle = Js.uncheckedCast(jsiLabel.getStyle());
             final JSIDiagramElement jsiLabelSharedStyle = Js.uncheckedCast(jsiLabel.getSharedStyle());
-            if (Objects.nonNull(jsiLabelSharedStyle) && JSIDMNStyle.instanceOf(jsiLabelSharedStyle)) {
+            if (Objects.nonNull(jsiLabelSharedStyle) && JSIDMNStyle.instanceJSIDMNStyleOf(jsiLabelSharedStyle.getTYPE_NAME())) {
                 mergeFontSet(fontSet, FontSetPropertyConverter.wbFromDMN((Js.uncheckedCast(jsiLabelSharedStyle))));
             }
-            if (Objects.nonNull(jsiLabelStyle) && JSIDMNStyle.instanceOf(jsiLabelStyle)) {
+            if (Objects.nonNull(jsiLabelStyle) && JSIDMNStyle.instanceJSIDMNStyleOf(jsiLabelStyle.getTYPE_NAME())) {
                 mergeFontSet(fontSet, FontSetPropertyConverter.wbFromDMN(Js.uncheckedCast(jsiLabelStyle)));
             }
         }
         fontSetSetter.accept(fontSet);
 
         if (Objects.nonNull(drgShape.getDMNDecisionServiceDividerLine())) {
-            decisionServiceDividerLineYSetter.accept(drgShape.getDMNDecisionServiceDividerLine().getWaypoint().getAt(0).getY());
+            decisionServiceDividerLineYSetter.accept(drgShape.getDMNDecisionServiceDividerLine().getWaypoint().get(0).getY());
         }
     }
 
@@ -1281,11 +1270,11 @@ public class DMNMarshallerKogito {
             leftPoint.setX(v.getBounds().getUpperLeft().getX());
             final double dlY = v.getBounds().getUpperLeft().getY() + d.getDividerLineY().getValue();
             leftPoint.setY(dlY);
-            JsUtils.add(dl.getWaypoint(), leftPoint);
+            dl.getWaypoint().add(leftPoint);
             final JSIPoint rightPoint = new JSIPoint();
             rightPoint.setX(v.getBounds().getLowerRight().getX());
             rightPoint.setY(dlY);
-            JsUtils.add(dl.getWaypoint(), rightPoint);
+            dl.getWaypoint().add(rightPoint);
             result.setDMNDecisionServiceDividerLine(dl);
         }
         return result;
@@ -1351,9 +1340,21 @@ public class DMNMarshallerKogito {
                 return decisionServiceConverter.dmnFromNode((Node<View<DecisionService>, ?>) node,
                                                             componentWidthsConsumer);
             } else {
-                throw new UnsupportedOperationException("TODO"); // TODO
+                throw new UnsupportedOperationException("TODO 3"); // TODO
             }
         }
         throw new RuntimeException("wrong diagram structure to marshall");
     }
+
+    public static native JsArrayLike<JSITDRGElement> getDrgElement(JSITDefinitions instance) /*-{
+        return @org.kie.workbench.common.dmn.webapp.kogito.marshaller.mapper.JsUtils::getUnwrappedElementsArray(Ljsinterop/base/JsArrayLike;)(instance.drgElement)
+    }-*/;
+
+    public static native String type(Object instance) /*-{
+        return instance.TYPE_NAME
+    }-*/;
+
+    public static native JsArrayLike<JSIDiagramElement> getDMNDiagramElement(JSIDMNDiagram instance) /*-{
+        return @org.kie.workbench.common.dmn.webapp.kogito.marshaller.mapper.JsUtils::getUnwrappedElementsArray(Ljsinterop/base/JsArrayLike;)(instance.dmnDiagramElement)
+    }-*/;
 }

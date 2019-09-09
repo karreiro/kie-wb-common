@@ -43,7 +43,7 @@ public class ContextPropertyConverter {
         final Context result = new Context(id,
                                            description,
                                            typeRef);
-        for (JSITContextEntry ce : dmn.getContextEntry().asArray()) {
+        for (JSITContextEntry ce : dmn.getContextEntry()) {
             final ContextEntry ceConverted = ContextEntryPropertyConverter.wbFromDMN(ce, hasComponentWidthsConsumer);
             if (ceConverted != null) {
                 ceConverted.setParent(result);
@@ -82,17 +82,17 @@ public class ContextPropertyConverter {
             if (ceConverted != null) {
                 ceConverted.setParent(result);
             }
-            JsUtils.add(result.getContextEntry(), ceConverted);
+            JsUtils.add(result.getNativeContextEntry(), ceConverted);
         }
 
         //The UI appends a ContextEntry for the _default_ result that may contain an undefined Expression.
         //If this is the case then DMN does not require the ContextEntry to be written out to the XML.
         //Conversion of ContextEntries will always create a _mock_ LiteralExpression if no Expression has
         //been defined therefore remove the last entry from the org.kie.dmn.model if the WB had no Expression.
-        final int contextEntriesCount = result.getContextEntry().getLength();
+        final int contextEntriesCount = result.getContextEntry().size();
         if (contextEntriesCount > 0) {
             if (Objects.isNull(wb.getContextEntry().get(contextEntriesCount - 1).getExpression())) {
-                JsUtils.remove(result.getContextEntry(), contextEntriesCount - 1);
+                JsUtils.remove(result.getNativeContextEntry(), contextEntriesCount - 1);
             }
         }
 

@@ -154,14 +154,14 @@ public class BusinessKnowledgeModelConverter implements NodeConverter<JSITBusine
                         final JSITDMNElementReference ri = new JSITDMNElementReference();
                         ri.setHref(getHref(drgElement));
                         iReq.setRequiredKnowledge(ri);
-                        JsUtils.add(result.getKnowledgeRequirement(), iReq);
+                        JsUtils.add(result.getNativeKnowledgeRequirement(), iReq);
                     } else if (drgElement instanceof KnowledgeSource) {
                         final JSITAuthorityRequirement iReq = new JSITAuthorityRequirement();
                         iReq.setId(e.getUUID());
                         final JSITDMNElementReference ri = new JSITDMNElementReference();
                         ri.setHref(getHref(drgElement));
                         iReq.setRequiredAuthority(ri);
-                        JsUtils.add(result.getAuthorityRequirement(), iReq);
+                        JsUtils.add(result.getNativeAuthorityRequirement(), iReq);
                     } else if (drgElement instanceof DecisionService) {
                         if (e.getContent() instanceof View && ((View) e.getContent()).getDefinition() instanceof KnowledgeRequirement) {
                             final JSITKnowledgeRequirement iReq = new JSITKnowledgeRequirement();
@@ -169,7 +169,7 @@ public class BusinessKnowledgeModelConverter implements NodeConverter<JSITBusine
                             final JSITDMNElementReference ri = new JSITDMNElementReference();
                             ri.setHref(getHref(drgElement));
                             iReq.setRequiredKnowledge(ri);
-                            JsUtils.add(result.getKnowledgeRequirement(), iReq);
+                            JsUtils.add(result.getNativeKnowledgeRequirement(), iReq);
                         } else {
                             throw new UnsupportedOperationException("wrong model definition.");
                         }

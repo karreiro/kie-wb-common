@@ -40,7 +40,7 @@ public class ListPropertyConverter {
         QName typeRef = QNamePropertyConverter.wbFromDMN(dmn.getTypeRef(), dmn);
 
         final java.util.List<Expression> expression = new ArrayList<>();
-        for (JSITExpression e : dmn.getExpression().asArray()) {
+        for (JSITExpression e : dmn.getExpression()) {
             Expression eConverted = ExpressionPropertyConverter.wbFromDMN(e,
                                                                           hasComponentWidthsConsumer);
             expression.add(eConverted);
@@ -68,7 +68,7 @@ public class ListPropertyConverter {
             if (eConverted != null) {
                 eConverted.setParent(result);
             }
-            JsUtils.add(result.getExpression(), eConverted);
+            JsUtils.add(result.getNativeExpression(), eConverted);
         }
 
         return result;

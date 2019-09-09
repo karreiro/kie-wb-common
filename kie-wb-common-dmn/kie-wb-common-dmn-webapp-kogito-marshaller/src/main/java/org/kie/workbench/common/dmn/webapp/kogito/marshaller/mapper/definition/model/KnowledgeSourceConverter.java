@@ -108,21 +108,21 @@ public class KnowledgeSourceConverter implements NodeConverter<JSITKnowledgeSour
                         final JSITDMNElementReference ri = new JSITDMNElementReference();
                         ri.setHref(getHref(drgElement));
                         iReq.setRequiredDecision(ri);
-                        JsUtils.add(result.getAuthorityRequirement(), iReq);
+                        JsUtils.add(result.getNativeAuthorityRequirement(), iReq);
                     } else if (drgElement instanceof KnowledgeSource) {
                         final JSITAuthorityRequirement iReq = new JSITAuthorityRequirement();
                         iReq.setId(e.getUUID());
                         final JSITDMNElementReference ri = new JSITDMNElementReference();
                         ri.setHref(getHref(drgElement));
                         iReq.setRequiredAuthority(ri);
-                        JsUtils.add(result.getAuthorityRequirement(), iReq);
+                        JsUtils.add(result.getNativeAuthorityRequirement(), iReq);
                     } else if (drgElement instanceof InputData) {
                         final JSITAuthorityRequirement iReq = new JSITAuthorityRequirement();
                         iReq.setId(e.getUUID());
                         final JSITDMNElementReference ri = new JSITDMNElementReference();
                         ri.setHref(getHref(drgElement));
                         iReq.setRequiredInput(ri);
-                        JsUtils.add(result.getAuthorityRequirement(), iReq);
+                        JsUtils.add(result.getNativeAuthorityRequirement(), iReq);
                     } else {
                         throw new UnsupportedOperationException("wrong model definition.");
                     }

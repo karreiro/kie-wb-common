@@ -139,28 +139,28 @@ public class DecisionConverter implements NodeConverter<JSITDecision, org.kie.wo
                         final JSITDMNElementReference ri = new JSITDMNElementReference();
                         ri.setHref(getHref(drgElement));
                         iReq.setRequiredDecision(ri);
-                        JsUtils.add(d.getInformationRequirement(), iReq);
+                        JsUtils.add(d.getNativeInformationRequirement(), iReq);
                     } else if (drgElement instanceof BusinessKnowledgeModel) {
                         final JSITKnowledgeRequirement iReq = new JSITKnowledgeRequirement();
                         iReq.setId(e.getUUID());
                         final JSITDMNElementReference ri = new JSITDMNElementReference();
                         ri.setHref(getHref(drgElement));
                         iReq.setRequiredKnowledge(ri);
-                        JsUtils.add(d.getKnowledgeRequirement(), iReq);
+                        JsUtils.add(d.getNativeKnowledgeRequirement(), iReq);
                     } else if (drgElement instanceof KnowledgeSource) {
                         final JSITAuthorityRequirement iReq = new JSITAuthorityRequirement();
                         iReq.setId(e.getUUID());
                         final JSITDMNElementReference ri = new JSITDMNElementReference();
                         ri.setHref(getHref(drgElement));
                         iReq.setRequiredAuthority(ri);
-                        JsUtils.add(d.getAuthorityRequirement(), iReq);
+                        JsUtils.add(d.getNativeAuthorityRequirement(), iReq);
                     } else if (drgElement instanceof InputData) {
                         final JSITInformationRequirement iReq = new JSITInformationRequirement();
                         iReq.setId(e.getUUID());
                         final JSITDMNElementReference ri = new JSITDMNElementReference();
                         ri.setHref(getHref(drgElement));
                         iReq.setRequiredInput(ri);
-                        JsUtils.add(d.getInformationRequirement(), iReq);
+                        JsUtils.add(d.getNativeInformationRequirement(), iReq);
                     } else if (drgElement instanceof DecisionService) {
                         if (e.getContent() instanceof Child) {
                             // Stunner relationship of this Decision be encapsulated by the DecisionService, not managed here.
@@ -170,7 +170,7 @@ public class DecisionConverter implements NodeConverter<JSITDecision, org.kie.wo
                             final JSITDMNElementReference ri = new JSITDMNElementReference();
                             ri.setHref(getHref(drgElement));
                             iReq.setRequiredKnowledge(ri);
-                            JsUtils.add(d.getKnowledgeRequirement(), iReq);
+                            JsUtils.add(d.getNativeKnowledgeRequirement(), iReq);
                         } else {
                             throw new UnsupportedOperationException("wrong model definition.");
                         }

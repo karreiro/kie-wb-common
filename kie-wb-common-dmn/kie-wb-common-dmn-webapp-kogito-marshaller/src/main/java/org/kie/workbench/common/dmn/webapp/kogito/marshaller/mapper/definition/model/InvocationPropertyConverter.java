@@ -55,7 +55,7 @@ public class InvocationPropertyConverter {
             convertedExpression.setParent(result);
         }
 
-        for (JSITBinding b : dmn.getBinding().asArray()) {
+        for (JSITBinding b : dmn.getBinding()) {
             final Binding bConverted = BindingPropertyConverter.wbFromDMN(b,
                                                                           hasComponentWidthsConsumer);
             if (bConverted != null) {
@@ -90,7 +90,7 @@ public class InvocationPropertyConverter {
             if (bConverted != null) {
                 bConverted.setParent(result);
             }
-            JsUtils.add(result.getBinding(), bConverted);
+            JsUtils.add(result.getNativeBinding(), bConverted);
         }
 
         return result;

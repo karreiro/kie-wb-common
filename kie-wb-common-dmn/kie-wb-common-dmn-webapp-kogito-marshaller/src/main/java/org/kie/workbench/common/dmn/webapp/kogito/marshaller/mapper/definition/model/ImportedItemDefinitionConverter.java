@@ -42,7 +42,7 @@ public class ImportedItemDefinitionConverter {
                                                    final String prefix) {
 
         final String nameWithPrefix = prefix + "." + itemDefinition.getName();
-        final List<JSITItemDefinition> itemComponents = Arrays.asList(itemDefinition.getItemComponent().asArray());
+        final List<JSITItemDefinition> itemComponents = itemDefinition.getItemComponent();
 
         if (itemDefinition.getTypeRef() != null && !isBuiltInType(itemDefinition.getTypeRef())) {
             itemDefinition.setTypeRef(makeQNameWithPrefix(itemDefinition.getTypeRef(), prefix).toString());

@@ -47,21 +47,21 @@ public class DecisionTablePropertyConverter {
         result.setDescription(description);
         result.setTypeRef(typeRef);
 
-        for (JSITInputClause input : dmn.getInput().asArray()) {
+        for (JSITInputClause input : dmn.getInput()) {
             final InputClause inputClauseConverted = InputClausePropertyConverter.wbFromDMN(input);
             if (inputClauseConverted != null) {
                 inputClauseConverted.setParent(result);
             }
             result.getInput().add(inputClauseConverted);
         }
-        for (JSITOutputClause input : dmn.getOutput().asArray()) {
+        for (JSITOutputClause input : dmn.getOutput()) {
             final OutputClause outputClauseConverted = OutputClausePropertyConverter.wbFromDMN(input);
             if (outputClauseConverted != null) {
                 outputClauseConverted.setParent(result);
             }
             result.getOutput().add(outputClauseConverted);
         }
-        for (JSITDecisionRule dr : dmn.getRule().asArray()) {
+        for (JSITDecisionRule dr : dmn.getRule()) {
             final DecisionRule decisionRuleConverted = DecisionRulePropertyConverter.wbFromDMN(dr);
             if (decisionRuleConverted != null) {
                 decisionRuleConverted.setParent(result);
@@ -94,24 +94,24 @@ public class DecisionTablePropertyConverter {
             if (c != null) {
                 c.setParent(result);
             }
-            JsUtils.add(result.getInput(), c);
+            JsUtils.add(result.getNativeInput(), c);
         }
         for (OutputClause input : wb.getOutput()) {
             final JSITOutputClause c = OutputClausePropertyConverter.dmnFromWB(input);
             if (c != null) {
                 c.setParent(result);
             }
-            JsUtils.add(result.getOutput(), c);
+            JsUtils.add(result.getNativeOutput(), c);
         }
-        if (result.getOutput().getLength() == 1) {
-            result.getOutput().getAt(0).setName(null); // DROOLS-3281
+        if (result.getOutput().size() == 1) {
+            result.getOutput().get(0).setName(null); // DROOLS-3281
         }
         for (DecisionRule dr : wb.getRule()) {
             final JSITDecisionRule c = DecisionRulePropertyConverter.dmnFromWB(dr);
             if (c != null) {
                 c.setParent(result);
             }
-            JsUtils.add(result.getRule(), c);
+            JsUtils.add(result.getNativeRule(), c);
         }
         if (wb.getHitPolicy() != null) {
             result.setHitPolicy(JSITHitPolicy.valueOf(wb.getHitPolicy().name()));

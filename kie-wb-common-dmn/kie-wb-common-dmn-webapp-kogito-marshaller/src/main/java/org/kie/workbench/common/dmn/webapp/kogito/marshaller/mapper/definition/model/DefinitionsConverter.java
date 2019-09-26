@@ -17,6 +17,7 @@
 package org.kie.workbench.common.dmn.webapp.kogito.marshaller.mapper.definition.model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -26,7 +27,6 @@ import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 import jsinterop.base.Js;
-import jsinterop.base.JsArrayLike;
 import org.kie.workbench.common.dmn.api.definition.model.DMNModelInstrumentedBase;
 import org.kie.workbench.common.dmn.api.definition.model.Definitions;
 import org.kie.workbench.common.dmn.api.definition.model.Import;
@@ -87,9 +87,9 @@ public class DefinitionsConverter {
             }
         }
 
-        final JsArrayLike<JSITItemDefinition> jsiItemDefinitions = JSITDefinitions.getItemDefinition(dmn);
-        for (int i = 0; i < jsiItemDefinitions.getLength(); i++) {
-            final JSITItemDefinition jsiItemDefinition = Js.uncheckedCast(jsiItemDefinitions.getAt(i));
+        final List<JSITItemDefinition> jsiItemDefinitions = dmn.getItemDefinition();
+        for (int i = 0; i < jsiItemDefinitions.size(); i++) {
+            final JSITItemDefinition jsiItemDefinition = Js.uncheckedCast(jsiItemDefinitions.get(i));
             final ItemDefinition itemDefConverted = ItemDefinitionPropertyConverter.wbFromDMN(jsiItemDefinition);
             if (Objects.nonNull(itemDefConverted)) {
                 itemDefConverted.setParent(result);
@@ -97,9 +97,9 @@ public class DefinitionsConverter {
             }
         }
 
-        final JsArrayLike<JSITImport> jsiImports = JSITDefinitions.getImport(dmn);
-        for (int i = 0; i < jsiImports.getLength(); i++) {
-            final JSITImport jsiImport = Js.uncheckedCast(jsiImports.getAt(i));
+        final List<JSITImport> jsiImports = dmn.getImport();
+        for (int i = 0; i < jsiImports.size(); i++) {
+            final JSITImport jsiImport = Js.uncheckedCast(jsiImports.get(i));
             final JSITDefinitions definitions = importDefinitions.get(jsiImport);
             final PMMLDocumentMetadata pmmlDocument = pmmlDocuments.get(jsiImport);
             final Import importConverted = ImportConverter.wbFromDMN(jsiImport, definitions, pmmlDocument);
@@ -116,7 +116,7 @@ public class DefinitionsConverter {
         if (wb == null) {
             return null;
         }
-        final JSITDefinitions result = JSITDefinitions.newInstance();
+        final JSITDefinitions result = new JSITDefinitions();
 
         // TODO currently DMN wb UI does not offer feature to set these required DMN properties, setting some hardcoded defaults for now.
         final String defaultId = (wb.getId() != null) ? wb.getId().getValue() : UUID.uuid();
@@ -157,7 +157,7 @@ public class DefinitionsConverter {
 //        otherAttributes.put(new QName("",
 //                                      "name",
 //                                      XMLConstants.NULL_NS_URI), result.getName());
-        JSITDMNElement.setOtherAttributesMap(result, otherAttributes);
+        result.setOtherAttributes(otherAttributes);
 
         // TODO {gcardosi} add because  present in original json
         if (Objects.isNull(result.getItemDefinition())) {
@@ -165,7 +165,7 @@ public class DefinitionsConverter {
         }
         for (ItemDefinition itemDef : wb.getItemDefinition()) {
             final JSITItemDefinition itemDefConverted = ItemDefinitionPropertyConverter.dmnFromWB(itemDef);
-            JSITDefinitions.addItemDefinition(result, itemDefConverted);
+            result.addItemDefinition(itemDefConverted);
         }
         // TODO {gcardosi} add because  present in original json
         if (Objects.isNull(result.getImport())) {
@@ -181,7 +181,7 @@ public class DefinitionsConverter {
         }
         for (Import i : wb.getImport()) {
             final JSITImport importConverted = ImportConverter.dmnFromWb(i);
-            JSITDefinitions.addImport(result, importConverted);
+            result.addImport(importConverted);
         }
 
         return result;

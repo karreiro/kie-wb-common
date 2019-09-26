@@ -111,22 +111,21 @@ public class ExpressionPropertyConverter {
         // SPECIAL CASE: to represent a partially edited DMN file.
         // reference above.
         if (wb == null) {
-            final JSITLiteralExpression mockedExpression = JSITLiteralExpression.newInstance();
+            final JSITLiteralExpression mockedExpression = new JSITLiteralExpression();
             final JSITLiteralExpression wrappedMockedExpression = getWrappedJSITLiteralExpression(mockedExpression, "dmn", "literalExpression");
             return wrappedMockedExpression;
         }
 
         final String uuid = wb.getId().getValue();
         if (Objects.nonNull(uuid)) {
-            final JSITComponentWidths componentWidths = JSITComponentWidths.newInstance();
+            final JSITComponentWidths componentWidths = new JSITComponentWidths();
             componentWidths.setDmnElementRef(uuid);
             wb.getComponentWidths()
                     .stream()
                     .filter(Objects::nonNull)
                     .forEach(w -> {
-                        final double dw = w;
-                        final float fw = (float) dw;
-                        JSITComponentWidths.addWidth(componentWidths, fw);
+                        final Float floatValue = w.floatValue();
+                        componentWidths.addWidth(floatValue);
                     });
             componentWidthsConsumer.accept(componentWidths);
         }

@@ -36,6 +36,7 @@ import org.kie.workbench.common.dmn.api.property.dmn.QName;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSITDMNElement;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSITDefinitions;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSITImport;
+import org.kie.workbench.common.dmn.webapp.kogito.marshaller.mapper.JsUtils;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.mapper.utils.NameSpaceUtils;
 
 import static org.kie.workbench.common.dmn.api.editors.included.DMNImportTypes.determineImportType;
@@ -81,7 +82,7 @@ public final class ImportConverter {
     }
 
     static JSITImport dmnFromWb(final Import wb) {
-        final JSITImport result = JSITImport.newInstance();
+        final JSITImport result = new JSITImport();
         result.setImportType(wb.getImportType());
         result.setLocationURI(wb.getLocationURI().getValue());
         result.setNamespace(wb.getNamespace());
@@ -109,7 +110,7 @@ public final class ImportConverter {
         result.setName(wb.getName().getValue());
         final Optional<String> description = Optional.ofNullable(DescriptionPropertyConverter.dmnFromWB(wb.getDescription()));
         description.ifPresent(result::setDescription);
-        JSITDMNElement.setOtherAttributesMap(result, otherAttributes);
+        result.setOtherAttributes(JsUtils.fromAttributesMap(otherAttributes));
 
         return result;
     }

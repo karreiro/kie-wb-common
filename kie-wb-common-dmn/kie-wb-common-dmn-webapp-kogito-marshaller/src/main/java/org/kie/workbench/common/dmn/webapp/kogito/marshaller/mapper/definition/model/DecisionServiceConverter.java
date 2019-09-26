@@ -151,7 +151,7 @@ public class DecisionServiceConverter implements NodeConverter<JSITDecisionServi
     public JSITDecisionService dmnFromNode(final Node<View<DecisionService>, ?> node,
                                            final Consumer<JSITComponentWidths> componentWidthsConsumer) {
         final DecisionService source = node.getContent().getDefinition();
-        final JSITDecisionService ds = JSITDecisionService.newInstance();
+        final JSITDecisionService ds = new JSITDecisionService();
         ds.setId(source.getId().getValue());
         final Optional<String> description = Optional.ofNullable(DescriptionPropertyConverter.dmnFromWB(source.getDescription()));
         description.ifPresent(ds::setDescription);
@@ -182,7 +182,7 @@ public class DecisionServiceConverter implements NodeConverter<JSITDecisionServi
                     final DRGElement drgElement = (DRGElement) targetNodeView.getDefinition();
                     if (drgElement instanceof Decision) {
                         final Decision decision = (Decision) drgElement;
-                        final JSITDMNElementReference ri = JSITDMNElementReference.newInstance();
+                        final JSITDMNElementReference ri = new JSITDMNElementReference();
                         ri.setHref(new StringBuilder("#").append(decision.getId().getValue()).toString());
                         if (isOutputDecision(targetNode.getContent(), node.getContent())) {
                             candidate_outputDecision.add(ri);
@@ -203,7 +203,7 @@ public class DecisionServiceConverter implements NodeConverter<JSITDecisionServi
         reqInputs.stream()
                 .sorted(Comparator.comparing(x -> x.getName().getValue()))
                 .map(x -> {
-                    final JSITDMNElementReference ri = JSITDMNElementReference.newInstance();
+                    final JSITDMNElementReference ri = new JSITDMNElementReference();
                     ri.setHref(new StringBuilder("#").append(x.getId().getValue()).toString());
                     return ri;
                 })
@@ -211,7 +211,7 @@ public class DecisionServiceConverter implements NodeConverter<JSITDecisionServi
         reqDecisions.stream()
                 .sorted(Comparator.comparing(x -> x.getName().getValue()))
                 .map(x -> {
-                    final JSITDMNElementReference ri = JSITDMNElementReference.newInstance();
+                    final JSITDMNElementReference ri = new JSITDMNElementReference();
                     ri.setHref(new StringBuilder("#").append(x.getId().getValue()).toString());
                     return ri;
                 })

@@ -106,7 +106,7 @@ public class BusinessKnowledgeModelConverter implements NodeConverter<JSITBusine
     public JSITBusinessKnowledgeModel dmnFromNode(final Node<View<BusinessKnowledgeModel>, ?> node,
                                                   final Consumer<JSITComponentWidths> componentWidthsConsumer) {
         final BusinessKnowledgeModel source = node.getContent().getDefinition();
-        final JSITBusinessKnowledgeModel result = JSITBusinessKnowledgeModel.newInstance();
+        final JSITBusinessKnowledgeModel result = new JSITBusinessKnowledgeModel();
         result.setId(source.getId().getValue());
         final Optional<String> description = Optional.ofNullable(DescriptionPropertyConverter.dmnFromWB(source.getDescription()));
         description.ifPresent(result::setDescription);
@@ -130,15 +130,14 @@ public class BusinessKnowledgeModelConverter implements NodeConverter<JSITBusine
         if (Objects.nonNull(wbFunctionDefinition)) {
             final String uuid = wbFunctionDefinition.getId().getValue();
             if (Objects.nonNull(uuid)) {
-                final JSITComponentWidths componentWidths = JSITComponentWidths.newInstance();
+                final JSITComponentWidths componentWidths = new JSITComponentWidths();
                 componentWidths.setDmnElementRef(uuid);
                 source.getEncapsulatedLogic().getComponentWidths()
                         .stream()
                         .filter(Objects::nonNull)
                         .forEach(w -> {
-                            final double dw = w;
-                            final float fw = (float) dw;
-                            JSITComponentWidths.addWidth(componentWidths, fw);
+                            final Float floatValue = w.floatValue();
+                            componentWidths.addWidth(floatValue);
                         });
                 componentWidthsConsumer.accept(componentWidths);
             }
@@ -155,27 +154,27 @@ public class BusinessKnowledgeModelConverter implements NodeConverter<JSITBusine
                 if (view.getDefinition() instanceof DRGElement) {
                     final DRGElement drgElement = (DRGElement) view.getDefinition();
                     if (drgElement instanceof BusinessKnowledgeModel) {
-                        final JSITKnowledgeRequirement iReq = JSITKnowledgeRequirement.newInstance();
+                        final JSITKnowledgeRequirement iReq = new JSITKnowledgeRequirement();
                         iReq.setId(e.getUUID());
-                        final JSITDMNElementReference ri = JSITDMNElementReference.newInstance();
+                        final JSITDMNElementReference ri = new JSITDMNElementReference();
                         ri.setHref(getHref(drgElement));
                         iReq.setRequiredKnowledge(ri);
-                        JSITBusinessKnowledgeModel.addKnowledgeRequirement(result, iReq);
+                        result.addKnowledgeRequirement(iReq);
                     } else if (drgElement instanceof KnowledgeSource) {
-                        final JSITAuthorityRequirement iReq = JSITAuthorityRequirement.newInstance();
+                        final JSITAuthorityRequirement iReq = new JSITAuthorityRequirement();
                         iReq.setId(e.getUUID());
-                        final JSITDMNElementReference ri = JSITDMNElementReference.newInstance();
+                        final JSITDMNElementReference ri = new JSITDMNElementReference();
                         ri.setHref(getHref(drgElement));
                         iReq.setRequiredAuthority(ri);
-                        JSITBusinessKnowledgeModel.addAuthorityRequirement(result, iReq);
+                        result.addAuthorityRequirement(iReq);
                     } else if (drgElement instanceof DecisionService) {
                         if (e.getContent() instanceof View && ((View) e.getContent()).getDefinition() instanceof KnowledgeRequirement) {
-                            final JSITKnowledgeRequirement iReq = JSITKnowledgeRequirement.newInstance();
+                            final JSITKnowledgeRequirement iReq = new JSITKnowledgeRequirement();
                             iReq.setId(e.getUUID());
-                            final JSITDMNElementReference ri = JSITDMNElementReference.newInstance();
+                            final JSITDMNElementReference ri = new JSITDMNElementReference();
                             ri.setHref(getHref(drgElement));
                             iReq.setRequiredKnowledge(ri);
-                            JSITBusinessKnowledgeModel.addKnowledgeRequirement(result, iReq);
+                            result.addKnowledgeRequirement(iReq);
                         } else {
                             throw new UnsupportedOperationException("wrong model definition.");
                         }

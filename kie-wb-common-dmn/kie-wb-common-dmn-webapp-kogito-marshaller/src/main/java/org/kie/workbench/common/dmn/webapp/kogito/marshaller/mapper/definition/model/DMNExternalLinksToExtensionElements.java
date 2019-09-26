@@ -16,10 +16,10 @@
 
 package org.kie.workbench.common.dmn.webapp.kogito.marshaller.mapper.definition.model;
 
+import java.util.List;
 import java.util.Objects;
 
 import jsinterop.base.Js;
-import jsinterop.base.JsArrayLike;
 import org.kie.workbench.common.dmn.api.property.dmn.DMNExternalLink;
 import org.kie.workbench.common.dmn.api.property.dmn.DocumentationLinks;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSITDMNElement;
@@ -33,11 +33,11 @@ class DMNExternalLinksToExtensionElements {
                                                        final org.kie.workbench.common.dmn.api.definition.model.DRGElement target) {
 
         if (!Objects.isNull(source.getExtensionElements())) {
-            final JsArrayLike<Object> extensions = JSITDMNElement.JSIExtensionElements.getAny(source.getExtensionElements());
+            final List<Object> extensions = source.getExtensionElements().getAny();
             if (!Objects.isNull(extensions)) {
-                for (int i = 0; i < extensions.getLength(); i++) {
-                    final Object extension = extensions.getAt(i);
-                    if (JSITAttachment.instanceOf(extension)) {
+                for (int i = 0; i < extensions.size(); i++) {
+                    final Object extension = extensions.get(i);
+                    if (JSITAttachment.instanceOfJSITAttachment(extension)) {
                         final JSITAttachment jsiExtension = Js.uncheckedCast(extension);
                         final DMNExternalLink external = new DMNExternalLink();
                         external.setDescription(jsiExtension.getName());
@@ -62,32 +62,32 @@ class DMNExternalLinksToExtensionElements {
         removeAllExistingLinks(elements);
 
         for (final DMNExternalLink link : links.getLinks()) {
-            final JSITAttachment attachment = JSITAttachment.newInstance();
+            final JSITAttachment attachment = new JSITAttachment();
             attachment.setName(link.getDescription());
             attachment.setUrl(link.getUrl());
-            JSITDMNElement.JSIExtensionElements.addAny(elements, attachment);
+            elements.addAny(attachment);
         }
         target.setExtensionElements(elements);
     }
 
     private static void removeAllExistingLinks(final JSITDMNElement.JSIExtensionElements elements) {
-        final JSITDMNElement.JSIExtensionElements others = JSITDMNElement.JSIExtensionElements.newInstance();
+        final JSITDMNElement.JSIExtensionElements others = new JSITDMNElement.JSIExtensionElements();
         // TODO {gcardosi} add because present in original json
         others.setAny(JsUtils.getNativeArray());
-        final JsArrayLike<Object> any = JSITDMNElement.JSIExtensionElements.getAny(elements);
-        for (int i = 0; i < any.getLength(); i++) {
-            final Object extension = any.getAt(i);
-            if (!JSITAttachment.instanceOf(extension)) {
-                JSITDMNElement.JSIExtensionElements.addAny(others, extension);
+        final List<Object> any = elements.getAny();
+        for (int i = 0; i < any.size(); i++) {
+            final Object extension = any.get(i);
+            if (!JSITAttachment.instanceOfJSITAttachment(extension)) {
+                others.addAny(extension);
             }
         }
-        elements.setAny(others.getAny());
+        elements.setAny(others.getNativeAny());
     }
 
     private static JSITDMNElement.JSIExtensionElements getOrCreateExtensionElements(final JSITDRGElement target) {
         // TODO {gcardosi} add because  present in original json
         JSITDMNElement.JSIExtensionElements toReturn = target.getExtensionElements() == null
-                ? JSITDMNElement.JSIExtensionElements.newInstance()
+                ? new JSITDMNElement.JSIExtensionElements()
                 : target.getExtensionElements();
         if (!Objects.isNull(toReturn) && Objects.isNull(toReturn.getAny())) {
             toReturn.setAny(JsUtils.getNativeArray());

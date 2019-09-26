@@ -39,7 +39,7 @@ public class AssociationConverter {
     @SuppressWarnings("unchecked")
     public static JsArrayLike<JSITAssociation> dmnFromWB(final Node<View<TextAnnotation>, ?> node) {
         final TextAnnotation ta = node.getContent().getDefinition();
-        final JSITDMNElementReference ta_elementReference = JSITDMNElementReference.newInstance();
+        final JSITDMNElementReference ta_elementReference = new JSITDMNElementReference();
         ta_elementReference.setHref(new StringBuilder("#").append(ta.getId().getValue()).toString());
 
         final JsArrayLike<JSITAssociation> result = JsUtils.getNativeArray();
@@ -51,10 +51,10 @@ public class AssociationConverter {
                 final View<?> view = (View<?>) sourceNode.getContent();
                 if (view.getDefinition() instanceof DRGElement) {
                     final DRGElement drgElement = (DRGElement) view.getDefinition();
-                    final JSITDMNElementReference sourceRef = JSITDMNElementReference.newInstance();
+                    final JSITDMNElementReference sourceRef = new JSITDMNElementReference();
                     sourceRef.setHref(getHref(drgElement));
 
-                    final JSITAssociation adding = JSITAssociation.newInstance();
+                    final JSITAssociation adding = new JSITAssociation();
                     adding.setId(((View<Association>) e.getContent()).getDefinition().getId().getValue());
                     final Optional<String> description = Optional.ofNullable(DescriptionPropertyConverter.dmnFromWB(((View<Association>) e.getContent()).getDefinition().getDescription()));
                     description.ifPresent(adding::setDescription);
@@ -72,10 +72,10 @@ public class AssociationConverter {
                 final View<?> view = (View<?>) targetNode.getContent();
                 if (view.getDefinition() instanceof DRGElement) {
                     final DRGElement drgElement = (DRGElement) view.getDefinition();
-                    final JSITDMNElementReference targetRef = JSITDMNElementReference.newInstance();
+                    final JSITDMNElementReference targetRef = new JSITDMNElementReference();
                     targetRef.setHref(getHref(drgElement));
 
-                    final JSITAssociation adding = JSITAssociation.newInstance();
+                    final JSITAssociation adding = new JSITAssociation();
                     adding.setId(((View<Association>) e.getContent()).getDefinition().getId().getValue());
                     final Optional<String> description = Optional.ofNullable(DescriptionPropertyConverter.dmnFromWB(((View<Association>) e.getContent()).getDefinition().getDescription()));
                     description.ifPresent(adding::setDescription);

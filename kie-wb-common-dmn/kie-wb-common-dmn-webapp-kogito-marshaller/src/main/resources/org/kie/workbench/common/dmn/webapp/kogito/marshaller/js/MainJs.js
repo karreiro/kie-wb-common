@@ -38,7 +38,6 @@ MainJs = {
         function createConstructor(typeInfo) {
             var functionName = "JsInterop__ConstructorAPI__DMN__JSI" + typeInfo.typeName;
 
-            console.log("~> " + functionName);
             if (window[functionName] === undefined) {
                 window[functionName] = createFunction(typeInfo);
             }

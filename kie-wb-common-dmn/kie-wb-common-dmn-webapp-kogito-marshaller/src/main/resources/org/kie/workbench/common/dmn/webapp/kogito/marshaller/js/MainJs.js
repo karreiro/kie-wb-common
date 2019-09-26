@@ -11,6 +11,7 @@ MainJs = {
 
     initializeJsInteropConstructors: function () {
 
+        var extraTypes = [{typeName: 'Name', namespace: ''}];
         var mappings = this.mappings;
 
         function flatMap(list, lambda) {
@@ -26,7 +27,7 @@ MainJs = {
                         namespace: mapping.name
                     };
                 });
-            });
+            }).concat(extraTypes);
         }
 
         function createFunction(typeInfo) {
@@ -36,6 +37,8 @@ MainJs = {
 
         function createConstructor(typeInfo) {
             var functionName = "JsInterop__ConstructorAPI__DMN__JSI" + typeInfo.typeName;
+
+            console.log("~> " + functionName);
             if (window[functionName] === undefined) {
                 window[functionName] = createFunction(typeInfo);
             }

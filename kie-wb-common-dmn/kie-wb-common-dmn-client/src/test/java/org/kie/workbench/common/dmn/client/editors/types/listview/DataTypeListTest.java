@@ -32,6 +32,8 @@ import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataTypeManager;
 import org.kie.workbench.common.dmn.client.editors.types.listview.common.DataTypeEditModeToggleEvent;
 import org.kie.workbench.common.dmn.client.editors.types.listview.common.DataTypeStackHash;
+import org.kie.workbench.common.dmn.client.editors.types.listview.draganddrop.DNDDataTypesHandler;
+import org.kie.workbench.common.dmn.client.editors.types.listview.draganddrop.DNDListComponent;
 import org.kie.workbench.common.dmn.client.editors.types.persistence.DataTypeStore;
 import org.kie.workbench.common.dmn.client.editors.types.search.DataTypeSearchBar;
 import org.mockito.ArgumentCaptor;
@@ -83,6 +85,12 @@ public class DataTypeListTest {
     @Mock
     private Consumer<DataTypeListItem> listItemConsumer;
 
+    @Mock
+    private DNDListComponent dndListComponent;
+
+    @Mock
+    private DNDDataTypesHandler dndDataTypesHandler;
+
     private DataTypeStore dataTypeStore;
 
     private DataTypeStackHash dataTypeStackHash;
@@ -96,7 +104,7 @@ public class DataTypeListTest {
     public void setup() {
         dataTypeStore = new DataTypeStore();
         dataTypeStackHash = new DataTypeStackHash(dataTypeStore);
-        dataTypeList = spy(new DataTypeList(view, listItems, dataTypeManager, searchBar, dataTypeStackHash));
+        dataTypeList = spy(new DataTypeList(view, listItems, dataTypeManager, searchBar, dndListComponent, dataTypeStackHash, dndDataTypesHandler));
         when(listItems.get()).thenReturn(treeGridItem);
     }
 
@@ -134,7 +142,7 @@ public class DataTypeListTest {
         final InOrder inOrder = Mockito.inOrder(dataTypeList);
 
         inOrder.verify(dataTypeList).setListItems(listItems);
-        inOrder.verify(dataTypeList).setupViewItems();
+//        inOrder.verify(dataTypeList).setupViewItems();
         inOrder.verify(dataTypeList).collapseItemsInTheFirstLevel();
     }
 
@@ -244,9 +252,9 @@ public class DataTypeListTest {
         when(listItem1.isReadOnly()).thenReturn(false);
         when(listItem2.isReadOnly()).thenReturn(true);
 
-        dataTypeList.setupViewItems();
+//        dataTypeList.setupViewItems();
 
-        verify(view).setupListItems(listItems);
+//        verify(view).setupListItems(listItems);
         verify(view).showReadOnlyMessage(true);
     }
 
@@ -261,9 +269,9 @@ public class DataTypeListTest {
         when(listItem1.isReadOnly()).thenReturn(false);
         when(listItem2.isReadOnly()).thenReturn(false);
 
-        dataTypeList.setupViewItems();
+//        dataTypeList.setupViewItems();
 
-        verify(view).setupListItems(listItems);
+//        verify(view).setupListItems(listItems);
         verify(view).showReadOnlyMessage(false);
     }
 
@@ -499,7 +507,7 @@ public class DataTypeListTest {
         dataTypeList.addDataType();
 
         verify(dataType).create();
-        verify(view).addSubItem(listItem);
+//        verify(view).addSubItem(listItem);
         verify(listItem).enableEditMode();
     }
 
@@ -514,7 +522,7 @@ public class DataTypeListTest {
 
         dataTypeList.insertBelow(dataType, reference);
 
-        verify(view).insertBelow(listItem, reference);
+//        verify(view).insertBelow(reference, listItem.getElement());
     }
 
     @Test
@@ -528,7 +536,7 @@ public class DataTypeListTest {
 
         dataTypeList.insertAbove(dataType, reference);
 
-        verify(view).insertAbove(listItem, reference);
+//        verify(view).insertAbove(reference, listItem.getElement());
     }
 
     @Test

@@ -135,7 +135,7 @@ public class DataTypeListItemTest {
 
         when(view.getElement()).thenReturn(expectedElement);
 
-        HTMLElement actualElement = listItem.getElement();
+        HTMLElement actualElement = listItem.getDragAndDropElement();
 
         assertEquals(expectedElement, actualElement);
     }
@@ -653,7 +653,7 @@ public class DataTypeListItemTest {
         final Command command = mock(Command.class);
 
         doReturn(dataType).when(listItem).getDataType();
-        doReturn(command).when(listItem).doRemove();
+        doReturn(command).when(listItem).destroy();
 
         listItem.remove();
 
@@ -675,7 +675,7 @@ public class DataTypeListItemTest {
         doReturn(removedDataTypes).when(listItem).removeTopLevelDataTypes(destroyedDataTypes);
         doReturn(dataType).when(listItem).getDataType();
 
-        listItem.doRemove().execute();
+        listItem.destroy().execute();
 
         verify(dataTypeList).refreshItemsByUpdatedDataTypes(asList(dataType0, dataType3));
         verify(listItem).fireDataChangedEvent();

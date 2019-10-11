@@ -38,7 +38,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.kie.workbench.common.dmn.client.editors.types.common.DataType.TOP_LEVEL_PARENT_UUID;
 import static org.kie.workbench.common.dmn.client.editors.types.persistence.CreationType.ABOVE;
 import static org.kie.workbench.common.dmn.client.editors.types.persistence.CreationType.BELOW;
 import static org.mockito.Mockito.doReturn;
@@ -77,7 +76,7 @@ public class DataTypeCreateHandlerTest {
         final List<DataType> expectedAffectedDataTypes = asList(mock(DataType.class), mock(DataType.class));
 
         when(recordEngine.update(updatedDataType)).thenReturn(expectedAffectedDataTypes);
-        doReturn(updatedDataType).when(handler).updateDataTypeProperties(dataType, TOP_LEVEL_PARENT_UUID, itemDefinition);
+//        doReturn(updatedDataType).when(handler).updateDataTypeWithParentUUID(dataType, TOP_LEVEL_PARENT_UUID, itemDefinition);
 
         final List<DataType> actualAffectedDataTypes = handler.append(dataType, itemDefinition);
 
@@ -93,9 +92,9 @@ public class DataTypeCreateHandlerTest {
         final List<DataType> expectedAffectedDataTypes = asList(mock(DataType.class), mock(DataType.class));
         final CreationType creationType = ABOVE;
 
-        doReturn(expectedAffectedDataTypes).when(handler).insert(dataType, reference, creationType, itemDefinition);
+        doReturn(expectedAffectedDataTypes).when(handler).insertSibling(dataType, reference, creationType, itemDefinition);
 
-        final List<DataType> actualAffectedDataTypes = handler.insert(dataType, reference, creationType, itemDefinition);
+        final List<DataType> actualAffectedDataTypes = handler.insertSibling(dataType, reference, creationType, itemDefinition);
 
         assertEquals(expectedAffectedDataTypes, actualAffectedDataTypes);
     }
@@ -125,9 +124,9 @@ public class DataTypeCreateHandlerTest {
         when(absoluteParent.getSubDataTypes()).thenReturn(siblings);
         when(recordEngine.update(absoluteParent)).thenReturn(expectedAffectedDataTypes);
         doReturn(Optional.of(absoluteParent)).when(handler).lookupAbsoluteParent(reference);
-        doReturn(updatedDataType).when(handler).updateDataTypeProperties(dataType, uuid, itemDefinition);
+//        doReturn(updatedDataType).when(handler).updateDataTypeWithParentUUID(dataType, uuid, itemDefinition);
 
-        final List<DataType> actualAffectedDataTypes = handler.insert(dataType, reference, BELOW, itemDefinition);
+        final List<DataType> actualAffectedDataTypes = handler.insertSibling(dataType, reference, BELOW, itemDefinition);
 
         verify(recordEngine).doUpdate(dataType, itemDefinition);
 
@@ -146,9 +145,9 @@ public class DataTypeCreateHandlerTest {
 
         when(reference.getParentUUID()).thenReturn(parentUUID);
         doReturn(Optional.empty()).when(handler).lookupAbsoluteParent(reference);
-        doReturn(updatedDataType).when(handler).updateDataTypeProperties(dataType, parentUUID, itemDefinition);
+//        doReturn(updatedDataType).when(handler).updateDataTypeWithParentUUID(dataType, parentUUID, itemDefinition);
 
-        final List<DataType> actualAffectedDataTypes = handler.insert(dataType, reference, BELOW, itemDefinition);
+        final List<DataType> actualAffectedDataTypes = handler.insertSibling(dataType, reference, BELOW, itemDefinition);
         final List<DataType> expectedAffectedDataTypes = emptyList();
 
         verify(recordEngine).doUpdate(updatedDataType, itemDefinition);
@@ -173,7 +172,7 @@ public class DataTypeCreateHandlerTest {
         when(reference.getSubDataTypes()).thenReturn(referenceSubDataTypes);
         when(dataTypeManager.withDataType(reference)).thenReturn(dataTypeManager);
         when(recordEngine.update(dataType)).thenReturn(expectedAffectedDataTypes);
-        doReturn(updatedDataType).when(handler).updateDataTypeProperties(dataType, parentUUID, itemDefinition);
+//        doReturn(updatedDataType).when(handler).updateDataTypeWithParentUUID(dataType, parentUUID, itemDefinition);
 
         final List<DataType> actualAffectedDataTypes = handler.insertNested(dataType, reference, itemDefinition);
 
@@ -203,7 +202,7 @@ public class DataTypeCreateHandlerTest {
         when(dataTypeManager.withDataType(topLevelReference)).thenReturn(dataTypeManager);
         when(recordEngine.update(dataType)).thenReturn(expectedAffectedDataTypes);
         when(dataTypeStore.getTopLevelDataTypes()).thenReturn(singletonList(topLevelReference));
-        doReturn(updatedDataType).when(handler).updateDataTypeProperties(dataType, parentUUID, itemDefinition);
+//        doReturn(updatedDataType).when(handler).updateDataTypeWithParentUUID(dataType, parentUUID, itemDefinition);
 
         final List<DataType> actualAffectedDataTypes = handler.insertNested(dataType, reference, itemDefinition);
 
@@ -229,7 +228,7 @@ public class DataTypeCreateHandlerTest {
         when(reference.getSubDataTypes()).thenReturn(referenceSubDataTypes);
         when(dataTypeManager.withDataType(reference)).thenReturn(dataTypeManager);
         when(recordEngine.update(dataType)).thenReturn(expectedAffectedDataTypes);
-        doReturn(updatedDataType).when(handler).updateDataTypeProperties(dataType, parentUUID, itemDefinition);
+//        doReturn(updatedDataType).when(handler).updateDataTypeWithParentUUID(dataType, parentUUID, itemDefinition);
 
         final List<DataType> actualAffectedDataTypes = handler.insertNested(dataType, reference, itemDefinition);
 
@@ -312,8 +311,8 @@ public class DataTypeCreateHandlerTest {
         when(dataTypeManagerItemDefinition.withIndexedItemDefinition()).thenReturn(dataTypeManagerIndexedItemDefinition);
         when(dataTypeManagerIndexedItemDefinition.get()).thenReturn(expectedUpdateDataType);
 
-        final DataType actualUpdatedDataType = handler.updateDataTypeProperties(dataType, parentUUID, itemDefinition);
+//        final DataType actualUpdatedDataType = handler.updateDataTypeWithParentUUID(dataType, parentUUID, itemDefinition);
 
-        assertEquals(expectedUpdateDataType, actualUpdatedDataType);
+//        assertEquals(expectedUpdateDataType, actualUpdatedDataType);
     }
 }

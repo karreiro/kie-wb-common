@@ -179,7 +179,7 @@ public class DataTypeSearchBarTest {
 
         final HTMLElement expectedElement = mock(HTMLElement.class);
 
-        when(dataTypeList.getListItemsElement()).thenReturn(expectedElement);
+//        when(dataTypeList.getListItemsElement()).thenReturn(expectedElement);
 
         final HTMLElement actualElement = searchBar.getResultsContainer();
 

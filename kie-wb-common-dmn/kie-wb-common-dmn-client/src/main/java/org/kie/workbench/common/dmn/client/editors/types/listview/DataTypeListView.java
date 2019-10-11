@@ -25,6 +25,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.google.gwt.event.dom.client.ClickEvent;
+import elemental2.dom.DomGlobal;
 import elemental2.dom.Element;
 import elemental2.dom.HTMLAnchorElement;
 import elemental2.dom.HTMLButtonElement;
@@ -34,9 +35,9 @@ import elemental2.dom.NodeList;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
-import org.kie.workbench.common.dmn.client.editors.common.RemoveHelper;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
 import org.kie.workbench.common.dmn.client.editors.types.common.ScrollHelper;
+import org.kie.workbench.common.dmn.client.editors.types.listview.draganddrop.DNDListComponent;
 import org.uberfire.client.views.pfly.selectpicker.ElementHelper;
 
 import static org.kie.workbench.common.dmn.client.editors.types.common.HiddenHelper.hide;
@@ -53,7 +54,7 @@ import static org.uberfire.client.views.pfly.selectpicker.ElementHelper.remove;
 public class DataTypeListView implements DataTypeList.View {
 
     @DataField("list-items")
-    private final HTMLDivElement listItems;
+    private final HTMLDivElement listElement;
 
     @DataField("placeholder")
     private final HTMLDivElement placeholder;
@@ -110,7 +111,7 @@ public class DataTypeListView implements DataTypeList.View {
                             final HTMLDivElement readOnlyMessage,
                             final HTMLButtonElement readOnlyMessageCloseButton,
                             final ScrollHelper scrollHelper) {
-        this.listItems = listItems;
+        this.listElement = listItems;
         this.collapsedDescription = collapsedDescription;
         this.expandedDescription = expandedDescription;
         this.viewMore = viewMore;
@@ -131,6 +132,7 @@ public class DataTypeListView implements DataTypeList.View {
         this.presenter = presenter;
 
         setupSearchBar();
+        setupListElement();
     }
 
     private void setupSearchBar() {
@@ -142,11 +144,12 @@ public class DataTypeListView implements DataTypeList.View {
         collapseDescription();
     }
 
-    @Override
-    public void setupListItems(final List<DataTypeListItem> listItems) {
-        RemoveHelper.removeChildren(this.listItems);
-        listItems.forEach(this::appendItem);
-        showOrHideNoCustomItemsMessage();
+    private void setupListElement() {
+        listElement.appendChild(getDndListComponent().getElement());
+    }
+
+    private DNDListComponent getDndListComponent() {
+        return presenter.getDndListComponent();
     }
 
     @Override
@@ -159,7 +162,8 @@ public class DataTypeListView implements DataTypeList.View {
     }
 
     boolean hasCustomDataType() {
-        return !Objects.isNull(this.listItems.childNodes) && this.listItems.childNodes.length > 0;
+        final NodeList<Element> childNodes = listElement.querySelectorAll("[" + UUID_ATTR + "]");
+        return !Objects.isNull(childNodes) && childNodes.length > 0;
     }
 
     @Override
@@ -170,7 +174,7 @@ public class DataTypeListView implements DataTypeList.View {
 
         for (final DataTypeListItem item : listItems) {
 
-            final HTMLElement itemElement = item.getElement();
+            final HTMLElement itemElement = item.getDragAndDropElement();
 
             hideItemElementIfParentIsCollapsed(itemElement, parent);
 
@@ -179,12 +183,6 @@ public class DataTypeListView implements DataTypeList.View {
         }
 
         showArrowIconIfDataTypeHasChildren(dataType);
-        showOrHideNoCustomItemsMessage();
-    }
-
-    @Override
-    public void addSubItem(final DataTypeListItem listItem) {
-        appendItem(listItem);
         showOrHideNoCustomItemsMessage();
     }
 
@@ -200,7 +198,7 @@ public class DataTypeListView implements DataTypeList.View {
 
     @EventHandler("add-button")
     public void onAddClick(final ClickEvent e) {
-        scrollHelper.animatedScrollToBottom(listItems);
+        scrollHelper.animatedScrollToBottom(listElement);
         presenter.addDataType();
     }
 
@@ -231,7 +229,7 @@ public class DataTypeListView implements DataTypeList.View {
     }
 
     private boolean hasChildren(final DataType dataType) {
-        return listItems.querySelectorAll("[" + PARENT_UUID_ATTR + "=\"" + dataType.getUUID() + "\"]").length > 0;
+        return DomGlobal.document.querySelectorAll("[" + PARENT_UUID_ATTR + "=\"" + dataType.getUUID() + "\"]").length > 0;
     }
 
     @Override
@@ -254,7 +252,7 @@ public class DataTypeListView implements DataTypeList.View {
     void cleanSubTypes(final String uuid) {
 
         final String selector = "[" + PARENT_UUID_ATTR + "=\"" + uuid + "\"]";
-        final NodeList<Element> subDataTypeRows = listItems.querySelectorAll(selector);
+        final NodeList<Element> subDataTypeRows = DomGlobal.document.querySelectorAll(selector);
 
         for (int i = 0; i < subDataTypeRows.length; i++) {
             final Element item = subDataTypeRows.getAt(i);
@@ -275,7 +273,7 @@ public class DataTypeListView implements DataTypeList.View {
                             final DataType reference) {
 
         final Element elementReference = getLastSubDataTypeElement(reference);
-        ElementHelper.insertAfter(listItem.getElement(), elementReference);
+        ElementHelper.insertAfter(listItem.getDragAndDropElement(), elementReference);
     }
 
     @Override
@@ -283,7 +281,7 @@ public class DataTypeListView implements DataTypeList.View {
                             final DataType reference) {
 
         final Element elementReference = getDataTypeRow(reference);
-        ElementHelper.insertBefore(listItem.getElement(), elementReference);
+        ElementHelper.insertBefore(listItem.getDragAndDropElement(), elementReference);
     }
 
     private boolean isCollapsed(final Element arrow) {
@@ -298,10 +296,6 @@ public class DataTypeListView implements DataTypeList.View {
     @EventHandler("view-less")
     public void onClickViewLess(final ClickEvent event) {
         collapseDescription();
-    }
-
-    private void appendItem(final DataTypeListItem listItem) {
-        listItems.appendChild(listItem.getElement());
     }
 
     void expandDescription() {
@@ -319,7 +313,7 @@ public class DataTypeListView implements DataTypeList.View {
     }
 
     Element getDataTypeRow(final DataType dataType) {
-        return listItems.querySelector("[" + UUID_ATTR + "=\"" + dataType.getUUID() + "\"]");
+        return DomGlobal.document.querySelector("[" + UUID_ATTR + "=\"" + dataType.getUUID() + "\"]");
     }
 
     Element getLastSubDataTypeElement(final DataType reference) {
@@ -330,7 +324,7 @@ public class DataTypeListView implements DataTypeList.View {
 
         final String parentUUID = element.getAttribute(UUID_ATTR);
         final String selector = "[" + PARENT_UUID_ATTR + "=\"" + parentUUID + "\"]";
-        final NodeList<Element> nestedElements = listItems.querySelectorAll(selector);
+        final NodeList<Element> nestedElements = DomGlobal.document.querySelectorAll(selector);
 
         if (nestedElements.length == 0) {
             return element;
@@ -343,24 +337,19 @@ public class DataTypeListView implements DataTypeList.View {
     public void showNoDataTypesFound() {
         show(noDataTypesFound);
         hide(placeholder);
-        hide(listItems);
+        hide(listElement);
     }
 
     void showListItems() {
         hide(noDataTypesFound);
         hide(placeholder);
-        show(listItems);
+        show(listElement);
     }
 
     void showPlaceHolder() {
         hide(noDataTypesFound);
         show(placeholder);
-        hide(listItems);
-    }
-
-    @Override
-    public HTMLDivElement getListItems() {
-        return listItems;
+        hide(listElement);
     }
 
     @Override

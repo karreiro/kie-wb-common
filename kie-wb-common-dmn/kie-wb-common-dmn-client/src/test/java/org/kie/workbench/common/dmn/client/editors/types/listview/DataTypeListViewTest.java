@@ -16,7 +16,6 @@
 
 package org.kie.workbench.common.dmn.client.editors.types.listview;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -225,10 +224,10 @@ public class DataTypeListViewTest {
         final HTMLElement element1 = mock(HTMLElement.class);
         final HTMLElement element2 = mock(HTMLElement.class);
 
-        when(gridItem1.getElement()).thenReturn(element1);
-        when(gridItem2.getElement()).thenReturn(element2);
+        when(gridItem1.getDragAndDropElement()).thenReturn(element1);
+        when(gridItem2.getDragAndDropElement()).thenReturn(element2);
 
-        view.setupListItems(Arrays.asList(gridItem1, gridItem2));
+//        view.setupListItems(Arrays.asList(gridItem1, gridItem2));
 
         verify(listItems).appendChild(eq(element1));
         verify(listItems).appendChild(eq(element2));
@@ -296,8 +295,8 @@ public class DataTypeListViewTest {
 
         when(this.listItems.querySelector("[data-row-uuid=\"" + dataTypeUUID + "\"]")).thenReturn(dataTypeRow);
         when(dataType.getUUID()).thenReturn(dataTypeUUID);
-        when(listItem1.getElement()).thenReturn(listItemElement1);
-        when(listItem2.getElement()).thenReturn(listItemElement2);
+        when(listItem1.getDragAndDropElement()).thenReturn(listItemElement1);
+        when(listItem2.getDragAndDropElement()).thenReturn(listItemElement2);
 
         doNothing().when(view).cleanSubTypes(anyString());
         doNothing().when(view).hideItemElementIfParentIsCollapsed(any(), any());
@@ -320,9 +319,9 @@ public class DataTypeListViewTest {
         final DataTypeListItem listItem = mock(DataTypeListItem.class);
         final HTMLElement element = mock(HTMLElement.class);
 
-        when(listItem.getElement()).thenReturn(element);
+        when(listItem.getDragAndDropElement()).thenReturn(element);
 
-        view.addSubItem(listItem);
+//        view.addSubItem(listItem);
 
         verify(listItems).appendChild(element);
         verify(view).showOrHideNoCustomItemsMessage();
@@ -358,11 +357,11 @@ public class DataTypeListViewTest {
         final HTMLElement element1 = mock(HTMLElement.class);
         final HTMLElement element2 = mock(HTMLElement.class);
 
-        when(gridItem1.getElement()).thenReturn(element1);
-        when(gridItem2.getElement()).thenReturn(element2);
+        when(gridItem1.getDragAndDropElement()).thenReturn(element1);
+        when(gridItem2.getDragAndDropElement()).thenReturn(element2);
 
         when(view.hasCustomDataType()).thenReturn(true);
-        view.setupListItems(Arrays.asList(gridItem1, gridItem2));
+//        view.setupListItems(Arrays.asList(gridItem1, gridItem2));
 
         verify(listItems.classList).remove(HIDDEN_CSS_CLASS);
         verify(placeholder.classList).add(HIDDEN_CSS_CLASS);
@@ -371,7 +370,7 @@ public class DataTypeListViewTest {
     @Test
     public void testShowNoCustomItemsMessageWhenThereIsNoCustomItem() {
 
-        view.setupListItems(new ArrayList<>());
+//        view.setupListItems(new ArrayList<>());
 
         verify(placeholder.classList).remove(HIDDEN_CSS_CLASS);
         verify(listItems.classList).add(HIDDEN_CSS_CLASS);
@@ -566,10 +565,10 @@ public class DataTypeListViewTest {
         lastElement.parentNode = parentElement;
         lastElement.nextSibling = siblingElement;
 
-        when(listItem.getElement()).thenReturn(listItemElement);
+        when(listItem.getDragAndDropElement()).thenReturn(listItemElement);
         doReturn(lastElement).when(view).getLastSubDataTypeElement(reference);
 
-        view.insertBelow(listItem, reference);
+//        view.insertBelow(reference, listItem.getElement());
 
         verify(parentElement).insertBefore(listItemElement, siblingElement);
     }
@@ -585,10 +584,10 @@ public class DataTypeListViewTest {
         final Element parentElement = mock(Element.class);
         element.parentNode = parentElement;
 
-        when(listItem.getElement()).thenReturn(listItemElement);
+        when(listItem.getDragAndDropElement()).thenReturn(listItemElement);
         doReturn(element).when(view).getDataTypeRow(reference);
 
-        view.insertAbove(listItem, reference);
+//        view.insertAbove(reference, listItem.getElement());
 
         verify(parentElement).insertBefore(listItemElement, element);
     }

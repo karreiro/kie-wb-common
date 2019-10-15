@@ -130,7 +130,7 @@ public class DNDListDOMHelperTest {
 
         when(element.querySelector(selector)).thenReturn(expectedElement);
 
-        final HTMLElement actualElement = querySelector(element).getDraggableElement(42);
+        final HTMLElement actualElement = querySelector(element).getDraggableElement(42).orElseThrow(RuntimeException::new);
 
         assertEquals(expectedElement, actualElement);
     }
@@ -143,7 +143,7 @@ public class DNDListDOMHelperTest {
 
         when(element.querySelector(selector)).thenReturn(expectedElement);
 
-        final HTMLElement actualElement = querySelector(element).getHoverElement();
+        final HTMLElement actualElement = querySelector(element).getHoverElement().orElseThrow(RuntimeException::new);
 
         assertEquals(expectedElement, actualElement);
     }

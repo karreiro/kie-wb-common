@@ -19,6 +19,7 @@ package org.kie.workbench.common.dmn.client.editors.types.listview.draganddrop;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import elemental2.dom.DomGlobal;
 import elemental2.dom.Element;
@@ -83,14 +84,14 @@ class DNDListDOMHelper {
             this.container = container;
         }
 
-        HTMLElement getDraggableElement(final int yPosition) {
+        Optional<HTMLElement> getDraggableElement(final int yPosition) {
             final String selector = "." + DRAGGABLE + "[" + DATA_Y_POSITION + "=\"" + yPosition + "\"]";
-            return (HTMLElement) container.querySelector(selector);
+            return Optional.ofNullable(container.querySelector(selector)).map(e -> (HTMLElement) e);
         }
 
-        HTMLElement getHoverElement() {
+        Optional<HTMLElement> getHoverElement() {
             final String selector = "." + HOVER;
-            return (HTMLElement) container.querySelector(selector);
+            return Optional.ofNullable(container.querySelector(selector)).map(e -> (HTMLElement) e);
         }
 
         List<HTMLElement> getDraggableElements() {

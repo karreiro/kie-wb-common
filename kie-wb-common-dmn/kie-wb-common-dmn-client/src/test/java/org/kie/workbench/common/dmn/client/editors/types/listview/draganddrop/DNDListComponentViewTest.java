@@ -17,6 +17,7 @@
 package org.kie.workbench.common.dmn.client.editors.types.listview.draganddrop;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import elemental2.dom.CSSStyleDeclaration;
@@ -301,9 +302,10 @@ public class DNDListComponentViewTest {
         when(current.getAttribute(DATA_Y_POSITION)).thenReturn("1");
         when(dragArea.querySelector(".kie-dnd-draggable[data-y-position=\"0\"]")).thenReturn(expectedPrevious);
 
-        final Element actualPrevious = view.getPreviousElement(current);
+        final Optional<HTMLElement> actualPrevious = view.getPreviousElement(current);
 
-        assertEquals(expectedPrevious, actualPrevious);
+        assertTrue(actualPrevious.isPresent());
+        assertEquals(expectedPrevious, actualPrevious.get());
     }
 
     @Test
@@ -314,9 +316,9 @@ public class DNDListComponentViewTest {
         when(current.getAttribute(DATA_Y_POSITION)).thenReturn("1");
         when(dragArea.querySelector(".kie-dnd-draggable[data-y-position=\"0\"]")).thenReturn(null);
 
-        final Element actualPrevious = view.getPreviousElement(current);
+        final Optional<HTMLElement> actualPrevious = view.getPreviousElement(current);
 
-        assertNull(actualPrevious);
+        assertFalse(actualPrevious.isPresent());
     }
 
     @Test
@@ -493,7 +495,7 @@ public class DNDListComponentViewTest {
         getDependentElement2.style = mock(CSSStyleDeclaration.class);
 
         doReturn(draggingElement).when(view).getDragging();
-        doReturn(previousElement).when(view).getPreviousElement(draggingElement);
+        doReturn(Optional.of(previousElement)).when(view).getPreviousElement(draggingElement);
         doReturn(dependentElements).when(view).getDependentElements();
         doReturn(true).when(view).hasChildren(previousElement);
 
@@ -527,7 +529,7 @@ public class DNDListComponentViewTest {
         dependentElement2.style = mock(CSSStyleDeclaration.class);
 
         doReturn(draggingElement).when(view).getDragging();
-        doReturn(previousElement).when(view).getPreviousElement(draggingElement);
+        doReturn(Optional.of(previousElement)).when(view).getPreviousElement(draggingElement);
         doReturn(dependentElements).when(view).getDependentElements();
         doReturn(false).when(view).hasChildren(previousElement);
 
@@ -776,11 +778,6 @@ public class DNDListComponentViewTest {
         when(currentElement.getAttribute(DATA_X_POSITION)).thenReturn("0");
 
         assertFalse(view.hasChildren(currentElement));
-    }
-
-    @Test
-    public void testHasChildrenWhenElementIsNull() {
-        assertFalse(view.hasChildren(null));
     }
 
     @Test

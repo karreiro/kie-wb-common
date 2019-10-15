@@ -164,9 +164,9 @@ public class DNDListComponentView implements DNDListComponent.View {
     }
 
     @Override
-    public HTMLElement getPreviousElement(final Element reference) {
+    public Optional<HTMLElement> getPreviousElement(final Element reference) {
         final int positionY = Position.getY(reference);
-        return querySelector(getDragArea()).getDraggableElement(positionY - 1).orElse(null);
+        return querySelector(getDragArea()).getDraggableElement(positionY - 1);
     }
 
     void setupDragAreaHandlers() {
@@ -228,9 +228,10 @@ public class DNDListComponentView implements DNDListComponent.View {
     void updateDraggingElementsPosition() {
 
         final HTMLElement draggingElement = getDragging();
-        final HTMLElement previousElement = getPreviousElement(draggingElement);
+        final Optional<HTMLElement> previousElement = getPreviousElement(draggingElement);
+        final boolean hasChildren = previousElement.map(this::hasChildren).orElse(false);
         final int currentXPosition = getCurrentXPosition(draggingElement);
-        final int numberOfExtraLevels = hasChildren(previousElement) ? 1 : 0;
+        final int numberOfExtraLevels = hasChildren ? 1 : 0;
 
         Position.setX(draggingElement, currentXPosition + numberOfExtraLevels);
         getDependentElements().forEach(el -> Position.setX(el, numberOfExtraLevels + getCurrentXPosition(el)));
@@ -312,10 +313,6 @@ public class DNDListComponentView implements DNDListComponent.View {
     }
 
     boolean hasChildren(final Element element) {
-
-        if (element == null) {
-            return false;
-        }
 
         final Element next = getNextElement(element, nextElement -> {
             final boolean isNotDragging = !Objects.equals(nextElement, getDragging());

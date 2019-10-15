@@ -84,7 +84,7 @@ public class DataTypeSearchBar {
     }
 
     HTMLElement getResultsContainer() {
-        return dataTypeList.getListItemsElement();
+        return dataTypeList.getElement();
     }
 
     String getCurrentSearch() {

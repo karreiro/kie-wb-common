@@ -28,6 +28,7 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
+import elemental2.dom.Element;
 import elemental2.dom.HTMLElement;
 import org.kie.workbench.common.dmn.api.definition.model.ConstraintType;
 import org.kie.workbench.common.dmn.client.editors.types.DataTypeChangedEvent;
@@ -37,6 +38,7 @@ import org.kie.workbench.common.dmn.client.editors.types.listview.common.DataTyp
 import org.kie.workbench.common.dmn.client.editors.types.listview.common.SmallSwitchComponent;
 import org.kie.workbench.common.dmn.client.editors.types.listview.confirmation.DataTypeConfirmation;
 import org.kie.workbench.common.dmn.client.editors.types.listview.constraint.DataTypeConstraint;
+import org.kie.workbench.common.dmn.client.editors.types.listview.draganddrop.DNDListComponent;
 import org.kie.workbench.common.dmn.client.editors.types.listview.validation.DataTypeNameFormatValidator;
 import org.uberfire.client.mvp.UberElemental;
 import org.uberfire.mvp.Command;
@@ -87,6 +89,8 @@ public class DataTypeListItem {
 
     private String[] canNotHaveConstraintTypes;
 
+    private HTMLElement dragAndDropElement;
+
     @Inject
     public DataTypeListItem(final View view,
                             final DataTypeSelect dataTypeSelectComponent,
@@ -123,20 +127,25 @@ public class DataTypeListItem {
         this.dataTypeList = dataTypeList;
     }
 
-    public HTMLElement getElement() {
-        return view.getElement();
-    }
-
     void setupDataType(final DataType dataType,
                        final int level) {
 
         this.dataType = dataType;
         this.level = level;
 
+        setupDragAndDropComponent();
         setupSelectComponent();
         setupListComponent();
         setupConstraintComponent();
         setupView();
+    }
+
+    private void setupDragAndDropComponent() {
+
+        final DNDListComponent dragAndDropComponent = dataTypeList.getDndListComponent();
+        final HTMLElement dragAndDropElement = dragAndDropComponent.registerNewItem(getContentElement());
+
+        this.dragAndDropElement = dragAndDropElement;
     }
 
     void setupListComponent() {
@@ -157,7 +166,23 @@ public class DataTypeListItem {
         view.setupSelectComponent(dataTypeSelectComponent);
         view.setupConstraintComponent(dataTypeConstraintComponent);
         view.setupListComponent(dataTypeListComponent);
+        setupDataType();
+    }
+
+    public void setupDataType() {
         view.setDataType(getDataType());
+    }
+
+    public HTMLElement getDragAndDropElement() {
+        return dragAndDropElement;
+    }
+
+    public HTMLElement getContentElement() {
+        return view.getElement();
+    }
+
+    HTMLElement getListElement() {
+        return dataTypeList.getDndListComponent().getElement();
     }
 
     void refresh() {
@@ -186,11 +211,15 @@ public class DataTypeListItem {
     }
 
     void expandOrCollapseSubTypes() {
-        if (view.isCollapsed()) {
+        if (isCollapsed()) {
             expand();
         } else {
             collapse();
         }
+    }
+
+    boolean isCollapsed() {
+        return view.isCollapsed();
     }
 
     public void expand() {
@@ -204,6 +233,9 @@ public class DataTypeListItem {
     void refreshSubItems(final List<DataType> dataTypes) {
 
         dataTypeList.refreshSubItemsFromListItem(this, dataTypes);
+
+        dataTypeList.getDndListComponent().consolidateHierarchicalLevel2();
+        dataTypeList.getDndListComponent().refreshItemsPosition();
 
         view.enableFocusMode();
         view.toggleArrow(!dataTypes.isEmpty());
@@ -344,10 +376,10 @@ public class DataTypeListItem {
     }
 
     public void remove() {
-        confirmation.ifIsNotReferencedDataType(getDataType(), doRemove());
+        confirmation.ifIsNotReferencedDataType(getDataType(), destroy());
     }
 
-    Command doRemove() {
+    public Command destroy() {
         return () -> {
 
             final List<DataType> destroyedDataTypes = getDataType().destroy();
@@ -452,7 +484,24 @@ public class DataTypeListItem {
             dataTypeList.refreshItemsByUpdatedDataTypes(updatedDataTypes);
         }
 
+        dataTypeList.getDndListComponent().refreshItemsPositionAndHTML();
+
         enableEditModeAndUpdateCallbacks(getNewDataTypeHash(newDataType, referenceDataTypeHash));
+    }
+
+    public void insertFieldAbove(final DataType dataType) {
+
+        final String referenceDataTypeHash = dataTypeList.calculateParentHash(getDataType());
+        final List<DataType> updatedDataTypes = dataType.create(getDataType(), ABOVE);
+
+        if (dataType.isTopLevel()) {
+            dataTypeList.insertAbove(dataType, getDataType());
+        } else {
+            dataTypeList.refreshItemsByUpdatedDataTypes(updatedDataTypes);
+        }
+
+        String newDataTypeHash = getNewDataTypeHash(dataType, referenceDataTypeHash);
+        dataTypeList.findItemByDataTypeHash(newDataTypeHash).ifPresent(e -> e.expand());
     }
 
     public void insertFieldBelow() {
@@ -469,7 +518,20 @@ public class DataTypeListItem {
             dataTypeList.refreshItemsByUpdatedDataTypes(updatedDataTypes);
         }
 
+        dataTypeList.getDndListComponent().refreshItemsPositionAndHTML();
+
         enableEditModeAndUpdateCallbacks(getNewDataTypeHash(newDataType, referenceDataTypeHash));
+    }
+
+    public void insertFieldBelow(final DataType dataType) {
+
+        final List<DataType> updatedDataTypes = dataType.create(getDataType(), BELOW);
+
+        if (dataType.isTopLevel()) {
+            dataTypeList.insertBelow(dataType, getDataType());
+        } else {
+            dataTypeList.refreshItemsByUpdatedDataTypes(updatedDataTypes);
+        }
     }
 
     public void insertNestedField() {
@@ -480,9 +542,19 @@ public class DataTypeListItem {
         final DataType newDataType = newDataType();
         final String referenceDataTypeHash = dataTypeList.calculateHash(getDataType());
         final List<DataType> updatedDataTypes = newDataType.create(getDataType(), NESTED);
+
         dataTypeList.refreshItemsByUpdatedDataTypes(updatedDataTypes);
 
         enableEditModeAndUpdateCallbacks(getNewDataTypeHash(newDataType, referenceDataTypeHash));
+    }
+
+    public void insertNestedField(final DataType dataType) {
+
+        closeEditMode();
+        expand();
+
+        final List<DataType> updatedDataTypes = dataType.create(getDataType(), NESTED);
+        dataTypeList.refreshItemsByUpdatedDataTypes(updatedDataTypes.stream().distinct().collect(Collectors.toList()));
     }
 
     void enableEditModeAndUpdateCallbacks(final String dataTypeHash) {
@@ -515,10 +587,7 @@ public class DataTypeListItem {
             return true;
         }
 
-        if (Stream.of(getCanNotHaveConstraintTypes())
-                .filter(type -> Objects.equals(type, getType()))
-                .findFirst()
-                .isPresent()) {
+        if (Stream.of(getCanNotHaveConstraintTypes()).anyMatch(type -> Objects.equals(type, getType()))) {
             return true;
         }
 
@@ -550,6 +619,24 @@ public class DataTypeListItem {
         }
 
         return false;
+    }
+
+    public void refreshDNDPosition() {
+        dataTypeList.refreshDNDPosition();
+    }
+
+    public void setPositionX(final Element element,
+                             final double positionX) {
+        dataTypeList.getDndListComponent().setPositionX(element, positionX);
+    }
+
+    public void setPositionY(final Element element,
+                             final double positionY) {
+        dataTypeList.getDndListComponent().setPositionY(element, positionY);
+    }
+
+    public int getPositionY(final Element element) {
+        return dataTypeList.getDndListComponent().getPositionY(element);
     }
 
     public interface View extends UberElemental<DataTypeListItem> {

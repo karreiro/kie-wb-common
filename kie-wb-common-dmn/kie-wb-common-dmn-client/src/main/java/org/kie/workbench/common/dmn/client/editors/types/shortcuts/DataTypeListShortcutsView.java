@@ -112,16 +112,16 @@ public class DataTypeListShortcutsView implements DataTypeListShortcuts.View {
     @Override
     public void focusIn() {
         if (isEmpty(getCurrentUUID())) {
-            getDataTypeListItem(getPreviousUUID()).ifPresent(listItem -> highlight(listItem.getElement()));
+            getDataTypeListItem(getPreviousUUID()).ifPresent(listItem -> highlight(listItem.getDragAndDropElement()));
         }
     }
 
     void scrollTo(final Element target) {
 
-        final int padding = 20;
-        final HTMLElement container = presenter.getDataTypeList().getListItemsElement();
-
-        scrollHelper.scrollTo(target, container, padding);
+//        final int padding = 20;
+//        final HTMLElement container = presenter.getDataTypeList().getListItemsElement();
+//
+//        scrollHelper.scrollTo(target, container, padding);
     }
 
     public void reset() {
@@ -137,7 +137,7 @@ public class DataTypeListShortcutsView implements DataTypeListShortcuts.View {
     }
 
     NodeList<Element> querySelectorAll(final String selector) {
-        return presenter.getDataTypeList().getListItemsElement().querySelectorAll(selector);
+        return presenter.getDataTypeList().getElement().querySelectorAll(selector);
     }
 
     void addHighlightClass(final Element element) {

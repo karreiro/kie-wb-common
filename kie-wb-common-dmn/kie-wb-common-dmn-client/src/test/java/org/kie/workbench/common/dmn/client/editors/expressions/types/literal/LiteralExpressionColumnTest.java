@@ -24,32 +24,32 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.client.editors.expressions.mocks.MockHasDOMElementResourcesHeaderMetaData;
 import org.kie.workbench.common.dmn.client.widgets.grid.columns.BaseDOMElementSingletonColumnTest;
-import org.kie.workbench.common.dmn.client.widgets.grid.columns.factory.TextAreaSingletonDOMElementFactory;
-import org.kie.workbench.common.dmn.client.widgets.grid.columns.factory.dom.TextAreaDOMElement;
+import org.kie.workbench.common.dmn.client.widgets.grid.columns.factory.AutocompleteTextareaDOMElementFactory;
+import org.kie.workbench.common.dmn.client.widgets.grid.columns.factory.dom.MonacoEditorDOMElement;
 import org.mockito.Mock;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @RunWith(LienzoMockitoTestRunner.class)
-public class LiteralExpressionColumnTest extends BaseDOMElementSingletonColumnTest<TextAreaSingletonDOMElementFactory, TextAreaDOMElement, TextArea, LiteralExpressionColumn, LiteralExpressionGrid> {
+public class LiteralExpressionColumnTest extends BaseDOMElementSingletonColumnTest<AutocompleteTextareaDOMElementFactory, MonacoEditorDOMElement, TextArea, LiteralExpressionColumn, LiteralExpressionGrid> {
 
     @Mock
-    private TextAreaSingletonDOMElementFactory factory;
+    private AutocompleteTextareaDOMElementFactory factory;
 
     @Mock
-    private TextAreaDOMElement domElement;
+    private MonacoEditorDOMElement domElement;
 
     @Mock
     private TextArea widget;
 
     @Override
-    protected TextAreaSingletonDOMElementFactory getFactory() {
+    protected AutocompleteTextareaDOMElementFactory getFactory() {
         return factory;
     }
 
     @Override
-    protected TextAreaDOMElement getDomElement() {
+    protected MonacoEditorDOMElement getDomElement() {
         return domElement;
     }
 

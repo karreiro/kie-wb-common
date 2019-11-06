@@ -24,6 +24,7 @@ import org.kie.workbench.common.dmn.client.widgets.codecompletion.monaco.jsinter
 import org.mockito.Mock;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -87,5 +88,24 @@ public class MonacoEditorWidgetTest {
         final String actualValue = widget.getValue();
 
         assertEquals(expectedValue, actualValue);
+    }
+
+    @Test
+    public void testSetFocusWhenFocusIsEnabled() {
+        widget.setFocus(true);
+        verify(codeEditor).focus();
+    }
+
+    @Test
+    public void testSetFocusWhenFocusIsNotEnabled() {
+        widget.setFocus(false);
+        verify(codeEditor, never()).focus();
+    }
+
+    @Test
+    public void testSetFocusWhenCodeEditorIsNotPresent() {
+        widget.setCodeEditor(null);
+        widget.setFocus(true);
+        verify(codeEditor, never()).focus();
     }
 }

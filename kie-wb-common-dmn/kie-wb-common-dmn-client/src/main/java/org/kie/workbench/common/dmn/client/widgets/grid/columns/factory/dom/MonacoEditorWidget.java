@@ -44,11 +44,23 @@ public class MonacoEditorWidget extends TextBoxBase {
                 .orElse("");
     }
 
+    @Override
+    public void setFocus(final boolean focused) {
+        getCodeEditor().ifPresent(c -> {
+            if (focused) {
+                c.focus();
+            }
+            // IStandaloneCodeEditor(codeEditor) supports focus, but does not support blur.
+            // https://microsoft.github.io/monaco-editor/api/interfaces/monaco.editor.istandalonecodeeditor.html
+        });
+    }
+
     private Optional<MonacoStandaloneCodeEditor> getCodeEditor() {
         return Optional.ofNullable(codeEditor);
     }
 
     public void setTabIndex(final int index) {
-        // empty: 'codeEditor' does not support tab index.
+        // IStandaloneCodeEditor(codeEditor) does not support tab index.
+        // https://microsoft.github.io/monaco-editor/api/interfaces/monaco.editor.istandalonecodeeditor.html
     }
 }

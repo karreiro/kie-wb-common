@@ -82,7 +82,7 @@ public class MonacoPropertiesFactoryTest {
         doReturn(theme).when(factory).makeJSONString(FEEL_THEME_ID);
         doReturn(renderLineHighlight).when(factory).makeJSONString("none");
         doReturn(lineNumbers).when(factory).makeJSONString("off");
-        doReturn(fontSize).when(factory).makeJSONNumber(14);
+        doReturn(fontSize).when(factory).makeJSONNumber(12);
 
         when(options.getJavaScriptObject()).thenReturn(expectedOptions);
 

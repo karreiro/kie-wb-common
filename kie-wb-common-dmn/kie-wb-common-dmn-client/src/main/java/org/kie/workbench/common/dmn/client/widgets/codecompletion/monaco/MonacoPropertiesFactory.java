@@ -50,7 +50,7 @@ public class MonacoPropertiesFactory {
         options.put("renderLineHighlight", makeJSONString("none"));
         options.put("lineNumbers", makeJSONString("off"));
 
-        options.put("fontSize", makeJSONNumber(14));
+        options.put("fontSize", makeJSONNumber(12));
         options.put("lineNumbersMinChars", makeJSONNumber(1));
         options.put("lineDecorationsWidth", makeJSONNumber(1));
 

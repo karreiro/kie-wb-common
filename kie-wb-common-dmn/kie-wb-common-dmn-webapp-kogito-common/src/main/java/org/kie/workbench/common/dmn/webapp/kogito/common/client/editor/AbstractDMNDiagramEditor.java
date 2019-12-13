@@ -266,10 +266,11 @@ public abstract class AbstractDMNDiagramEditor extends AbstractDiagramEditor {
     @OnFocus
     @SuppressWarnings("unused")
     public void onFocus() {
+        DomGlobal.console.log("~> FOCUS (Kogito)");
         superDoFocus();
-        onDiagramLoad();
-        dataTypesPage.onFocus();
-        dataTypesPage.enableShortcuts();
+//        onDiagramLoad();
+//        dataTypesPage.onFocus();
+//        dataTypesPage.enableShortcuts();
     }
 
     void superDoFocus() {

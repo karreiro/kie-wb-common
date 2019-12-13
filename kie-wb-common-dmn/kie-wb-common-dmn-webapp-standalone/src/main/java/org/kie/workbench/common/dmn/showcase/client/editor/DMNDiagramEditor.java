@@ -29,6 +29,7 @@ import javax.inject.Inject;
 
 import com.google.gwt.logging.client.LogConfiguration;
 import com.google.gwt.user.client.ui.IsWidget;
+import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
 import org.jboss.errai.common.client.ui.ElementWrapperWidget;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
@@ -448,6 +449,7 @@ public class DMNDiagramEditor implements KieEditorWrapperView.KieEditorWrapperPr
 
     @OnFocus
     public void onFocus() {
+        DomGlobal.console.log("~> FOCUS (Standalone)");
         final EditorSession session = presenter.getInstance();
         log(Level.INFO, "FOCUS [" + session + "]");
         if (null != session) {

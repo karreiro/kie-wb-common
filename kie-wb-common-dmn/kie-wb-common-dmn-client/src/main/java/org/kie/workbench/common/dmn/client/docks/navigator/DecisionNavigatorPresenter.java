@@ -25,8 +25,11 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import elemental2.dom.DomGlobal;
 import org.jboss.errai.ui.client.local.api.elemental2.IsElement;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
+import org.kie.workbench.common.dmn.api.definition.model.DRGElement;
+import org.kie.workbench.common.dmn.api.graph.DMNDiagramUtils;
 import org.kie.workbench.common.dmn.client.docks.navigator.events.RefreshDecisionComponents;
 import org.kie.workbench.common.dmn.client.docks.navigator.factories.DecisionNavigatorItemFactory;
 import org.kie.workbench.common.dmn.client.docks.navigator.included.components.DecisionComponents;
@@ -188,7 +191,18 @@ public class DecisionNavigatorPresenter {
         }
     }
 
+    @Inject
+    DMNDiagramUtils utils;
+
     public void refreshTreeView() {
+
+        DomGlobal.console.log("### List types ###");
+
+        utils.getDRGElements(getDiagram())
+                .forEach(drgElement -> {
+                    DomGlobal.console.log(drgElement.getClass().getName());
+                });
+
         treePresenter.setupItems(getItems());
     }
 

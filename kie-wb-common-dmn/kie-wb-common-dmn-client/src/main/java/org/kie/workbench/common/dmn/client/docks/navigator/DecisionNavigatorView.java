@@ -18,8 +18,10 @@ package org.kie.workbench.common.dmn.client.docks.navigator;
 
 import javax.inject.Inject;
 
+import com.google.gwt.event.dom.client.ClickEvent;
 import elemental2.dom.HTMLDivElement;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
+import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.kie.workbench.common.dmn.client.docks.navigator.included.components.DecisionComponents;
 import org.kie.workbench.common.dmn.client.docks.navigator.tree.DecisionNavigatorTreePresenter;
@@ -30,6 +32,18 @@ import static org.kie.workbench.common.dmn.client.editors.types.common.HiddenHel
 @Templated
 public class DecisionNavigatorView implements DecisionNavigatorPresenter.View {
 
+    @DataField("switch-to-global")
+    private final HTMLDivElement switchToGlobal;
+
+    @DataField("switch-to-1")
+    private final HTMLDivElement switchTo1;
+
+    @DataField("switch-to-2")
+    private final HTMLDivElement switchTo2;
+
+    @DataField("switch-to-3")
+    private final HTMLDivElement switchTo3;
+
     @DataField("main-tree")
     private final HTMLDivElement mainTree;
 
@@ -39,15 +53,47 @@ public class DecisionNavigatorView implements DecisionNavigatorPresenter.View {
     @DataField("decision-components")
     private final HTMLDivElement decisionComponents;
 
+    private final GraphDRDSwitchPOC switchPOC;
+
     private DecisionNavigatorPresenter presenter;
 
     @Inject
-    public DecisionNavigatorView(final HTMLDivElement mainTree,
+    public DecisionNavigatorView(final HTMLDivElement switchToGlobal,
+                                 final HTMLDivElement switchTo1,
+                                 final HTMLDivElement switchTo2,
+                                 final HTMLDivElement switchTo3,
+                                 final HTMLDivElement mainTree,
                                  final HTMLDivElement decisionComponentsContainer,
-                                 final HTMLDivElement decisionComponents) {
+                                 final HTMLDivElement decisionComponents,
+                                 final GraphDRDSwitchPOC switchPOC) {
+        this.switchToGlobal = switchToGlobal;
+        this.switchTo1 = switchTo1;
+        this.switchTo2 = switchTo2;
+        this.switchTo3 = switchTo3;
         this.mainTree = mainTree;
         this.decisionComponentsContainer = decisionComponentsContainer;
         this.decisionComponents = decisionComponents;
+        this.switchPOC = switchPOC;
+    }
+
+    @EventHandler("switch-to-global")
+    public void switchToGlobal(final ClickEvent event) {
+        switchPOC.hideNodes(0);
+    }
+
+    @EventHandler("switch-to-1")
+    public void switchTo1(final ClickEvent event) {
+        switchPOC.hideNodes(1);
+    }
+
+    @EventHandler("switch-to-2")
+    public void switchTo2(final ClickEvent event) {
+        switchPOC.hideNodes(2);
+    }
+
+    @EventHandler("switch-to-3")
+    public void switchTo3(final ClickEvent event) {
+        switchPOC.hideNodes(3);
     }
 
     @Override

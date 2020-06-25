@@ -33,6 +33,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
+import elemental2.dom.DomGlobal;
 import elemental2.promise.Promise;
 import jsinterop.base.Js;
 import org.kie.workbench.common.dmn.api.DMNDefinitionSet;
@@ -63,6 +64,7 @@ import org.kie.workbench.common.dmn.api.property.dmn.DecisionServiceDividerLineY
 import org.kie.workbench.common.dmn.api.property.dmn.Description;
 import org.kie.workbench.common.dmn.api.property.dmn.Id;
 import org.kie.workbench.common.dmn.api.property.font.FontSet;
+import org.kie.workbench.common.dmn.client.docks.navigator.GraphDRDSwitchPOC;
 import org.kie.workbench.common.dmn.webapp.kogito.common.client.converters.model.BusinessKnowledgeModelConverter;
 import org.kie.workbench.common.dmn.webapp.kogito.common.client.converters.model.DecisionConverter;
 import org.kie.workbench.common.dmn.webapp.kogito.common.client.converters.model.DecisionServiceConverter;
@@ -107,6 +109,7 @@ import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.kie.JSITCo
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.mapper.JsUtils;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
 import org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils;
+import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Graph;
@@ -153,6 +156,9 @@ public class DMNMarshallerKogitoUnmarshaller {
     private TextAnnotationConverter textAnnotationConverter;
     private DecisionServiceConverter decisionServiceConverter;
     private Promises promises;
+
+    @Inject
+    GraphDRDSwitchPOC graphDRDSwitchPOC;
 
     protected DMNMarshallerKogitoUnmarshaller() {
         this(null, null, null);
@@ -411,88 +417,115 @@ public class DMNMarshallerKogitoUnmarshaller {
                 PointUtils.convertToRelativeBounds(kv.getValue());
             }
 
-            final Graph graph = factoryManager.newDiagram("prova",
-                                                          BindableAdapterUtils.getDefinitionSetId(DMNDefinitionSet.class),
-                                                          metadata).getGraph();
-            elems.values().stream().map(Entry::getValue).forEach(graph::addNode);
-            textAnnotations.values().forEach(graph::addNode);
+            final Diagram diagram = factoryManager.newDiagram("prova",
+                                                            BindableAdapterUtils.getDefinitionSetId(DMNDefinitionSet.class),
+                                                            metadata);
+            final Graph graph = diagram.getGraph();
+            a(jsiDefinitions,
+              hasComponentWidthsMap,
+              dmnDDDiagram,
+              importDefinitions,
+              pmmlDocuments,
+              dmnDecisionServices,
+              elems,
+              textAnnotations,
+              graph);
 
-            final Node<?, ?> dmnDiagramRoot = DMNMarshallerUtils.findDMNDiagramRoot(graph);
-            final Definitions definitionsStunnerPojo = DefinitionsConverter.wbFromDMN(jsiDefinitions,
-                                                                                      importDefinitions,
-                                                                                      pmmlDocuments);
 
-            loadImportedItemDefinitions(definitionsStunnerPojo, importDefinitions);
-
-            ((View<DMNDiagram>) dmnDiagramRoot.getContent()).getDefinition().setDefinitions(definitionsStunnerPojo);
-
-            //Only connect Nodes to the Diagram that are not referenced by DecisionServices
-            final List<String> references = new ArrayList<>();
-            final List<JSITDecisionService> lstDecisionServices = new ArrayList<>(dmnDecisionServices);
-            for (int iDS = 0; iDS < lstDecisionServices.size(); iDS++) {
-                final JSITDecisionService jsiDecisionService = Js.uncheckedCast(lstDecisionServices.get(iDS));
-                final List<JSITDMNElementReference> jsiEncapsulatedDecisions = jsiDecisionService.getEncapsulatedDecision();
-                if (Objects.nonNull(jsiEncapsulatedDecisions)) {
-                    for (int i = 0; i < jsiEncapsulatedDecisions.size(); i++) {
-                        final JSITDMNElementReference jsiEncapsulatedDecision = Js.uncheckedCast(jsiEncapsulatedDecisions.get(i));
-                        references.add(jsiEncapsulatedDecision.getHref());
-                    }
-                }
-
-                final List<JSITDMNElementReference> jsiOutputDecisions = jsiDecisionService.getOutputDecision();
-                if (Objects.nonNull(jsiOutputDecisions)) {
-                    for (int i = 0; i < jsiOutputDecisions.size(); i++) {
-                        final JSITDMNElementReference jsiOutputDecision = Js.uncheckedCast(jsiOutputDecisions.get(i));
-                        references.add(jsiOutputDecision.getHref());
-                    }
-                }
-            }
-
-            final Map<JSITDRGElement, Node> elementsToConnectToRoot = new HashMap<>();
-            for (Entry<JSITDRGElement, Node> kv : elems.values()) {
-                final JSITDRGElement element = Js.uncheckedCast(kv.getKey());
-                final Node node = kv.getValue();
-                if (!references.contains("#" + element.getId())) {
-                    elementsToConnectToRoot.put(element, node);
-                }
-            }
-            elementsToConnectToRoot.values().forEach(node -> connectRootWithChild(dmnDiagramRoot, node));
-            textAnnotations.values().forEach(node -> connectRootWithChild(dmnDiagramRoot, node));
-
-            //Copy ComponentWidths information
-            final Optional<JSITComponentsWidthsExtension> extension = findComponentsWidthsExtension(dmnDDDiagram);
-            extension.ifPresent(componentsWidthsExtension -> {
-                //This condition is required because a node with ComponentsWidthsExtension
-                //can be imported from another diagram but the extension is not imported or present in this diagram.
-                if (Objects.nonNull(componentsWidthsExtension.getComponentWidths())) {
-                    hasComponentWidthsMap.entrySet().forEach(es -> {
-                        final List<JSITComponentWidths> jsiComponentWidths = componentsWidthsExtension.getComponentWidths();
-                        for (int i = 0; i < jsiComponentWidths.size(); i++) {
-                            final JSITComponentWidths jsiWidths = Js.uncheckedCast(jsiComponentWidths.get(i));
-                            if (Objects.equals(jsiWidths.getDmnElementRef(), es.getKey())) {
-                                final List<Double> widths = es.getValue().getComponentWidths();
-                                if (Objects.nonNull(jsiWidths.getWidth())) {
-                                    widths.clear();
-                                    for (int w = 0; w < jsiWidths.getWidth().size(); w++) {
-                                        final double width = jsiWidths.getWidth().get(w).doubleValue();
-                                        widths.add(width);
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-            });
 
             return promises.resolve(graph);
         });
     }
 
+    private void a(final JSITDefinitions jsiDefinitions,
+                   final Map<String, HasComponentWidths> hasComponentWidthsMap,
+                   final Optional<JSIDMNDiagram> dmnDDDiagram,
+                   final Map<JSITImport, JSITDefinitions> importDefinitions,
+                   final Map<JSITImport, PMMLDocumentMetadata> pmmlDocuments,
+                   final Set<JSITDecisionService> dmnDecisionServices,
+                   final Map<String, Entry<JSITDRGElement, Node>> elems,
+                   final Map<String, Node<View<TextAnnotation>, ?>> textAnnotations,
+                   final Graph graph) {
+        elems.values().stream().map(Entry::getValue).forEach(graph::addNode);
+        textAnnotations.values().forEach(graph::addNode);
+
+        final Node<?, ?> dmnDiagramRoot = DMNMarshallerUtils.findDMNDiagramRoot(graph);
+        final Definitions definitionsStunnerPojo = DefinitionsConverter.wbFromDMN(jsiDefinitions,
+                                                                                  importDefinitions,
+                                                                                  pmmlDocuments);
+
+        loadImportedItemDefinitions(definitionsStunnerPojo, importDefinitions);
+
+        ((View<DMNDiagram>) dmnDiagramRoot.getContent()).getDefinition().setDefinitions(definitionsStunnerPojo);
+
+        //Only connect Nodes to the Diagram that are not referenced by DecisionServices
+        final List<String> references = new ArrayList<>();
+        final List<JSITDecisionService> lstDecisionServices = new ArrayList<>(dmnDecisionServices);
+        for (int iDS = 0; iDS < lstDecisionServices.size(); iDS++) {
+            final JSITDecisionService jsiDecisionService = Js.uncheckedCast(lstDecisionServices.get(iDS));
+            final List<JSITDMNElementReference> jsiEncapsulatedDecisions = jsiDecisionService.getEncapsulatedDecision();
+            if (Objects.nonNull(jsiEncapsulatedDecisions)) {
+                for (int i = 0; i < jsiEncapsulatedDecisions.size(); i++) {
+                    final JSITDMNElementReference jsiEncapsulatedDecision = Js.uncheckedCast(jsiEncapsulatedDecisions.get(i));
+                    references.add(jsiEncapsulatedDecision.getHref());
+                }
+            }
+
+            final List<JSITDMNElementReference> jsiOutputDecisions = jsiDecisionService.getOutputDecision();
+            if (Objects.nonNull(jsiOutputDecisions)) {
+                for (int i = 0; i < jsiOutputDecisions.size(); i++) {
+                    final JSITDMNElementReference jsiOutputDecision = Js.uncheckedCast(jsiOutputDecisions.get(i));
+                    references.add(jsiOutputDecision.getHref());
+                }
+            }
+        }
+
+        final Map<JSITDRGElement, Node> elementsToConnectToRoot = new HashMap<>();
+        for (Entry<JSITDRGElement, Node> kv : elems.values()) {
+            final JSITDRGElement element = Js.uncheckedCast(kv.getKey());
+            final Node node = kv.getValue();
+            if (!references.contains("#" + element.getId())) {
+                elementsToConnectToRoot.put(element, node);
+            }
+        }
+        elementsToConnectToRoot.values().forEach(node -> connectRootWithChild(dmnDiagramRoot, node));
+        textAnnotations.values().forEach(node -> connectRootWithChild(dmnDiagramRoot, node));
+
+        //Copy ComponentWidths information
+        final Optional<JSITComponentsWidthsExtension> extension = findComponentsWidthsExtension(dmnDDDiagram);
+        extension.ifPresent(componentsWidthsExtension -> {
+            //This condition is required because a node with ComponentsWidthsExtension
+            //can be imported from another diagram but the extension is not imported or present in this diagram.
+            if (Objects.nonNull(componentsWidthsExtension.getComponentWidths())) {
+                hasComponentWidthsMap.entrySet().forEach(es -> {
+                    final List<JSITComponentWidths> jsiComponentWidths = componentsWidthsExtension.getComponentWidths();
+                    for (int i = 0; i < jsiComponentWidths.size(); i++) {
+                        final JSITComponentWidths jsiWidths = Js.uncheckedCast(jsiComponentWidths.get(i));
+                        if (Objects.equals(jsiWidths.getDmnElementRef(), es.getKey())) {
+                            final List<Double> widths = es.getValue().getComponentWidths();
+                            if (Objects.nonNull(jsiWidths.getWidth())) {
+                                widths.clear();
+                                for (int w = 0; w < jsiWidths.getWidth().size(); w++) {
+                                    final double width = jsiWidths.getWidth().get(w).doubleValue();
+                                    widths.add(width);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    }
+
     private Optional<JSIDMNDiagram> findJSIDiagram(final JSITDefinitions dmnXml) {
+
         if (Objects.isNull(dmnXml.getDMNDI())) {
             return Optional.empty();
         }
         final List<JSIDMNDiagram> elems = dmnXml.getDMNDI().getDMNDiagram();
+
+        DomGlobal.console.log("()()()()()() ===========> ", elems.size());
+
         if (elems.size() != 1) {
             return Optional.empty();
         } else {

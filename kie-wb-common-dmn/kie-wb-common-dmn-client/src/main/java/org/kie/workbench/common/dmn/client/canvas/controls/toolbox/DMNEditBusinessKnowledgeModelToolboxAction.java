@@ -43,7 +43,7 @@ import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 public class DMNEditBusinessKnowledgeModelToolboxAction implements ToolboxAction<AbstractCanvasHandler> {
 
     private static final ImageDataUriGlyph GLYPH =
-            ImageDataUriGlyph.create(StunnerCommonImageResources.INSTANCE.edit().getSafeUri());
+            ImageDataUriGlyph.create(StunnerCommonImageResources.INSTANCE.gears().getSafeUri());
 
     private final SessionManager sessionManager;
     private final ClientTranslationService translationService;
@@ -67,7 +67,7 @@ public class DMNEditBusinessKnowledgeModelToolboxAction implements ToolboxAction
     @Override
     public String getTitle(final AbstractCanvasHandler canvasHandler,
                            final String uuid) {
-        return translationService.getValue(CoreTranslationMessages.EDIT);
+        return "Boom!! 💥";
     }
 
     @Override

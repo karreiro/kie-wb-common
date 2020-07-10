@@ -1,0 +1,41 @@
+/*
+ * Copyright 2020 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// (>>>) Set the scope of our CSS Classes
+[data-i18n-prefix="ExampleView."] {
+  .example-modal {
+    position: absolute;
+    width: 550px;
+    height: 400px;
+    top: ~"calc(50% - 200px)";
+    left: ~"calc(50% - 275px)";
+    background: #FFF;
+    padding: 30px 40px;
+    border: 5px solid #333;
+
+    .elemental2-example {
+      padding: 20px;
+      margin: 20px;
+      border: 5px solid blue;
+    }
+
+    .gwt-example {
+      padding: 20px;
+      margin: 20px;
+      border: 5px solid red;
+    }
+  }
+}

@@ -39,6 +39,7 @@ import org.kie.workbench.common.dmn.client.editors.types.common.DataTypeManager;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataTypeManagerStackStore;
 import org.kie.workbench.common.dmn.client.editors.types.common.ItemDefinitionUtils;
 import org.kie.workbench.common.dmn.client.editors.types.common.events.RefreshDataTypesListEvent;
+import org.kie.workbench.common.dmn.client.editors.types.example.Example;
 import org.kie.workbench.common.dmn.client.editors.types.listview.DataTypeList;
 import org.kie.workbench.common.dmn.client.editors.types.persistence.DataTypeStore;
 import org.kie.workbench.common.dmn.client.editors.types.persistence.ItemDefinitionStore;
@@ -139,11 +140,15 @@ public class DataTypesPage extends DMNPage {
         loadDataTypes();
     }
 
+    @Inject
+    private Example example;
+
     void refreshPageView() {
         final HTMLDivElement pageView = getPageView();
         RemoveHelper.removeChildren(pageView);
         pageView.appendChild(flashMessages.getElement());
         pageView.appendChild(treeList.getElement());
+        pageView.appendChild(example.getElement());
     }
 
     boolean isLoaded() {

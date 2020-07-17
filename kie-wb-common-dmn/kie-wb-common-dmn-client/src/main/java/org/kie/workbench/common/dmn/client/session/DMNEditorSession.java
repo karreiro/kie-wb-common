@@ -66,7 +66,7 @@ import org.uberfire.mvp.Command;
 public class DMNEditorSession extends DefaultEditorSession implements DMNSession {
 
     @Inject
-    public DMNEditorSession(final ManagedSession session,
+    public DMNEditorSession(final @DMNEditor DMNManagedSession session,
                             final CanvasCommandManager<AbstractCanvasHandler> canvasCommandManager,
                             final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
                             final Registry<org.kie.workbench.common.stunner.core.command.Command<AbstractCanvasHandler, CanvasViolation>> commandRegistry,
@@ -111,6 +111,7 @@ public class DMNEditorSession extends DefaultEditorSession implements DMNSession
                            .registerCanvasControl(CellEditorControl.class)
                            .registerCanvasControl(MousePanMediatorControl.class)
                            .registerCanvasControl(DMNGridPanelControl.class)
+                           .registerCanvasControl(MultiDRDControl.class)
                            .registerCanvasControl(ExpressionEditorControl.class),
                    metadata,
                    callback);

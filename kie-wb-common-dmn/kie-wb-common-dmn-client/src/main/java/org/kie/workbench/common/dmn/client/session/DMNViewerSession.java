@@ -46,7 +46,7 @@ import org.uberfire.mvp.Command;
 public class DMNViewerSession extends DefaultViewerSession implements DMNSession {
 
     @Inject
-    public DMNViewerSession(final ManagedSession session,
+    public DMNViewerSession(final @DMNEditor DMNManagedSession session,
                             final CanvasCommandManager<AbstractCanvasHandler> canvasCommandManager) {
         super(session,
               canvasCommandManager);

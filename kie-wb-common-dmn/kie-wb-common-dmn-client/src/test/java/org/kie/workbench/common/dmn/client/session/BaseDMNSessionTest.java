@@ -129,7 +129,7 @@ public abstract class BaseDMNSessionTest<S extends AbstractSession<AbstractCanva
     @Mock
     protected ExpressionEditorView.Presenter expressionEditor;
 
-    protected ManagedSession managedSession;
+    protected DMNManagedSession managedSession;
 
     protected ManagedInstance<AbstractCanvas> canvasInstances;
 
@@ -179,7 +179,7 @@ public abstract class BaseDMNSessionTest<S extends AbstractSession<AbstractCanva
         this.canvasHandlerControlInstances = spy(new ManagedInstanceStub<>(canvasHandlerControlRegistrations.keySet().toArray(canvasHandlerControls)));
         this.canvasHandlerControlRegistrations.entrySet().forEach(e -> when(canvasHandlerControlInstances.select(eq(e.getValue()), Mockito.<Annotation>anyVararg())).thenReturn(new ManagedInstanceStub<>(e.getKey())));
 
-        this.managedSession = spy(new ManagedSession(definitionUtils,
+        this.managedSession = spy(new DMNManagedSession(definitionUtils,
                                                      sessionLoader,
                                                      canvasInstances,
                                                      canvasHandlerInstances,

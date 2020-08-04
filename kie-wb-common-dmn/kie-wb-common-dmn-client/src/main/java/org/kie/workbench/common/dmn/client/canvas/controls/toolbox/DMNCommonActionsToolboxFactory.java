@@ -25,6 +25,7 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Any;
 import javax.inject.Inject;
 
+import elemental2.dom.DomGlobal;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.dmn.api.definition.model.BusinessKnowledgeModel;
 import org.kie.workbench.common.dmn.api.definition.model.Decision;
@@ -86,8 +87,12 @@ public class DMNCommonActionsToolboxFactory
         // Add specific additional toolbox actions for different DMN node-types.
         if (isDecision(element)) {
             actions.add(editDecisionToolboxActions.get());
+            DomGlobal.console.log("}}} isDecision", element);
         } else if (isBusinessKnowledgeModel(element)) {
             actions.add(editBusinessKnowledgeModelToolboxActions.get());
+            DomGlobal.console.log("}}} isBusinessKnowledgeModel", element);
+        } else {
+            DomGlobal.console.log("}}} isNone", element);
         }
         actions.add(editDRDToolboxActions.get());
         return actions;

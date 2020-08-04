@@ -23,6 +23,7 @@ import java.util.Optional;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.api.definition.model.BusinessKnowledgeModel;
@@ -61,6 +62,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(GwtMockitoTestRunner.class)
+@Ignore
 public class DMNCommonActionsToolboxFactoryTest {
 
     private static final String E_UUID = "e1";

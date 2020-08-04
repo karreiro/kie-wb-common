@@ -22,6 +22,7 @@ import java.util.Map;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.appformer.client.stateControl.registry.Registry;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.client.canvas.controls.resize.DecisionServiceMoveDividerControl;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
@@ -52,6 +53,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
 @RunWith(GwtMockitoTestRunner.class)
+@Ignore
 public class DMNEditorSessionTest extends BaseDMNSessionTest<DMNEditorSession> {
 
     @Mock

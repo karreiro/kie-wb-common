@@ -23,6 +23,7 @@ import java.util.Map;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorControl;
@@ -64,6 +65,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(GwtMockitoTestRunner.class)
+@Ignore
 public abstract class BaseDMNSessionTest<S extends AbstractSession<AbstractCanvas, AbstractCanvasHandler>> {
 
     @Mock

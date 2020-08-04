@@ -19,6 +19,7 @@ package org.kie.workbench.common.dmn.client.commands.expressions.types.undefined
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import elemental2.dom.DomGlobal;
 import org.kie.workbench.common.dmn.api.definition.HasExpression;
 import org.kie.workbench.common.dmn.api.definition.model.Expression;
 import org.kie.workbench.common.dmn.client.commands.VetoExecutionCommand;
@@ -95,6 +96,9 @@ public class SetCellValueCommand extends AbstractCanvasGraphCommand implements V
             public CommandResult<RuleViolation> execute(final GraphCommandExecutionContext context) {
                 expression.get().ifPresent(e -> {
                     hasExpression.setExpression(e);
+
+                    DomGlobal.console.log("[DEBUG 2091] =======> " + e.getId().getValue());
+
                     e.setParent(hasExpression.asDMNModelInstrumentedBase());
                 });
 

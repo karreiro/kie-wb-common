@@ -30,6 +30,7 @@ import org.appformer.client.context.Channel;
 import org.appformer.client.context.EditorContextProvider;
 import org.jboss.errai.ui.client.local.api.elemental2.IsElement;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
+import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
 import org.kie.workbench.common.dmn.client.docks.navigator.events.RefreshDecisionComponents;
 import org.kie.workbench.common.dmn.client.docks.navigator.factories.DecisionNavigatorItemFactory;
 import org.kie.workbench.common.dmn.client.docks.navigator.included.components.DecisionComponents;

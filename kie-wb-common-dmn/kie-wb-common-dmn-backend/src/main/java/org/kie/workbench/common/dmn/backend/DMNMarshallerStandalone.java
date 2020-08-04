@@ -839,7 +839,7 @@ public class DMNMarshallerStandalone implements DiagramMarshaller<Graph, Metadat
                                     uuid = ((Association) edgeView.getDefinition()).getId().getValue();
                                 }
                             }
-                            dmnEdge.setId("dmnedge-" + uuid);
+                            dmnEdge.setId("dmnedge-" + new Id().getValue()); //uuid);
                             dmnEdge.setDmnElementRef(new QName(uuid));
 
                             dmnEdge.getWaypoint().add(PointUtils.point2dToDMNDIPoint(sourcePoint));
@@ -1040,7 +1040,7 @@ public class DMNMarshallerStandalone implements DiagramMarshaller<Graph, Metadat
                                            final View<? extends DMNElement> v) {
 
         final DMNShape result = new org.kie.dmn.model.v1_2.dmndi.DMNShape();
-        result.setId("dmnshape-" + v.getDefinition().getId().getValue());
+        result.setId("dmnshape-" + new Id().getValue()); // check
         result.setDmnElementRef(getDmnElementRef(definitions, v));
         final Bounds bounds = new org.kie.dmn.model.v1_2.dmndi.Bounds();
         result.setBounds(bounds);

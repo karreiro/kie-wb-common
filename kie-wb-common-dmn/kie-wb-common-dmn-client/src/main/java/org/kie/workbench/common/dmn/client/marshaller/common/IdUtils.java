@@ -68,7 +68,7 @@ public class IdUtils {
                                     final String dmnElementId) {
 
         final String diagramName = lower(diagram.getName());
-        return getUniqueId("dmnshape", diagramName, dmnElementId, dmnElementIds);
+        return getUniqueId("dmnshape", diagramName, dmnElementId, 1, dmnElementIds);
     }
 
     public static String getEdgeId(final JSIDMNDiagram diagram,
@@ -76,20 +76,22 @@ public class IdUtils {
                                    final String dmnElementId) {
 
         final String diagramName = lower(diagram.getName());
-        return getUniqueId("dmnedge", diagramName, dmnElementId, dmnElementIds);
+        return getUniqueId("dmnedge", diagramName, dmnElementId, 1, dmnElementIds);
     }
 
     private static String getUniqueId(final String prefix,
                                       final String diagramName,
                                       final String dmnElementId,
+                                      final int seed,
                                       final List<String> dmnElementIds) {
-        final String composedId = getComposedId(prefix, diagramName, dmnElementId);
-        final String id;
-        if (dmnElementIds.contains(composedId)) {
-            id = getComposedId(prefix, diagramName, count(dmnElementIds, composedId), dmnElementId);
-        } else {
-            id = composedId;
+
+        final String count = seed == 1 ? ""  : Integer.toString(seed);
+        final String id = getComposedId(prefix, diagramName, count, dmnElementId);
+
+        if (dmnElementIds.contains(id)) {
+            return getUniqueId(prefix, diagramName, dmnElementId, seed + 1, dmnElementIds);
         }
+
         dmnElementIds.add(id);
         return id;
     }

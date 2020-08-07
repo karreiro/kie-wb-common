@@ -16,6 +16,8 @@
 
 package org.kie.workbench.common.dmn.client.marshaller.common;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,13 +64,39 @@ public class IdUtils {
     }
 
     public static String getShapeId(final JSIDMNDiagram diagram,
+                                    final List<String> dmnElementIds,
                                     final String dmnElementId) {
-        return getComposedId("dmnshape", lower(diagram.getName()), dmnElementId);
+
+        final String diagramName = lower(diagram.getName());
+        return getUniqueId("dmnshape", diagramName, dmnElementId, dmnElementIds);
     }
 
     public static String getEdgeId(final JSIDMNDiagram diagram,
+                                   final List<String> dmnElementIds,
                                    final String dmnElementId) {
-        return getComposedId("dmnedge", lower(diagram.getName()), dmnElementId);
+
+        final String diagramName = lower(diagram.getName());
+        return getUniqueId("dmnedge", diagramName, dmnElementId, dmnElementIds);
+    }
+
+    private static String getUniqueId(final String prefix,
+                                      final String diagramName,
+                                      final String dmnElementId,
+                                      final List<String> dmnElementIds) {
+        final String composedId = getComposedId(prefix, diagramName, dmnElementId);
+        final String id;
+        if (dmnElementIds.contains(composedId)) {
+            id = getComposedId(prefix, diagramName, count(dmnElementIds, composedId), dmnElementId);
+        } else {
+            id = composedId;
+        }
+        dmnElementIds.add(id);
+        return id;
+    }
+
+    private static String count(final List<String> dmnElementIds,
+                                final String dmnElementId) {
+        return Long.toString(dmnElementIds.stream().filter(e -> Objects.equals(e, dmnElementId)).count() + 1);
     }
 
     public static String uniqueId() {

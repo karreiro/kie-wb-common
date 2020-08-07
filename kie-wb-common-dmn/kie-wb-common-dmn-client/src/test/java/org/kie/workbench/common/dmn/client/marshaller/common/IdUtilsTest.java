@@ -63,7 +63,7 @@ public class IdUtilsTest {
     public void testGetShapeId() {
         final JSIDMNDiagram diagram = mock(JSIDMNDiagram.class);
         when(diagram.getName()).thenReturn("DRG");
-        assertEquals("dmnshape-drg-_1111-2222", getShapeId(diagram, "_1111-2222"));
+        assertEquals("dmnshape-drg-_1111-2222", getShapeId(diagram, dmnDiagramElementIds, "_1111-2222"));
     }
 
     @Test
@@ -76,7 +76,7 @@ public class IdUtilsTest {
     @Test
     public void testGetShapeIdWhenDiagramNameIsNull() {
         final JSIDMNDiagram diagram = mock(JSIDMNDiagram.class);
-        assertEquals("dmnshape-_1111-2222", getShapeId(diagram, "_1111-2222"));
+        assertEquals("dmnshape-_1111-2222", getShapeId(diagram, dmnDiagramElementIds, "_1111-2222"));
     }
 
     @Test

@@ -223,7 +223,7 @@ public class DMNDiagramEditor extends AbstractDMNDiagramEditor {
             expressionEditor.setToolbarStateHandler(new DMNProjectToolbarStateHandler(getMenuSessionItems()));
             decisionNavigatorDock.setupCanvasHandler(c);
             dataTypesPage.reload();
-            switcher.switchTo(switcher.getDMNDiagramElements().get(switcher.getDMNDiagramElements().size() - 1));
+            switcher.switchTo(switcher.getDMNDiagramElements().get(0));
             includedModelsPage.setup(importsPageProvider.withDiagram(c.getDiagram()));
         });
     }

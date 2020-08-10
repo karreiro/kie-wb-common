@@ -25,6 +25,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
+import elemental2.dom.DomGlobal;
 import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
 import org.kie.workbench.common.dmn.api.definition.model.DRGElement;
 import org.kie.workbench.common.dmn.api.definition.model.Definitions;
@@ -41,6 +42,7 @@ import org.kie.workbench.common.stunner.core.client.shape.view.ShapeView;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Node;
 import org.kie.workbench.common.stunner.core.graph.content.definition.Definition;
+import org.kie.workbench.common.stunner.svg.client.shape.view.impl.SVGShapeViewImpl;
 
 @ApplicationScoped
 public class DMNDiagramElementSwitcher {
@@ -84,7 +86,20 @@ public class DMNDiagramElementSwitcher {
                     getOutEdges(node).forEach(edge -> getShapeView(canvas, edge.getUUID()).ifPresent(s -> s.setAlpha(1)));
                 } else {
 
-                    getShapeView(canvas, node.getUUID()).ifPresent(s -> s.setAlpha(0));
+                    getShapeView(canvas, node.getUUID()).ifPresent((ShapeView s) -> {
+
+                        SVGShapeViewImpl shapeView = (SVGShapeViewImpl) s;
+
+//                        shapeView.setDraggable(false);
+//                        shapeView.setDragBounds(null);
+
+//                        shapeView.setContainer(null);
+
+
+                        DomGlobal.console.log("[AAAA 87218] ===> " + s.getClass().getSimpleName());
+
+                        s.setAlpha(0);
+                    });
                     getInEdges(node).forEach(edge -> getShapeView(canvas, edge.getUUID()).ifPresent(s -> s.setAlpha(0)));
                     getOutEdges(node).forEach(edge -> getShapeView(canvas, edge.getUUID()).ifPresent(s -> s.setAlpha(0)));
                 }

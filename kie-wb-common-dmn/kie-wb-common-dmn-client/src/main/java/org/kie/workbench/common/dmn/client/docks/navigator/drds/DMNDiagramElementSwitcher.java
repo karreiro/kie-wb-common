@@ -88,7 +88,8 @@ public class DMNDiagramElementSwitcher {
                 final ShapeView<?> shapeView = shape.getShapeView();
                 final WiresShape wiresShape = (WiresShape) shapeView;
 
-
+                view.getLayer().getWiresManager().addToIndex(wiresShape);
+                shapeView.setAlpha(1);
             });
             removedShapesByNodeId.clear();
             return;
@@ -106,7 +107,8 @@ public class DMNDiagramElementSwitcher {
 
                     removedShapesByNodeId.put(uuid, shape);
 
-                    view.getLayer().getWiresManager().deregister(wiresShape);
+                    view.getLayer().getWiresManager().removeFromIndex(wiresShape);
+                    shapeView.setAlpha(0);
                 }
 
 //                wiresCanvas.getWiresManager().resetContext();

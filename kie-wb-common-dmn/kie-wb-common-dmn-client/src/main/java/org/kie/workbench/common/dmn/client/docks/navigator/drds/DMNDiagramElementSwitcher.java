@@ -16,7 +16,9 @@
 
 package org.kie.workbench.common.dmn.client.docks.navigator.drds;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,12 +27,15 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
+import com.ait.lienzo.client.core.shape.wires.WiresShape;
+import elemental2.dom.DomGlobal;
 import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
 import org.kie.workbench.common.dmn.api.definition.model.DRGElement;
 import org.kie.workbench.common.dmn.api.definition.model.Definitions;
 import org.kie.workbench.common.dmn.api.definition.model.TextAnnotation;
 import org.kie.workbench.common.dmn.client.docks.navigator.SelectedDMNDiagramElementEvent;
 import org.kie.workbench.common.dmn.client.graph.DMNGraphUtils;
+import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvas;
 import org.kie.workbench.common.stunner.client.lienzo.canvas.wires.WiresCanvasView;
 import org.kie.workbench.common.stunner.client.widgets.canvas.ScrollableLienzoPanel;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvas;
@@ -50,6 +55,8 @@ public class DMNDiagramElementSwitcher {
     private final Event<SelectedDMNDiagramElementEvent> drdSelectedEvent;
 
     private DMNDiagramElement currentDMNDiagramElement;
+
+    private Map<String, Shape> removedShapesByNodeId = new HashMap<>();
 
     @Inject
     public DMNDiagramElementSwitcher(final DMNGraphUtils dmnGraphUtils,
@@ -74,20 +81,93 @@ public class DMNDiagramElementSwitcher {
         final WiresCanvasView view = (WiresCanvasView) canvas.getView();
 
         setCurrentDMNDiagramElement(dmnDiagramElement);
+
+        if (!removedShapesByNodeId.isEmpty()) {
+            DomGlobal.console.log(">>>>>>>>>>>>>>>>>>>>>>> EMPTY! add them");
+            removedShapesByNodeId.forEach((id, shape) -> {
+                final ShapeView<?> shapeView = shape.getShapeView();
+                final WiresShape wiresShape = (WiresShape) shapeView;
+
+
+            });
+            removedShapesByNodeId.clear();
+            return;
+        }
+
+        DomGlobal.console.log(">>>>>>>>>>>>>>>>>>>>>>> NOT EMPTY! remove them");
         getGraphNodes().forEach(node -> {
+            final String uuid = node.getUUID();
             getDiagramId(node).ifPresent(nodeDiagramId -> {
 
-                if (Objects.equals(nodeDiagramId, diagramId)) {
+                if (!Objects.equals(nodeDiagramId, diagramId)) {
+                    final Shape shape = canvas.getShape(uuid);
+                    final ShapeView<?> shapeView = shape.getShapeView();
+                    final WiresShape wiresShape = (WiresShape) shapeView;
 
-                    getShapeView(canvas, node.getUUID()).ifPresent(s -> s.setAlpha(1));
-                    getInEdges(node).forEach(edge -> getShapeView(canvas, edge.getUUID()).ifPresent(s -> s.setAlpha(1)));
-                    getOutEdges(node).forEach(edge -> getShapeView(canvas, edge.getUUID()).ifPresent(s -> s.setAlpha(1)));
-                } else {
+                    removedShapesByNodeId.put(uuid, shape);
 
-                    getShapeView(canvas, node.getUUID()).ifPresent(s -> s.setAlpha(0));
-                    getInEdges(node).forEach(edge -> getShapeView(canvas, edge.getUUID()).ifPresent(s -> s.setAlpha(0)));
-                    getOutEdges(node).forEach(edge -> getShapeView(canvas, edge.getUUID()).ifPresent(s -> s.setAlpha(0)));
+                    view.getLayer().getWiresManager().deregister(wiresShape);
                 }
+
+//                wiresCanvas.getWiresManager().resetContext();
+//
+//                final Shape shape = canvas.getShape(uuid);
+//                final ShapeView<?> shapeView = shape.getShapeView();
+
+//                if (shapeView instanceof WiresShape) {
+//                    final WiresShape shapeView1 = (WiresShape) shapeView;
+
+//                }
+                //=====================================
+//                if (Objects.equals(nodeDiagramId, diagramId)) {
+//                    wiresCanvas.getWiresManager().register(wiresShape);
+//                    final Shape shape = removedShapesByNodeId.get(uuid);
+//                    if (shape != null) {
+//                        final ShapeView<?> shapeView = shape.getShapeView();
+//                        if (WiresUtils.isWiresShape(shapeView)) {
+////                            wiresCanvas.getWiresManager().getAlignAndDistribute().removeShape(wiresShape.getGroup());
+////                            final WiresShape wiresShape = (WiresShape) shapeView;
+////                            wiresCanvas.getWiresManager().register(wiresShape, true, true);
+////                            wiresCanvas.addShape(shape);
+////                            wiresCanvas.addShapeIntoView(shape);
+//
+//                        }
+//                    }
+//
+////                    getShapeView(canvas, node.getUUID()).ifPresent(s -> s.setAlpha(1));
+////                    getInEdges(node).forEach(edge -> getShapeView(canvas, edge.getUUID()).ifPresent(s -> s.setAlpha(1)));
+////                    getOutEdges(node).forEach(edge -> getShapeView(canvas, edge.getUUID()).ifPresent(s -> s.setAlpha(1)));
+//                } else {
+//                    if (removedShapesByNodeId.get(uuid) == null) {
+//
+//                        final Shape shape = canvas.getShape(uuid);
+//                        final ShapeView<?> shapeView = shape.getShapeView();
+//                        if (WiresUtils.isWiresShape(shapeView)) {
+//                            removedShapesByNodeId.put(uuid, shape);
+//                            final WiresShape wiresShape = (WiresShape) shapeView;
+////                            final MagnetManager.Magnets magnets = wiresShape.getMagnets();
+////                            wiresShape.setMagnets(null);
+////                            shapeView.setAlpha(0);
+////                            wiresCanvas.getWiresManager().getAlignAndDistribute().removeShape(wiresShape.getGroup());
+////                            wiresCanvas.deleteShape(shape);
+////                            wiresCanvas.deleteShapeFromView(shape);
+//                        }
+//                    }
+//=======================================
+//                    getShapeView(canvas, node.getUUID()).ifPresent((ShapeView s) -> {
+//
+//                        SVGShapeViewImpl shapeView = (SVGShapeViewImpl) s;
+//
+//
+//                        shapeView.removeFromParent();
+//                        DomGlobal.console.log(" DEBUG 219021 =============> " + canvas.getClass().getSimpleName());
+//                        s.setAlpha(0);
+//                    });
+
+//                    getShapeView(canvas, node.getUUID()).ifPresent(s -> s.setAlpha(0));
+//                    getInEdges(node).forEach(edge -> getShapeView(canvas, edge.getUUID()).ifPresent(s -> s.setAlpha(0)));
+//                    getOutEdges(node).forEach(edge -> getShapeView(canvas, edge.getUUID()).ifPresent(s -> s.setAlpha(0)));
+//                }
             });
         });
 
@@ -103,6 +183,7 @@ public class DMNDiagramElementSwitcher {
         final WiresCanvasView view = (WiresCanvasView) abstractCanvasView;
         final ScrollableLienzoPanel scrollableLienzoPanel = (ScrollableLienzoPanel) view.getLienzoPanel();
         scrollableLienzoPanel.refresh();
+//        scrollableLienzoPanel.getView().onResize();
     }
 
     private Optional<ShapeView> getShapeView(final AbstractCanvas canvas,

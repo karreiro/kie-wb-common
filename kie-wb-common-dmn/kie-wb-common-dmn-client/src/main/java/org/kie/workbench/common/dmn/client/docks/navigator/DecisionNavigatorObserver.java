@@ -21,6 +21,7 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 
+import elemental2.dom.DomGlobal;
 import org.kie.workbench.common.dmn.api.definition.HasExpression;
 import org.kie.workbench.common.dmn.api.definition.model.Expression;
 import org.kie.workbench.common.dmn.client.docks.navigator.tree.DecisionNavigatorTreePresenter;
@@ -45,44 +46,49 @@ public class DecisionNavigatorObserver {
 
     @SuppressWarnings("unused")
     void onCanvasClear(final @Observes CanvasClearEvent event) {
-        getOptionalPresenter().ifPresent(p -> {
-            p.removeAllElements();
-            p.refreshTreeView();
-        });
+//        getOptionalPresenter().ifPresent(p -> {
+//            p.removeAllElements();
+//            p.refreshTreeView();
+//        });
+
+        DomGlobal.console.log("CanvasClearEvent >> ....");
+//        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
     }
 
     void onCanvasElementAdded(final @Observes CanvasElementAddedEvent event) {
-        getOptionalPresenter().ifPresent(p -> p.addOrUpdateElement(event.getElement()));
+//        getOptionalPresenter().ifPresent(p -> p.addOrUpdateElement(event.getElement(
+//
+        DomGlobal.console.log("CanvasElementAddedEvent >> ....");
+//        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
     }
 
     void onCanvasElementUpdated(final @Observes CanvasElementUpdatedEvent event) {
-        getOptionalPresenter().ifPresent(p -> p.addOrUpdateElement(event.getElement()));
+//        getOptionalPresenter().ifPresent(p -> p.addOrUpdateElement(event.getElement(
+//
+        DomGlobal.console.log("CanvasElementUpdatedEvent >> ....");
+//        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
     }
 
     void onCanvasElementRemoved(final @Observes CanvasElementRemovedEvent event) {
-        getOptionalPresenter().ifPresent(p -> p.removeElement(event.getElement()));
+//        getOptionalPresenter().ifPresent(p -> p.removeElement(event.getElement(
+
+        DomGlobal.console.log("CanvasElementRemovedEvent >> ....");
+//        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
     }
 
     void onNestedElementSelected(final @Observes EditExpressionEvent event) {
-        selectItem(event);
-        setActiveParent(event);
+//        selectItem(event);
+//        setActiveParent(event);
+
+        DomGlobal.console.log("EditExpressionEvent >> ....");
+//        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
     }
 
     void onNestedElementAdded(final @Observes ExpressionEditorChanged event) {
-        presenter.getGraph().ifPresent(this::updateNode);
-    }
+//        presenter.getGraph().ifPresent(this::updateNode);
 
-    private void updateNode(final Graph graph) {
-
-        getActiveParent().ifPresent(activeParent -> {
-
-            final String activeParentUUID = activeParent.getUUID();
-            final Node node = graph.getNode(activeParentUUID);
-
-            presenter.updateElement(node);
-
-            activeParent.getChildren().forEach(e -> getTreePresenter().selectItem(e.getUUID()));
-        });
+        DomGlobal.console.log("ExpressionEditorChanged >> ....");
+//        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
     }
 
     void onNestedElementLostFocus(final @Observes CanvasFocusedShapeEvent event) {

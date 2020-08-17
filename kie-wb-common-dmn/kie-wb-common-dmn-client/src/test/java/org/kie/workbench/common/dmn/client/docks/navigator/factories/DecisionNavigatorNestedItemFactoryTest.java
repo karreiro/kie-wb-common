@@ -89,12 +89,12 @@ public class DecisionNavigatorNestedItemFactoryTest {
     @Before
     @SuppressWarnings("unchecked")
     public void setup() {
-        factory = spy(new DecisionNavigatorNestedItemFactory(sessionManager,
-                                                             editExpressionEvent,
-                                                             decisionNavigatorPresenter,
-                                                             expressionEditorDefinitionsSupplier,
-                                                             canvasSelectionEvent,
-                                                             boxedExpressionHelper));
+//        factory = spy(new DecisionNavigatorNestedItemFactory(sessionManager,
+//                                                             editExpressionEvent,
+//                                                             decisionNavigatorPresenter,
+//                                                             expressionEditorDefinitionsSupplier,
+//                                                             canvasSelectionEvent,
+//                                                             boxedExpressionHelper));
 
         final ExpressionEditorDefinitions expressionEditorDefinitions = new ExpressionEditorDefinitions();
         expressionEditorDefinitions.add(decisionTableEditorDefinition);
@@ -136,7 +136,7 @@ public class DecisionNavigatorNestedItemFactoryTest {
         final CanvasSelectionEvent event = mock(CanvasSelectionEvent.class);
         final String uuid = "uuid";
 
-        when(decisionNavigatorPresenter.getHandler()).thenReturn(canvasHandler);
+//        when(decisionNavigatorPresenter.getHandler()).thenReturn(canvasHandler);
 
         doReturn(event).when(factory).makeCanvasSelectionEvent(canvasHandler, uuid);
         doReturn(expressionEvent).when(factory).makeEditExpressionEvent(node);

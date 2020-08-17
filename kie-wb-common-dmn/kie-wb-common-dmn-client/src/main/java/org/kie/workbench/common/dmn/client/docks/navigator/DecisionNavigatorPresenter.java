@@ -18,39 +18,31 @@ package org.kie.workbench.common.dmn.client.docks.navigator;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Function;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import elemental2.dom.DomGlobal;
 import org.appformer.client.context.Channel;
 import org.appformer.client.context.EditorContextProvider;
 import org.jboss.errai.ui.client.local.api.elemental2.IsElement;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
 import org.kie.workbench.common.dmn.client.docks.navigator.events.RefreshDecisionComponents;
-import org.kie.workbench.common.dmn.client.docks.navigator.factories.DecisionNavigatorItemFactory;
 import org.kie.workbench.common.dmn.client.docks.navigator.included.components.DecisionComponents;
 import org.kie.workbench.common.dmn.client.docks.navigator.tree.DecisionNavigatorTreePresenter;
-import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.event.registration.CanvasElementAddedEvent;
-import org.kie.workbench.common.stunner.core.diagram.Diagram;
-import org.kie.workbench.common.stunner.core.graph.Edge;
-import org.kie.workbench.common.stunner.core.graph.Element;
-import org.kie.workbench.common.stunner.core.graph.Graph;
-import org.kie.workbench.common.stunner.core.graph.Node;
 import org.uberfire.client.annotations.DefaultPosition;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
 import org.uberfire.client.mvp.UberElemental;
+import org.uberfire.ext.widgets.common.client.common.BusyPopup;
 import org.uberfire.workbench.model.CompassPosition;
 import org.uberfire.workbench.model.Position;
 
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
 import static org.appformer.client.context.Channel.DEFAULT;
 import static org.appformer.client.context.Channel.VSCODE;
 import static org.kie.workbench.common.dmn.client.resources.i18n.DMNEditorConstants.DecisionNavigatorPresenter_DecisionNavigator;
@@ -69,15 +61,13 @@ public class DecisionNavigatorPresenter {
 
     private DecisionNavigatorObserver decisionNavigatorObserver;
 
-    private DecisionNavigatorChildrenTraverse navigatorChildrenTraverse;
-
-    private DecisionNavigatorItemFactory itemFactory;
+    private DMNDiagramsSession dmnDiagramsStore;
 
     private TranslationService translationService;
 
-    private CanvasHandler handler;
-
     private EditorContextProvider context;
+
+    private DecisionNavigatorItemsProvider navigatorItemsProvider;
 
     protected DecisionNavigatorPresenter() {
         //CDI proxy
@@ -88,18 +78,18 @@ public class DecisionNavigatorPresenter {
                                       final DecisionNavigatorTreePresenter treePresenter,
                                       final DecisionComponents decisionComponents,
                                       final DecisionNavigatorObserver decisionNavigatorObserver,
-                                      final DecisionNavigatorChildrenTraverse navigatorChildrenTraverse,
-                                      final DecisionNavigatorItemFactory itemFactory,
+                                      final DMNDiagramsSession dmnDiagramsStore,
                                       final TranslationService translationService,
-                                      final EditorContextProvider context) {
+                                      final EditorContextProvider context,
+                                      final DecisionNavigatorItemsProvider navigatorItemsProvider) {
         this.view = view;
         this.treePresenter = treePresenter;
         this.decisionComponents = decisionComponents;
         this.decisionNavigatorObserver = decisionNavigatorObserver;
-        this.navigatorChildrenTraverse = navigatorChildrenTraverse;
-        this.itemFactory = itemFactory;
+        this.dmnDiagramsStore = dmnDiagramsStore;
         this.translationService = translationService;
         this.context = context;
+        this.navigatorItemsProvider = navigatorItemsProvider;
     }
 
     @WorkbenchPartView
@@ -124,57 +114,15 @@ public class DecisionNavigatorPresenter {
     }
 
     public void onRefreshDecisionComponents(final @Observes RefreshDecisionComponents events) {
-        refreshComponentsView();
+//        refreshComponentsView();
     }
 
     public void onElementAdded(final @Observes CanvasElementAddedEvent event) {
-        refreshComponentsView();
+//        refreshComponentsView();
     }
 
     public DecisionNavigatorTreePresenter getTreePresenter() {
         return treePresenter;
-    }
-
-    public Diagram getDiagram() {
-        return handler.getDiagram();
-    }
-
-    public CanvasHandler getHandler() {
-        return handler;
-    }
-
-    public void setHandler(final CanvasHandler handler) {
-        this.handler = handler;
-
-        refreshTreeView();
-        refreshComponentsView();
-    }
-
-    public void addOrUpdateElement(final Element<?> element) {
-
-        if (!isNode(element)) {
-            return;
-        }
-
-        treePresenter.addOrUpdateItem(makeItem(element));
-    }
-
-    public void updateElement(final Element<?> element) {
-
-        if (!isNode(element)) {
-            return;
-        }
-
-        treePresenter.updateItem(makeItem(element));
-    }
-
-    public void removeElement(final Element<?> element) {
-
-        if (!isNode(element)) {
-            return;
-        }
-
-        treePresenter.remove(makeItem(element));
     }
 
     public void removeAllElements() {
@@ -199,37 +147,23 @@ public class DecisionNavigatorPresenter {
     }
 
     public void refreshTreeView() {
-        treePresenter.setupItems(getItems());
+        DomGlobal.console.log("refreshing.. >>>> ");
+        final double d0 = DomGlobal.performance.now();
+        final List<DecisionNavigatorItem> items = getItems();
+        items.forEach(e -> {
+            DomGlobal.console.log("refreshing..... >>>> " + e.getLabel());
+        });
+        treePresenter.setupItems(items);
+        final double d1 = DomGlobal.performance.now();
+        DomGlobal.console.log("refresh time >>>> " + (d1 - d0) + "ms");
     }
 
     public void refreshComponentsView() {
-        getOptionalHandler().ifPresent(handler -> decisionComponents.refresh(handler.getDiagram()));
+        decisionComponents.refresh();
     }
 
     List<DecisionNavigatorItem> getItems() {
-        return getGraph().map(navigatorChildrenTraverse::getItems).orElse(emptyList());
-    }
-
-    public Optional<Graph> getGraph() {
-        return getOptionalHandler()
-                .map((Function<CanvasHandler, Diagram>) CanvasHandler::getDiagram)
-                .map(Diagram::getGraph);
-    }
-
-    Optional<CanvasHandler> getOptionalHandler() {
-        return ofNullable(this.handler);
-    }
-
-    DecisionNavigatorItem makeItem(final Element<?> element) {
-
-        final Node<org.kie.workbench.common.stunner.core.graph.content.view.View, Edge> node =
-                (Node<org.kie.workbench.common.stunner.core.graph.content.view.View, Edge>) element.asNode();
-
-        return itemFactory.makeItem(node);
-    }
-
-    private boolean isNode(final Element<?> element) {
-        return element instanceof Node;
+        return navigatorItemsProvider.getItems();
     }
 
     public void clearSelections() {

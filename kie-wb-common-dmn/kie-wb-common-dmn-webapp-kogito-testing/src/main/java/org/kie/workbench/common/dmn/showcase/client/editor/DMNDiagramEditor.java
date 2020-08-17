@@ -23,11 +23,12 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import elemental2.dom.DomGlobal;
 import org.appformer.client.context.EditorContextProvider;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.docks.navigator.DecisionNavigatorDock;
-import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramElementSwitcher;
+import org.kie.workbench.common.dmn.client.docks.navigator.SelectedDMNDiagramElement;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
 import org.kie.workbench.common.dmn.client.editors.included.IncludedModelsPage;
 import org.kie.workbench.common.dmn.client.editors.included.imports.IncludedModelsPageStateProviderImpl;
@@ -46,6 +47,7 @@ import org.kie.workbench.common.dmn.webapp.kogito.common.client.editor.DMNEditor
 import org.kie.workbench.common.dmn.webapp.kogito.common.client.editor.DMNProjectToolbarStateHandler;
 import org.kie.workbench.common.dmn.webapp.kogito.common.client.tour.GuidedTourBridgeInitializer;
 import org.kie.workbench.common.kogito.client.editor.MultiPageEditorContainerView;
+import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionEditorPresenter;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.SessionViewerPresenter;
 import org.kie.workbench.common.stunner.core.client.annotation.DiagramEditor;
@@ -60,6 +62,7 @@ import org.kie.workbench.common.stunner.core.client.error.DiagramClientErrorHand
 import org.kie.workbench.common.stunner.core.client.i18n.ClientTranslationService;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
+import org.kie.workbench.common.stunner.core.client.session.ClientSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.client.session.impl.ViewerSession;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
@@ -100,8 +103,10 @@ public class DMNDiagramEditor extends AbstractDMNDiagramEditor {
     private final Event<NotificationEvent> notificationEvent;
     private final DMNVFSService vfsService;
 
-    @Inject
-    private DMNDiagramElementSwitcher switcher;
+    @Override
+    public SessionPresenter<? extends ClientSession, ?, Diagram> getSessionPresenter() {
+        return super.getSessionPresenter();
+    }
 
     @Inject
     public DMNDiagramEditor(final View view,
@@ -221,9 +226,9 @@ public class DMNDiagramEditor extends AbstractDMNDiagramEditor {
 
             final ExpressionEditorView.Presenter expressionEditor = ((DMNSession) sessionManager.getCurrentSession()).getExpressionEditor();
             expressionEditor.setToolbarStateHandler(new DMNProjectToolbarStateHandler(getMenuSessionItems()));
-            decisionNavigatorDock.setupCanvasHandler(c);
+            decisionNavigatorDock.reload();
             dataTypesPage.reload();
-            switcher.switchTo(switcher.getDMNDiagramElements().get(switcher.getDMNDiagramElements().size() - 1));
+//            switcher.switchTo(switcher.getDMNDiagramElements().get(0));
             includedModelsPage.setup(importsPageProvider.withDiagram(c.getDiagram()));
         });
     }
@@ -233,6 +238,10 @@ public class DMNDiagramEditor extends AbstractDMNDiagramEditor {
         final String fileName = metadata.getTitle();
         final String uri = root.toURI();
         return PathFactory.newPath(fileName, uri + "/" + URIUtil.encode(fileName));
+    }
+
+    public void d(final @Observes SelectedDMNDiagramElement e) {
+        DomGlobal.console.log(">> pick pick >>>>>>>>> ", getSessionPresenter().getInstance());
     }
 
     @SuppressWarnings("unchecked")

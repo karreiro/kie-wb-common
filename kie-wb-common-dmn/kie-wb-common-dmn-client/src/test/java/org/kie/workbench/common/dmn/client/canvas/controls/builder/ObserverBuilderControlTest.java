@@ -34,7 +34,7 @@ import org.kie.workbench.common.dmn.api.definition.model.FunctionDefinition;
 import org.kie.workbench.common.dmn.api.definition.model.IsInformationItem;
 import org.kie.workbench.common.dmn.api.property.dmn.Id;
 import org.kie.workbench.common.dmn.api.property.dmn.Name;
-import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramElementSwitcher;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
 import org.kie.workbench.common.forms.adf.definitions.DynamicReadOnly;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.content.view.View;
@@ -53,13 +53,12 @@ public class ObserverBuilderControlTest {
     private ObserverBuilderControl observerBuilderControl;
 
     @Mock
-    private DMNDiagramElementSwitcher dmnDiagramElementSwitcher;
+    private DMNDiagramsSession dmnDiagramsSession;
 
     @Before
     public void setup() {
         doCallRealMethod().when(observerBuilderControl).updateElementFromDefinition(anyObject(), anyObject());
-        when(observerBuilderControl.getDMNDiagramElementSwitcher()).thenReturn(dmnDiagramElementSwitcher);
-        when(dmnDiagramElementSwitcher.getCurrentDMNDiagramElement()).thenReturn(Optional.empty());
+        when(dmnDiagramsSession.getCurrentDMNDiagramElement()).thenReturn(Optional.empty());
     }
 
     @Test
@@ -205,7 +204,7 @@ public class ObserverBuilderControlTest {
 
         when(id.getValue()).thenReturn(selectedDiagramId);
         when(selectedDiagram.getId()).thenReturn(id);
-        when(dmnDiagramElementSwitcher.getCurrentDMNDiagramElement()).thenReturn(Optional.of(selectedDiagram));
+        when(dmnDiagramsSession.getCurrentDMNDiagramElement()).thenReturn(Optional.of(selectedDiagram));
         when(elementContent.getDefinition()).thenReturn(newDefinition);
         when(element.getContent()).thenReturn(elementContent);
 

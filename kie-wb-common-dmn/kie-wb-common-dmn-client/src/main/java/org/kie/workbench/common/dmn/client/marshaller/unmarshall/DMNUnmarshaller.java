@@ -32,10 +32,13 @@ import jsinterop.base.Js;
 import org.kie.workbench.common.dmn.api.DMNDefinitionSet;
 import org.kie.workbench.common.dmn.api.definition.HasComponentWidths;
 import org.kie.workbench.common.dmn.api.definition.model.DMNDiagram;
+import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
 import org.kie.workbench.common.dmn.api.definition.model.DMNModelInstrumentedBase;
 import org.kie.workbench.common.dmn.api.definition.model.Definitions;
 import org.kie.workbench.common.dmn.api.definition.model.ItemDefinition;
 import org.kie.workbench.common.dmn.api.editors.included.PMMLDocumentMetadata;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSessionState;
 import org.kie.workbench.common.dmn.client.marshaller.common.DMNDiagramElementsUtils;
 import org.kie.workbench.common.dmn.client.marshaller.common.DMNGraphUtils;
 import org.kie.workbench.common.dmn.client.marshaller.converters.DefinitionsConverter;
@@ -80,6 +83,9 @@ public class DMNUnmarshaller {
     private final NodeEntriesFactory modelToStunnerConverter;
 
     private final DMNDiagramElementsUtils dmnDiagramElementsUtils;
+
+    @Inject
+    private DMNDiagramsSession dmnDiagramsSession;
 
     protected DMNUnmarshaller() {
         this(null, null, null, null, null);
@@ -146,19 +152,36 @@ public class DMNUnmarshaller {
         //Ensure all locations are updated to relative for Stunner
         nodeEntries.forEach(e -> PointUtils.convertToRelativeBounds(e.getNode()));
 
-        final Diagram diagram = factoryManager.newDiagram("prova",
-                                                          BindableAdapterUtils.getDefinitionSetId(DMNDefinitionSet.class),
-                                                          metadata);
-        final Graph graph = diagram.getGraph();
+        final Map<String, Diagram> stunnerDiagramsById = new HashMap<>();
+        final Map<String, DMNDiagramElement> dmnDiagramsById = new HashMap<>();
 
+        for (final DMNDiagramElement dmnDiagramElement : wbDefinitions.getDmnDiagramElements()) {
+            final String dmnDiagramId = dmnDiagramElement.getId().getValue();
+            final Diagram value = factoryManager.newDiagram(dmnDiagramId,
+                                                            BindableAdapterUtils.getDefinitionSetId(DMNDefinitionSet.class),
+                                                            metadata);
+            stunnerDiagramsById.put(dmnDiagramId, value);
+            dmnDiagramsById.put(dmnDiagramId, dmnDiagramElement);
+        }
+
+        dmnDiagramsSession.setState(metadata, stunnerDiagramsById, dmnDiagramsById);
+
+        final Graph[] drgGraph = new Graph[1];
         nodeEntries.forEach(nodeEntry -> {
+            final String diagramId = nodeEntry.getDiagramId();
+            final DMNDiagramElement diagramElement = dmnDiagramsById.get(diagramId);
+            final Graph graph = stunnerDiagramsById.get(diagramId).getGraph();
+
+            if (Objects.equals(diagramElement.getName().getValue(), "DRG")) {
+                drgGraph[0] = graph;
+            }
             graph.addNode(nodeEntry.getNode());
         });
 
-        final Node<?, ?> dmnDiagramRoot = DMNGraphUtils.findDMNDiagramRoot(graph);
-
+        final Node<?, ?> dmnDiagramRoot = DMNGraphUtils.findDMNDiagramRoot(drgGraph[0]);
         loadImportedItemDefinitions(wbDefinitions, importDefinitions);
 
+        // TODO: fix for all diagrams
         ((View<DMNDiagram>) dmnDiagramRoot.getContent()).getDefinition().setDefinitions(wbDefinitions);
 
         //Only connect Nodes to the Diagram that are not referenced by DecisionServices
@@ -183,9 +206,9 @@ public class DMNUnmarshaller {
             }
         }
 
-        nodeEntries.forEach(ne -> {
-            connectRootWithChild(dmnDiagramRoot, ne.getNode());
-        });
+//        nodeEntries.forEach(ne -> {
+//            connectRootWithChild(dmnDiagramRoot, ne.getNode());
+//        });
 
         //Copy ComponentWidths information
         final List<JSITComponentsWidthsExtension> extensions = findComponentsWidthsExtensions(dmnDefinitions.getDMNDI().getDMNDiagram());
@@ -213,7 +236,7 @@ public class DMNUnmarshaller {
             }
         });
 
-        return promises.resolve(graph);
+        return promises.resolve(drgGraph[0]);
     }
 
     private void ensureDRGElementExists(final JSITDefinitions dmnDefinitions) {

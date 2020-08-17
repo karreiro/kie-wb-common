@@ -24,6 +24,7 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
+import elemental2.dom.DomGlobal;
 import org.kie.workbench.common.dmn.api.definition.model.NamedElement;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.graph.DMNGraphUtils;
@@ -41,6 +42,7 @@ import org.kie.workbench.common.stunner.core.client.canvas.event.registration.Ca
 import org.kie.workbench.common.stunner.core.client.command.CanvasCommandFactory;
 import org.kie.workbench.common.stunner.core.client.shape.Shape;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.kie.workbench.common.stunner.core.diagram.DiagramImpl;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Element;
 import org.kie.workbench.common.stunner.core.graph.Node;
@@ -53,7 +55,7 @@ import org.kie.workbench.common.stunner.core.rule.RuleManager;
 
 @DMNEditor
 @Dependent
-public class DMNCanvasHandler<D extends Diagram, C extends AbstractCanvas> extends CanvasHandlerImpl<D, C> {
+public class DMNCanvasHandler<D extends Diagram, C extends AbstractCanvas> extends CanvasHandlerImpl<DiagramImpl, C> {
 
     private final DMNGraphUtils dmnGraphUtils;
 
@@ -143,5 +145,11 @@ public class DMNCanvasHandler<D extends Diagram, C extends AbstractCanvas> exten
 
     private Optional<DMNEditorSession> getCurrentSession() {
         return dmnGraphUtils.getCurrentSession().map(s -> (DMNEditorSession) s);
+    }
+
+    @Override
+    public DiagramImpl getDiagram() {
+        final DiagramImpl diagram = super.getDiagram();
+        return diagram;
     }
 }

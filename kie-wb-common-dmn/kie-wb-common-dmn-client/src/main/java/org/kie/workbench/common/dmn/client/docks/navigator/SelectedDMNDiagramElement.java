@@ -19,7 +19,7 @@ package org.kie.workbench.common.dmn.client.docks.navigator;
 import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
 import org.uberfire.workbench.events.UberFireEvent;
 
-public class SelectedDMNDiagramElementEvent implements UberFireEvent {
+public class SelectedDMNDiagramElement implements UberFireEvent {
 
     private final DMNDiagramElement diagramElement;
 
@@ -27,7 +27,7 @@ public class SelectedDMNDiagramElementEvent implements UberFireEvent {
         return diagramElement;
     }
 
-    public SelectedDMNDiagramElementEvent(final DMNDiagramElement diagramElement) {
+    public SelectedDMNDiagramElement(final DMNDiagramElement diagramElement) {
         this.diagramElement = diagramElement;
     }
 }

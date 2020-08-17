@@ -34,6 +34,7 @@ import org.jboss.errai.common.client.ui.ElementWrapperWidget;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.commands.general.NavigateToExpressionEditorCommand;
 import org.kie.workbench.common.dmn.client.docks.navigator.DecisionNavigatorDock;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
 import org.kie.workbench.common.dmn.client.editors.included.IncludedModelsPage;
 import org.kie.workbench.common.dmn.client.editors.included.imports.IncludedModelsPageStateProviderImpl;
@@ -146,6 +147,10 @@ public class DMNDiagramEditor implements KieEditorWrapperView.KieEditorWrapperPr
     private PlaceRequest placeRequest;
     private String title = "Authoring Screen";
     private Menus menu = null;
+    private Metadata metadata = null;
+
+    @Inject
+    private DMNDiagramsSession dmnDiagramsSession;
 
     @Inject
     public DMNDiagramEditor(final SessionManager sessionManager,
@@ -417,6 +422,8 @@ public class DMNDiagramEditor implements KieEditorWrapperView.KieEditorWrapperPr
                                       public void onSuccess(final Diagram diagram) {
                                           open(diagram,
                                                callback);
+                                          DMNDiagramEditor.this.metadata = diagram.getMetadata();
+                                          DMNDiagramEditor.this.kieView.getMultiPage().selectPage(0);
                                       }
 
                                       @Override
@@ -468,10 +475,15 @@ public class DMNDiagramEditor implements KieEditorWrapperView.KieEditorWrapperPr
         destroyDock();
         destroySession();
         dataTypesPage.disableShortcuts();
+        destroyDMNDiagramsSession();
+    }
+
+    private void destroyDMNDiagramsSession() {
+        dmnDiagramsSession.destroyState(metadata);
     }
 
     void setupCanvasHandler(final EditorSession session) {
-        decisionNavigatorDock.setupCanvasHandler(session.getCanvasHandler());
+        decisionNavigatorDock.reload();
     }
 
     void openDock() {

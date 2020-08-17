@@ -41,7 +41,7 @@ import org.kie.workbench.common.dmn.api.property.dmn.Id;
 import org.kie.workbench.common.dmn.api.property.dmn.LocationURI;
 import org.kie.workbench.common.dmn.api.property.dmn.Name;
 import org.kie.workbench.common.dmn.client.api.included.legacy.DMNIncludeModelsClient;
-import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramElementSwitcher;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
 import org.kie.workbench.common.dmn.client.graph.DMNGraphUtils;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.graph.Node;
@@ -89,7 +89,7 @@ public class DecisionComponentsTest {
     private DMNGraphUtils dmnGraphUtils;
 
     @Mock
-    private DMNDiagramElementSwitcher dmnDiagramElementSwitcher;
+    private DMNDiagramsSession dmnDiagramsSession;
 
     @Captor
     private ArgumentCaptor<List<DecisionComponent>> decisionComponentListCaptor;
@@ -99,7 +99,7 @@ public class DecisionComponentsTest {
     @Before
     public void setup() {
 
-        decisionComponents = spy(new DecisionComponents(view, graphUtils, client, itemManagedInstance, filter, dmnGraphUtils, dmnDiagramElementSwitcher));
+        decisionComponents = spy(new DecisionComponents(view, client, itemManagedInstance, filter, dmnDiagramsSession));
     }
 
     @Test
@@ -120,10 +120,10 @@ public class DecisionComponentsTest {
         final List<DMNIncludedModel> includedModels = new ArrayList<>();
         final Consumer<List<DMNIncludedNode>> listConsumer = (list) -> {/* Nothing. */};
 
-        doReturn(includedModels).when(decisionComponents).getDMNIncludedModels(diagram);
+        doReturn(includedModels).when(decisionComponents).getDMNIncludedModels();
         doReturn(listConsumer).when(decisionComponents).getNodesConsumer();
 
-        decisionComponents.refresh(diagram);
+        decisionComponents.refresh();
 
         verify(decisionComponents).clearDecisionComponents();
         verify(decisionComponents).startLoading();
@@ -144,7 +144,7 @@ public class DecisionComponentsTest {
 
         when(graphUtils.getDefinitions(diagram)).thenReturn(definitions);
 
-        final List<DMNIncludedModel> includedModels = decisionComponents.getDMNIncludedModels(diagram);
+        final List<DMNIncludedModel> includedModels = decisionComponents.getDMNIncludedModels();
 
         assertThat(includedModels).hasSize(1);
         assertThat(includedModels.get(0).getModelName()).isEqualTo("dmn");
@@ -358,7 +358,7 @@ public class DecisionComponentsTest {
         when(view.getComponentsCounter()).thenReturn(existingComponentsCounter);
         doNothing().when(decisionComponents).createDecisionComponentItems(anyList());
 
-        decisionComponents.loadDRDComponentsFromDiagram(diagramElement);
+//        decisionComponents.loadDRDComponentsFromDiagram();
 
         verify(view).enableFilterInputs();
         verify(view).hideLoading();

@@ -25,6 +25,7 @@ import javax.enterprise.inject.Any;
 import javax.inject.Inject;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import elemental2.dom.DomGlobal;
 import org.jboss.errai.ioc.client.api.ManagedInstance;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.stunner.client.widgets.canvas.StunnerBoundsProviderFactory;
@@ -123,37 +124,64 @@ public class PreviewDiagramScreen {
     }
 
     void closePreview() {
+        DomGlobal.console.log(">> pucky >> 1");
         view.clearPreviewWidget();
+        DomGlobal.console.log(">> pucky >> 2");
         if (null != previewWidget) {
+            DomGlobal.console.log(">> pucky >> 3");
             previewWidget.destroy();
+            DomGlobal.console.log(">> pucky >> 4");
             sessionPreviews.destroy(previewWidget);
+            DomGlobal.console.log(">> pucky >> 5");
             previewWidget = null;
+            DomGlobal.console.log(">> pucky >> 6");
         }
     }
 
     void onCanvasSessionOpened(final @Observes SessionOpenedEvent sessionOpenedEvent) {
-        checkNotNull("sessionOpenedEvent", sessionOpenedEvent);
-        showPreview(sessionOpenedEvent.getSession());
+//        checkNotNull("sessionOpenedEvent", sessionOpenedEvent);
+//
+//        try {
+//            showPreview(sessionOpenedEvent.getSession());
+//        } catch (Exception e) {
+//            DomGlobal.console.log(">> pick 1 >> ", e);
+//        }
     }
 
     void onCanvasSessionDestroyed(final @Observes SessionDestroyedEvent sessionDestroyedEvent) {
-        checkNotNull("sessionDestroyedEvent", sessionDestroyedEvent);
-        closePreview();
+//        checkNotNull("sessionDestroyedEvent", sessionDestroyedEvent);
+//
+//        try {
+//            closePreview();
+//        } catch (Exception e) {
+//            DomGlobal.console.log(">> pick 2 >> ", e);
+//        }
     }
 
     void onSessionDiagramOpenedEvent(final @Observes SessionDiagramOpenedEvent sessionDiagramOpenedEvent) {
-        checkNotNull("sessionDiagramOpenedEvent", sessionDiagramOpenedEvent);
-        showPreview(sessionDiagramOpenedEvent.getSession());
+//        checkNotNull("sessionDiagramOpenedEvent", sessionDiagramOpenedEvent);
+//
+//        try {
+//            showPreview(sessionDiagramOpenedEvent.getSession());
+//        } catch (Exception e) {
+//            DomGlobal.console.log(">> pick 3 >> ", e);
+//        }
     }
 
     void showPreview(final ClientSession session) {
+        DomGlobal.console.log(">> pick 3 >> 1");
         if (Objects.isNull(session)) {
+            DomGlobal.console.log(">> pick 3 >> 2");
             return;
         }
+        DomGlobal.console.log(">> pick 3 >> 3");
         if (session instanceof AbstractSession) {
+            DomGlobal.console.log(">> pick 3 >> 4");
             if (Objects.nonNull(previewWidget)) {
+                DomGlobal.console.log(">> pick 3 >> 5");
                 closePreview();
             }
+            DomGlobal.console.log(">> pick 3 >> 6");
             previewWidget = sessionPreviews.get();
             previewWidget.open((AbstractSession) session,
                                PREVIEW_WIDTH,
@@ -166,7 +194,9 @@ public class PreviewDiagramScreen {
 
                                    @Override
                                    public void onSuccess() {
+                                       DomGlobal.console.log(">> pick 3 >> 7");
                                        view.setPreviewWidget(previewWidget.getView());
+                                       DomGlobal.console.log(">> pick 3 >> 8");
                                    }
 
                                    @Override

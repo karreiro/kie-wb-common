@@ -304,7 +304,7 @@ public class DMNDiagramEditorTest {
         verify(layoutHelper).applyLayout(diagram, layoutExecutor);
 
         final InOrder inOrder = inOrder(decisionNavigatorDock, diagramPreviewAndExplorerDock, diagramPropertiesDock);
-        inOrder.verify(decisionNavigatorDock).setupCanvasHandler(canvasHandler);
+        inOrder.verify(decisionNavigatorDock).reload();
         inOrder.verify(decisionNavigatorDock).open();
         inOrder.verify(diagramPropertiesDock).open();
         inOrder.verify(diagramPreviewAndExplorerDock).open();

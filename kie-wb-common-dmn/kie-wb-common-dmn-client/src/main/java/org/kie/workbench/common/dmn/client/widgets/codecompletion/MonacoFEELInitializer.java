@@ -41,6 +41,11 @@ public class MonacoFEELInitializer {
     private final MonacoFEELVariableSuggestions variableSuggestions;
     private MonacoFEELInitializationStatus initializationStatus = NOT_INITIALIZED;
 
+    public MonacoFEELInitializer() {
+        this(null);
+        // CDI
+    }
+
     @Inject
     public MonacoFEELInitializer(final MonacoFEELVariableSuggestions variableSuggestions) {
         this.variableSuggestions = variableSuggestions;

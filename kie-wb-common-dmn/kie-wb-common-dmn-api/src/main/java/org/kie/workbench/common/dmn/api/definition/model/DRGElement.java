@@ -99,7 +99,7 @@ public abstract class DRGElement extends NamedElement implements DynamicReadOnly
         return dmnDiagramId;
     }
 
-    public void setDMNDiagramId(final String dmnDiagramId) {
+    public void setDiagramId(final String dmnDiagramId) {
         this.dmnDiagramId = dmnDiagramId;
     }
 

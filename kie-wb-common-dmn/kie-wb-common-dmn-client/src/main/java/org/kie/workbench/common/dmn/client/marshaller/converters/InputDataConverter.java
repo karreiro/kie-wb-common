@@ -69,7 +69,7 @@ public class InputDataConverter implements NodeConverter<JSITInputData, InputDat
                                                   new BackgroundSet(),
                                                   new FontSet(),
                                                   new GeneralRectangleDimensionsSet());
-        inputData.setDMNDiagramId(nodeEntry.getDiagramId());
+        inputData.setDiagramId(nodeEntry.getDiagramId());
         node.getContent().setDefinition(inputData);
 
         if (Objects.nonNull(informationItem)) {

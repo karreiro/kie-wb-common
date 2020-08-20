@@ -40,11 +40,15 @@ public class DRDContextMenu {
 
     private final ClientTranslationService translationService;
     private final ContextMenu contextMenu;
+    private final DRDContextMenuService drdContextMenuService;
 
     @Inject
-    public DRDContextMenu(final ContextMenu contextMenu, final ClientTranslationService translationService) {
+    public DRDContextMenu(final ContextMenu contextMenu,
+                          final ClientTranslationService translationService,
+                          final DRDContextMenuService drdContextMenuService) {
         this.contextMenu = contextMenu;
         this.translationService = translationService;
+        this.drdContextMenuService = drdContextMenuService;
     }
 
     public String getTitle() {
@@ -68,13 +72,17 @@ public class DRDContextMenu {
         contextMenu.setHeaderMenu(translationService.getValue(DRDACTIONS_CONTEXT_MENU_TITLE).toUpperCase(), HEADER_MENU_ICON_CLASS);
         contextMenu.addTextMenuItem(translationService.getValue(DRDACTIONS_CONTEXT_MENU_ACTIONS_CREATE),
                                     true,
-                                    () -> DomGlobal.console.log("A", selectedNodes));
-        contextMenu.addTextMenuItem(translationService.getValue(DRDACTIONS_CONTEXT_MENU_ACTIONS_ADD_TO),
-                                    true,
-                                    () -> DomGlobal.console.log("B", selectedNodes));
+                                    () -> drdContextMenuService.addToNewDRD(selectedNodes));
+
+        drdContextMenuService.getDiagrams().forEach(dmnDiagram -> {
+            contextMenu.addTextMenuItem(translationService.getValue(DRDACTIONS_CONTEXT_MENU_ACTIONS_ADD_TO) + " " + dmnDiagram.getDMDNDiagram().getName().getValue(),
+                                        true,
+                                        () -> drdContextMenuService.addToExistingDRD(dmnDiagram, selectedNodes));
+        });
+
         contextMenu.addTextMenuItem(translationService.getValue(DRDACTIONS_CONTEXT_MENU_ACTIONS_REMOVE),
                                     true,
-                                    () -> DomGlobal.console.log("C", selectedNodes));
+                                    () -> DomGlobal.console.log("TODO: Remove nodes from current DRD ~> ", selectedNodes));
     }
 
     public HTMLElement getElement() {

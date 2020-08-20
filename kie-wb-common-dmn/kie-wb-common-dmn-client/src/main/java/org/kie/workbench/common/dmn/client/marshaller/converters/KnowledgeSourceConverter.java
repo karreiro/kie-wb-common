@@ -79,7 +79,7 @@ public class KnowledgeSourceConverter implements NodeConverter<JSITKnowledgeSour
                                                        new BackgroundSet(),
                                                        new FontSet(),
                                                        new GeneralRectangleDimensionsSet());
-        ks.setDMNDiagramId(nodeEntry.getDiagramId());
+        ks.setDiagramId(nodeEntry.getDiagramId());
         node.getContent().setDefinition(ks);
 
         DMNExternalLinksToExtensionElements.loadExternalLinksFromExtensionElements(dmn, ks);

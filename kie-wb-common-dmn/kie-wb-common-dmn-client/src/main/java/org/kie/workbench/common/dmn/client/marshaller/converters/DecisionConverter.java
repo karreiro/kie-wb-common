@@ -103,7 +103,7 @@ public class DecisionConverter implements NodeConverter<JSITDecision, Decision> 
                                                new BackgroundSet(),
                                                new FontSet(),
                                                new GeneralRectangleDimensionsSet());
-        decision.setDMNDiagramId(nodeEntry.getDiagramId());
+        decision.setDiagramId(nodeEntry.getDiagramId());
         decision.setQuestion(QuestionPropertyConverter.wbFromDMN(dmn.getQuestion()));
         decision.setAllowedAnswers(AllowedAnswersPropertyConverter.wbFromDMN(dmn.getAllowedAnswers()));
         node.getContent().setDefinition(decision);

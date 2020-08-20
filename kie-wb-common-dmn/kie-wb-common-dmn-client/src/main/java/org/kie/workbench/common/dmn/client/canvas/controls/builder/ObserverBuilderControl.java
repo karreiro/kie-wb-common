@@ -110,7 +110,7 @@ public class ObserverBuilderControl extends org.kie.workbench.common.stunner.cor
 
         final Optional<DMNDiagramElement> currentDMNDiagramElement = getDMNDiagramsSession().getCurrentDMNDiagramElement();
         if (currentDMNDiagramElement.isPresent() && newDefinition instanceof DRGElement) {
-            ((DRGElement) newDefinition).setDMNDiagramId(currentDMNDiagramElement.get().getId().getValue());
+            ((DRGElement) newDefinition).setDiagramId(currentDMNDiagramElement.get().getId().getValue());
         }
     }
 

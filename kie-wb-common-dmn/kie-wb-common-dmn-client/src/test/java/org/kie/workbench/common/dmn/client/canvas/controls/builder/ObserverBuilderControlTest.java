@@ -211,6 +211,6 @@ public class ObserverBuilderControlTest {
 
         observerBuilderControl.updateElementFromDefinition(element, definition);
 
-        verify(newDefinition).setDMNDiagramId(selectedDiagramId);
+        verify(newDefinition).setDiagramId(selectedDiagramId);
     }
 }

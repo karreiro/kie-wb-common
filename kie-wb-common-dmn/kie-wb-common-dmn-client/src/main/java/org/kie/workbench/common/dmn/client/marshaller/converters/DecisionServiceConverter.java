@@ -135,7 +135,7 @@ public class DecisionServiceConverter implements NodeConverter<JSITDecisionServi
                                                                     new FontSet(),
                                                                     new DecisionServiceRectangleDimensionsSet(),
                                                                     new DecisionServiceDividerLineY());
-        decisionService.setDMNDiagramId(nodeEntry.getDiagramId());
+        decisionService.setDiagramId(nodeEntry.getDiagramId());
         node.getContent().setDefinition(decisionService);
 
         if (Objects.nonNull(informationItem)) {

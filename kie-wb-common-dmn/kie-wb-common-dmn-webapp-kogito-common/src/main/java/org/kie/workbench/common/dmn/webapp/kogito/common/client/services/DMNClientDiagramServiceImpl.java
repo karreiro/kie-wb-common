@@ -149,6 +149,7 @@ public class DMNClientDiagramServiceImpl extends AbstractKogitoClientDiagramServ
 
         try {
             final String defSetId = BindableAdapterUtils.getDefinitionSetId(DMNDefinitionSet.class);
+
             final Diagram stunnerDiagram = factoryManager.newDiagram(title, defSetId, metadata);
             final Node<?, ?> dmnDiagramRoot = DMNGraphUtils.findDMNDiagramRoot(stunnerDiagram.getGraph());
             final DMNDiagram definition = ((View<DMNDiagram>) dmnDiagramRoot.getContent()).getDefinition();

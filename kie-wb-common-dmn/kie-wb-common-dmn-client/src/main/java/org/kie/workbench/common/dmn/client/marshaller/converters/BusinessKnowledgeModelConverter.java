@@ -86,7 +86,7 @@ public class BusinessKnowledgeModelConverter implements NodeConverter<JSITBusine
                                                                       new BackgroundSet(),
                                                                       new FontSet(),
                                                                       new GeneralRectangleDimensionsSet());
-        bkm.setDMNDiagramId(nodeEntry.getDiagramId());
+        bkm.setDiagramId(nodeEntry.getDiagramId());
         node.getContent().setDefinition(bkm);
 
         if (Objects.nonNull(informationItem)) {

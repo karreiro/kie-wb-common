@@ -16,41 +16,49 @@
 
 package org.kie.workbench.common.dmn.backend;
 
-import java.io.InputStream;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Named;
 
+import org.guvnor.common.services.backend.util.CommentedOptionFactory;
+import org.guvnor.common.services.shared.metadata.model.Overview;
 import org.jboss.errai.bus.server.annotations.Service;
 import org.kie.workbench.common.dmn.api.DMNContentService;
-import org.kie.workbench.common.dmn.backend.common.DMNIOHelper;
+import org.kie.workbench.common.services.backend.service.KieService;
+import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.uberfire.backend.server.util.Paths;
 import org.uberfire.backend.vfs.Path;
-import org.uberfire.io.IOService;
 
 @Service
 @ApplicationScoped
-public class DMNContentServiceImpl implements DMNContentService {
-
-    private final IOService ioService;
-
-    private final DMNIOHelper ioHelper;
+public class DMNContentServiceImpl extends KieService<String> implements DMNContentService {
 
     @Inject
-    public DMNContentServiceImpl(final @Named("ioStrategy") IOService ioService,
-                                 final DMNIOHelper ioHelper) {
-        this.ioService = ioService;
-        this.ioHelper = ioHelper;
-    }
+    private CommentedOptionFactory commentedOptionFactory;
 
     @Override
     public String getContent(final Path path) {
+        return getSource(path);
+    }
+
+    @Override
+    public void saveContent(final Path path,
+                            final String content,
+                            final Metadata metadata,
+                            final String comment) {
+
         try {
-            final InputStream inputStream = ioService.newInputStream(Paths.convert(path));
-            return ioHelper.isAsString(inputStream);
+            ioService.write(Paths.convert(path),
+                            content,
+                            commentedOptionFactory.makeCommentedOption(comment));
         } catch (final Exception e) {
-            return "";
+            logger.error("Error while saving diagram.", e);
+            throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    protected String constructContent(final Path path,
+                                      final Overview overview) {
+        return getSource(path);
     }
 }

@@ -17,10 +17,16 @@
 package org.kie.workbench.common.dmn.api;
 
 import org.jboss.errai.bus.server.annotations.Remote;
+import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.uberfire.backend.vfs.Path;
 
 @Remote
 public interface DMNContentService {
 
     String getContent(final Path path);
+
+    void saveContent(final Path path,
+                     final String content,
+                     final Metadata metadata,
+                     final String comment);
 }

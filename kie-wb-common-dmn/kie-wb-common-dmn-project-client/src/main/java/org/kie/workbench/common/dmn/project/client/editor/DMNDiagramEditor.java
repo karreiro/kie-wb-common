@@ -146,7 +146,7 @@ public class DMNDiagramEditor extends AbstractProjectDiagramEditor<DMNDiagramRes
                             final DMNEditorMenuSessionItems menuSessionItems,
                             final ProjectMessagesListener projectMessagesListener,
                             final ClientTranslationService translationService,
-                            final DMNClientProjectDiagramService projectDiagramServices,
+                            final @DMNEditor DMNClientProjectDiagramService projectDiagramServices,
                             final Caller<ProjectDiagramResourceService> projectDiagramResourceServiceCaller,
                             final SessionManager sessionManager,
                             final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
@@ -241,6 +241,11 @@ public class DMNDiagramEditor extends AbstractProjectDiagramEditor<DMNDiagramRes
                     }
                 };
             }
+//
+//            @Override
+//            protected void saveOrUpdate(final String commitMessage) {
+//                super.saveOrUpdate(commitMessage);
+//            }
         };
     }
 
@@ -475,6 +480,15 @@ public class DMNDiagramEditor extends AbstractProjectDiagramEditor<DMNDiagramRes
                         final PlaceRequest place) {
         super.doStartUp(path, place);
     }
+
+//    @Override
+//    protected void loadContent() {
+//        final ProjectDiagram diagram = null;
+//        final Viewer.Callback callback = null;
+//        super.loadContent();
+//        super.open(diagram,
+//                   callback);
+//    }
 
     ElementWrapperWidget<?> getWidget(final HTMLElement element) {
         return ElementWrapperWidget.getWidget(element);

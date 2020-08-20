@@ -32,6 +32,7 @@ import org.kie.workbench.common.dmn.api.definition.model.Decision;
 import org.kie.workbench.common.dmn.api.definition.model.TextAnnotation;
 import org.kie.workbench.common.dmn.api.graph.DMNDiagramUtils;
 import org.kie.workbench.common.dmn.api.property.dmn.Id;
+import org.kie.workbench.common.dmn.client.commands.clone.DMNDeepCloneProcess;
 import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramSelected;
 import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramTuple;
 import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
@@ -62,6 +63,9 @@ public class DRDContextMenuService {
     @Inject
     private DMNDiagramUtils dmnDiagramUtils;
 
+    @Inject
+    private DMNDeepCloneProcess dmnDeepCloneProcess;
+
     public List<DMNDiagramTuple> getDiagrams() {
         return dmnDiagramsSession.getDMNDiagrams();
     }
@@ -76,34 +80,32 @@ public class DRDContextMenuService {
             final Definition<?> content = node.getContent();
             final Object definition = content.getDefinition();
 //
-            if (definition instanceof DRGElement) {
-                final DRGElement drgElement = (DRGElement) definition;
-                drgElement.setDiagramId(dmnElement.getId().getValue());
+            if (definition instanceof Decision) {
+                final Decision target = new Decision();
+                final DRGElement source = (DRGElement) definition;
 
-//                final String nodeId = new Id().getValue();
-//                final Node<? extends Definition<DRGElement>, Edge> clone = (Node<? extends Definition<DRGElement>, Edge>) factoryManager.newElement(nodeId,
-//                                                                                                                                                    getDefinitionId(Decision.class)).asNode();
-//
-//                final Definition<DRGElement> cloneContent = clone.getContent();
-//
-//                drgElement.setDiagramId(dmnElement.getId().getValue());
-//                cloneContent.setDefinition(drgElement);
-//
-//                clone.getOutEdges().clear();
-//                clone.getInEdges().clear();
-//                clone.getLabels().clear();
-//
-//                node.getOutEdges().forEach(edge -> clone.getOutEdges().add(edge));
-//                node.getInEdges().forEach(edge -> clone.getInEdges().add(edge));
-//                node.getLabels().forEach(label -> clone.getLabels().add(label));
+                dmnDeepCloneProcess.clone(source, target);
+                target.setDiagramId(dmnElement.getId().getValue());
+
+                final String nodeId = new Id().getValue();
+                final Node<? extends Definition<Decision>, Edge> clone = (Node<? extends Definition<Decision>, Edge>) factoryManager.newElement(nodeId, getDefinitionId(Decision.class)).asNode();
+
+                clone.getContent().setDefinition(target);
+                clone.getOutEdges().clear();
+                clone.getInEdges().clear();
+                clone.getLabels().clear();
+
+                node.getOutEdges().forEach(edge -> clone.getOutEdges().add(edge));
+                node.getInEdges().forEach(edge -> clone.getInEdges().add(edge));
+                node.getLabels().forEach(label -> clone.getLabels().add(label));
+//                stunnerElement.getGraph().addNode(clone);
             }
 
-            if (definition instanceof TextAnnotation) {
-                final TextAnnotation textAnnotation = (TextAnnotation) definition;
-                textAnnotation.setDiagramId(dmnElement.getId().getValue());
-            }
+//            if (definition instanceof TextAnnotation) {
+//                final TextAnnotation textAnnotation = (TextAnnotation) definition;
+//                textAnnotation.setDiagramId(dmnElement.getId().getValue());
+//            }
 
-            stunnerElement.getGraph().addNode(node);
         });
 
         dmnDiagramsSession.add(dmnElement, stunnerElement);

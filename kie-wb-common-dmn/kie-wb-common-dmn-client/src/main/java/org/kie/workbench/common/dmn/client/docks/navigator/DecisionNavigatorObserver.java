@@ -45,26 +45,32 @@ public class DecisionNavigatorObserver {
     @SuppressWarnings("unused")
     void onCanvasClear(final @Observes CanvasClearEvent event) {
         getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
+        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshComponentsView);
     }
 
     void onCanvasElementAdded(final @Observes CanvasElementAddedEvent event) {
         getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
+        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshComponentsView);
     }
 
     void onCanvasElementUpdated(final @Observes CanvasElementUpdatedEvent event) {
         getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
+        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshComponentsView);
     }
 
     void onCanvasElementRemoved(final @Observes CanvasElementRemovedEvent event) {
         getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
+        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshComponentsView);
     }
 
     void onNestedElementSelected(final @Observes EditExpressionEvent event) {
         getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
+        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshComponentsView);
     }
 
     void onNestedElementAdded(final @Observes ExpressionEditorChanged event) {
         getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshTreeView);
+        getOptionalPresenter().ifPresent(DecisionNavigatorPresenter::refreshComponentsView);
     }
 
     void selectItem(final HasExpression hasExpression) {

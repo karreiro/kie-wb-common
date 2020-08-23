@@ -16,9 +16,11 @@
 
 package org.kie.workbench.common.dmn.client.docks.navigator.drds;
 
+import org.jboss.errai.common.client.api.annotations.NonPortable;
 import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
 import org.uberfire.workbench.events.UberFireEvent;
 
+@NonPortable
 public class DMNDiagramSelected implements UberFireEvent {
 
     private final DMNDiagramElement diagramElement;

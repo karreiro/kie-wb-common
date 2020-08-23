@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -46,7 +47,6 @@ import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSessi
 import org.kie.workbench.common.dmn.client.marshaller.common.DMNGraphUtils;
 import org.kie.workbench.common.dmn.client.marshaller.marshall.DMNMarshaller;
 import org.kie.workbench.common.dmn.client.marshaller.unmarshall.DMNUnmarshaller;
-import org.kie.workbench.common.dmn.client.session.DMNSession;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.MainJs;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.callbacks.DMN12MarshallCallback;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.callbacks.DMN12UnmarshallCallback;
@@ -69,6 +69,7 @@ import org.kie.workbench.common.stunner.core.util.StringUtils;
 import org.kie.workbench.common.stunner.kogito.api.editor.DiagramType;
 import org.kie.workbench.common.stunner.kogito.api.editor.impl.KogitoDiagramResourceImpl;
 import org.kie.workbench.common.stunner.kogito.client.service.AbstractKogitoClientDiagramService;
+import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.client.promise.Promises;
 import org.uberfire.commons.uuid.UUID;
@@ -236,7 +237,7 @@ public class DMNClientDiagramServiceImpl extends AbstractKogitoClientDiagramServ
             return;
         }
 
-        metadata = buildMetadataInstance(stunnerDiagram.getMetadata().getPath().getFileName());
+        // metadata = buildMetadataInstance(getFileName(stunnerDiagram));
 
         final Diagram diagram = dmnDiagramFactory.build(dmnDiagram.getName().getValue(), metadata, graph);
         updateClientShapeSetId(diagram);
@@ -328,9 +329,5 @@ public class DMNClientDiagramServiceImpl extends AbstractKogitoClientDiagramServ
         jsiName.setKey(key);
         jsiName.setString(keyString);
         return jsiName;
-    }
-
-    private DMNSession getCurrentSession() {
-        return sessionManager.getCurrentSession();
     }
 }

@@ -227,6 +227,10 @@
       <artifactId>uberfire-wires-core-grids</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.kie.workbench</groupId>
+      <artifactId>kie-wb-common-dmn-project-api</artifactId>
+    </dependency>
 
   </dependencies>
 

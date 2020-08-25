@@ -16,20 +16,28 @@
 
 package org.kie.workbench.common.dmn.api;
 
-import org.jboss.errai.bus.server.annotations.Remote;
+import org.jboss.errai.common.client.api.annotations.MapsTo;
+import org.jboss.errai.common.client.api.annotations.Portable;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
-import org.uberfire.backend.vfs.Path;
 
-@Remote
-public interface DMNContentService<M extends Metadata, C extends DMNContentResource<M>> {
+@Portable
+public class DMNContentResource<M extends Metadata> {
 
-    String getContent(final Path path);
+    private String content;
 
-    C getProjectContent(final Path path,
-                        final String defSetId);
+    private M metadata;
 
-    void saveContent(final Path path,
-                     final String content,
-                     final Metadata metadata,
-                     final String comment);
+    public DMNContentResource(final @MapsTo("content") String content,
+                              final @MapsTo("metadata") M metadata) {
+        this.content = content;
+        this.metadata = metadata;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public M getMetadata() {
+        return metadata;
+    }
 }

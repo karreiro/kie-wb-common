@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import javax.annotation.PostConstruct;
+import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
@@ -33,17 +35,17 @@ import jsinterop.base.Js;
 import org.guvnor.common.services.shared.metadata.model.Metadata;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
-import org.kie.workbench.common.dmn.api.DMNContentService;
 import org.kie.workbench.common.dmn.api.DMNDefinitionSet;
 import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
-import org.kie.workbench.common.dmn.api.factory.DMNDiagramFactory;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.DMNShapeSet;
 import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramSelected;
 import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
-import org.kie.workbench.common.dmn.client.graph.DMNGraphUtils;
 import org.kie.workbench.common.dmn.client.marshaller.marshall.DMNMarshaller;
 import org.kie.workbench.common.dmn.client.marshaller.unmarshall.DMNUnmarshaller;
+import org.kie.workbench.common.dmn.project.api.factory.impl.DMNProjectContentResource;
+import org.kie.workbench.common.dmn.project.api.factory.impl.DMNProjectContentService;
+import org.kie.workbench.common.dmn.project.api.factory.impl.DMNProjectDiagramFactory;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.MainJs;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.callbacks.DMN12MarshallCallback;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.callbacks.DMN12UnmarshallCallback;
@@ -52,73 +54,112 @@ import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSIT
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.mapper.JSIName;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.mapper.JsUtils;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
+import org.kie.workbench.common.stunner.core.client.api.SessionManager;
+import org.kie.workbench.common.stunner.core.client.api.ShapeManager;
 import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
+import org.kie.workbench.common.stunner.core.client.session.event.SessionDiagramSavedEvent;
 import org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
 import org.kie.workbench.common.stunner.core.diagram.MetadataImpl;
 import org.kie.workbench.common.stunner.core.graph.Graph;
+import org.kie.workbench.common.stunner.core.service.DiagramLookupService;
 import org.kie.workbench.common.stunner.core.util.StringUtils;
 import org.kie.workbench.common.stunner.project.client.service.ClientProjectDiagramService;
 import org.kie.workbench.common.stunner.project.diagram.ProjectDiagram;
+import org.kie.workbench.common.stunner.project.diagram.ProjectMetadata;
+import org.kie.workbench.common.stunner.project.service.ProjectDiagramService;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.client.promise.Promises;
 
 @DMNEditor
 public class DMNClientProjectDiagramService extends ClientProjectDiagramService {
 
-    @Inject
-    private Caller<DMNContentService> dmnContentServiceCaller;
+    private final Caller<DMNProjectContentService> dmnContentServiceCaller;
+    private final DMNUnmarshaller dmnMarshallerKogitoUnmarshaller;
+    private final DMNMarshaller dmnMarshallerKogitoMarshaller;
+    private final DMNProjectDiagramFactory dmnDiagramFactory;
+    private final DefinitionManager definitionManager;
+    private final Promises promises;
+    private final DMNDiagramsSession dmnDiagramsSession;
+
+    private ServiceCallback<Diagram> onLoadDiagramCallback;
 
     @Inject
-    private DMNUnmarshaller dmnMarshallerKogitoUnmarshaller;
+    public DMNClientProjectDiagramService(final ShapeManager shapeManager,
+                                          final SessionManager sessionManager,
+                                          final Caller<ProjectDiagramService> diagramServiceCaller,
+                                          final Caller<DiagramLookupService> diagramLookupServiceCaller,
+                                          final Event<SessionDiagramSavedEvent> saveEvent,
+                                          final Caller<DMNProjectContentService> dmnContentServiceCaller,
+                                          final DMNUnmarshaller dmnMarshallerKogitoUnmarshaller,
+                                          final DMNMarshaller dmnMarshallerKogitoMarshaller,
+                                          final DMNProjectDiagramFactory dmnDiagramFactory,
+                                          final DefinitionManager definitionManager,
+                                          final Promises promises,
+                                          final DMNDiagramsSession dmnDiagramsSession) {
 
-    @Inject
-    private DMNMarshaller dmnMarshallerKogitoMarshaller;
+        super(shapeManager,
+              sessionManager,
+              diagramServiceCaller,
+              diagramLookupServiceCaller,
+              saveEvent);
 
-    @Inject
-    private DMNDiagramFactory dmnDiagramFactory;
+        this.dmnContentServiceCaller = dmnContentServiceCaller;
+        this.dmnMarshallerKogitoUnmarshaller = dmnMarshallerKogitoUnmarshaller;
+        this.dmnMarshallerKogitoMarshaller = dmnMarshallerKogitoMarshaller;
+        this.dmnDiagramFactory = dmnDiagramFactory;
+        this.definitionManager = definitionManager;
+        this.promises = promises;
+        this.dmnDiagramsSession = dmnDiagramsSession;
+    }
 
-    @Inject
-    private DefinitionManager definitionManager;
+    @PostConstruct
+    public void init() {
+        MainJs.initializeJsInteropConstructors(MainJs.getConstructorsMap());
+    }
 
-    @Inject
-    private Promises promises;
-
-    @Inject
-    private DMNDiagramsSession dmnDiagramsSession;
-
-    @Inject
-    private DMNGraphUtils dmnGraphUtils;
-
-    private ServiceCallback<ProjectDiagram> onLoadDiagramCallback;
-
-    @Override
     public void getByPath(final Path path,
                           final ServiceCallback<ProjectDiagram> callback) {
 
         DomGlobal.console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> GET BY PATH");
+        final String defSetId = BindableAdapterUtils.getDefinitionSetId(DMNDefinitionSet.class);
 
-        dmnContentServiceCaller.call(new RemoteCallback<String>() {
+        dmnContentServiceCaller.call(new RemoteCallback<DMNProjectContentResource>() {
             @Override
-            public void callback(final String xml) {
+            public void callback(final DMNProjectContentResource resource) {
 
                 try {
                     final DMN12UnmarshallCallback jsCallback = dmn12 -> {
                         final JSITDefinitions definitions = Js.uncheckedCast(JsUtils.getUnwrappedElement(dmn12));
 
-                        DMNClientProjectDiagramService.this.onLoadDiagramCallback = callback;
+                        DMNClientProjectDiagramService.this.onLoadDiagramCallback = new ServiceCallback<Diagram>() {
+                            @Override
+                            public void onSuccess(final Diagram diagram) {
+                                final ProjectDiagram projectDiagram = (ProjectDiagram) diagram;
+                                callback.onSuccess(projectDiagram);
+                            }
 
-                        org.kie.workbench.common.stunner.core.diagram.Metadata metadata = buildMetadataInstance(path);
+                            @Override
+                            public void onError(final ClientRuntimeError error) {
+                                callback.onError(error);
+                            }
+                        };
+
+                        final ProjectMetadata metadata = resource.getMetadata();// buildMetadataInstance(path);
+
+                        if (Objects.nonNull(metadata) && StringUtils.isEmpty(metadata.getShapeSetId())) {
+                            final String shapeSetId = BindableAdapterUtils.getShapeSetId(DMNShapeSet.class);
+                            metadata.setShapeSetId(shapeSetId);
+                        }
 
                         dmnMarshallerKogitoUnmarshaller.unmarshall(metadata, definitions).then(_graph -> {
 
-                            final ProjectDiagram diagram = (ProjectDiagram) dmnDiagramFactory.build("DRG", metadata, _graph);
+                            final Diagram diagram = dmnDiagramFactory.build("DRG", metadata, _graph);
 
-                            updateClientShapeSetId(diagram);
+//                            updateClientShapeSetId(diagram);
                             onLoadDiagramCallback.onSuccess(diagram);
-
 
 //                            super.getByPath(path, callback);
 
@@ -126,25 +167,22 @@ public class DMNClientProjectDiagramService extends ClientProjectDiagramService 
                         });
                     };
 
-                    MainJs.unmarshall(xml, "", jsCallback);
+                    MainJs.unmarshall(resource.getContent(), "", jsCallback);
                 } catch (Exception e) {
                     GWT.log(e.getMessage(), e);
-                    callback.onError(new ClientRuntimeError(new DiagramParsingException(null, xml)));
+                    callback.onError(new ClientRuntimeError(new DiagramParsingException(null, resource.getContent())));
                 }
             }
-        }).getContent(path);
+        }).getProjectContent(path, defSetId);
     }
 
-    @Override
     public void saveOrUpdate(final Path path,
-                             final ProjectDiagram diagram,
+                             final Diagram diagram,
                              final Metadata metadata,
                              final String comment,
-                             final ServiceCallback<ProjectDiagram> callback) {
+                             final ServiceCallback<Diagram> callback) {
 
         DomGlobal.console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> saveOrUpdate");
-
-        final String xml111 = "";
 
         final ServiceCallback<String> onSaveAsXmlComplete = new ServiceCallback<String>() {
             public void onSuccess(final String xml) {
@@ -224,15 +262,21 @@ public class DMNClientProjectDiagramService extends ClientProjectDiagramService 
             final String diagramId = dmnDiagramElement.getId().getValue();
             final String diagramName = dmnDiagramElement.getName().getValue();
             final Diagram stunnerDiagram = dmnDiagramsSession.getDiagram(diagramId);
-            final org.kie.workbench.common.stunner.core.diagram.Metadata metadata = buildMetadataInstance(stunnerDiagram.getMetadata().getPath());
-            final ProjectDiagram diagram = (ProjectDiagram) dmnDiagramFactory.build(diagramName, metadata, stunnerDiagram.getGraph());
+
+            final ProjectMetadata metadata = getMetadata(buildMetadataInstance(stunnerDiagram.getMetadata().getPath()));
+            final Diagram diagram = dmnDiagramFactory.build(diagramName, metadata, stunnerDiagram.getGraph());
 
             updateClientShapeSetId(diagram);
             getOnLoadDiagramCallback().get().onSuccess(diagram);
         }
     }
 
-    private Optional<ServiceCallback<ProjectDiagram>> getOnLoadDiagramCallback() {
+    private ProjectMetadata getMetadata(final org.kie.workbench.common.stunner.core.diagram.Metadata metadata) {
+//        final ProjectMetadata projectMetadata = new ProjectMetadata();
+        return (ProjectMetadata) metadata;
+    }
+
+    private Optional<ServiceCallback<Diagram>> getOnLoadDiagramCallback() {
         return Optional.ofNullable(onLoadDiagramCallback);
     }
 

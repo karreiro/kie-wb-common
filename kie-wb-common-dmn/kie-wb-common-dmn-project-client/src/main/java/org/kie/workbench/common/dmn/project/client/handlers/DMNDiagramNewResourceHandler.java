@@ -21,10 +21,10 @@ import javax.inject.Inject;
 import com.google.gwt.user.client.ui.IsWidget;
 import org.kie.workbench.common.dmn.api.DMNDefinitionSet;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
+import org.kie.workbench.common.dmn.project.client.editor.DMNClientProjectDiagramService;
 import org.kie.workbench.common.dmn.project.client.type.DMNDiagramResourceType;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.project.client.handlers.AbstractProjectDiagramNewResourceHandler;
-import org.kie.workbench.common.stunner.project.client.service.ClientProjectDiagramService;
 import org.uberfire.ext.widgets.common.client.common.BusyIndicatorView;
 
 @ApplicationScoped
@@ -39,7 +39,7 @@ public class DMNDiagramNewResourceHandler extends AbstractProjectDiagramNewResou
 
     @Inject
     public DMNDiagramNewResourceHandler(final DefinitionManager definitionManager,
-                                        final @DMNEditor ClientProjectDiagramService projectDiagramServices,
+                                        final @DMNEditor DMNClientProjectDiagramService projectDiagramServices,
                                         final BusyIndicatorView busyIndicatorView,
                                         final DMNDiagramResourceType projectDiagramResourceType) {
         super(definitionManager,

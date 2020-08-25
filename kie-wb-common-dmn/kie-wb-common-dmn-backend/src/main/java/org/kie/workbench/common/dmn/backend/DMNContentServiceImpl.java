@@ -16,28 +16,51 @@
 
 package org.kie.workbench.common.dmn.backend;
 
+import java.io.InputStream;
+import java.util.Optional;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.guvnor.common.services.backend.util.CommentedOptionFactory;
+import org.guvnor.common.services.project.model.Package;
 import org.guvnor.common.services.shared.metadata.model.Overview;
 import org.jboss.errai.bus.server.annotations.Service;
+import org.kie.workbench.common.dmn.api.DMNContentResource;
 import org.kie.workbench.common.dmn.api.DMNContentService;
+import org.kie.workbench.common.dmn.backend.common.DMNIOHelper;
 import org.kie.workbench.common.services.backend.service.KieService;
+import org.kie.workbench.common.services.shared.project.KieModule;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
+import org.kie.workbench.common.stunner.project.diagram.ProjectMetadata;
+import org.kie.workbench.common.stunner.project.diagram.impl.ProjectMetadataImpl;
 import org.uberfire.backend.server.util.Paths;
 import org.uberfire.backend.vfs.Path;
 
 @Service
 @ApplicationScoped
-public class DMNContentServiceImpl extends KieService<String> implements DMNContentService {
+public class DMNContentServiceImpl extends KieService<String> implements DMNContentService<ProjectMetadata, DMNContentResource<ProjectMetadata>> {
 
     @Inject
     private CommentedOptionFactory commentedOptionFactory;
 
+    @Inject
+    private DMNIOHelper dmnIOHelper;
+
     @Override
     public String getContent(final Path path) {
         return getSource(path);
+    }
+
+    @Override
+    public DMNContentResource<ProjectMetadata> getProjectContent(final Path path,
+                                                                 final String defSetId) {
+
+        final String content = getSource(path);
+        final String title = path.getFileName();
+        final ProjectMetadata metadata = buildMetadataInstance(path, defSetId, title);
+
+        return new DMNContentResource<>(content, metadata);
     }
 
     @Override
@@ -58,7 +81,53 @@ public class DMNContentServiceImpl extends KieService<String> implements DMNCont
 
     @Override
     protected String constructContent(final Path path,
-                                      final Overview overview) {
+                                      final Overview _overview) {
         return getSource(path);
+    }
+
+    @Override
+    public String getSource(final Path path) {
+        return loadPath(path).map(dmnIOHelper::isAsString).orElse("");
+    }
+
+    private ProjectMetadata buildMetadataInstance(final Path path,
+                                                  final String defSetId,
+                                                  final String title) {
+        final Package modulePackage = moduleService.resolvePackage(path);
+        final KieModule kieModule = moduleService.resolveModule(path);
+        return buildProjectMetadataInstance(path,
+                                            title,
+                                            defSetId,
+                                            kieModule.getModuleName(),
+                                            modulePackage,
+                                            overviewLoader.loadOverview(path));
+    }
+
+    private ProjectMetadata buildProjectMetadataInstance(final Path path,
+                                                         final String name,
+                                                         final String defSetId,
+                                                         final String moduleName,
+                                                         final Package projPkg,
+                                                         final Overview overview) {
+        return new ProjectMetadataImpl.ProjectMetadataBuilder()
+                .forDefinitionSetId(defSetId)
+                .forModuleName(moduleName)
+                .forProjectPackage(projPkg)
+                .forOverview(overview)
+                .forTitle(name)
+                .forPath(path)
+                .build();
+    }
+
+    private Optional<InputStream> loadPath(final Path path) {
+        try {
+            return Optional.ofNullable(ioService.newInputStream(convertPath(path)));
+        } catch (final Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    private org.uberfire.java.nio.file.Path convertPath(final Path path) {
+        return Paths.convert(path);
     }
 }

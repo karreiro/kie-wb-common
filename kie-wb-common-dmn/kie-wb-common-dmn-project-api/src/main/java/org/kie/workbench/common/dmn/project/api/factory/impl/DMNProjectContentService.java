@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package org.kie.workbench.common.dmn.api;
+package org.kie.workbench.common.dmn.project.api.factory.impl;
 
-import org.jboss.errai.bus.server.annotations.Remote;
-import org.kie.workbench.common.stunner.core.diagram.Metadata;
-import org.uberfire.backend.vfs.Path;
+import org.kie.workbench.common.dmn.api.DMNContentService;
+import org.kie.workbench.common.stunner.project.diagram.ProjectMetadata;
 
-@Remote
-public interface DMNContentService<M extends Metadata, C extends DMNContentResource<M>> {
-
-    String getContent(final Path path);
-
-    C getProjectContent(final Path path,
-                        final String defSetId);
-
-    void saveContent(final Path path,
-                     final String content,
-                     final Metadata metadata,
-                     final String comment);
+public interface DMNProjectContentService extends DMNContentService<ProjectMetadata, DMNProjectContentResource> {
+    // empty.
 }

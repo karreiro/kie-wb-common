@@ -35,6 +35,8 @@ import jsinterop.base.Js;
 import org.guvnor.common.services.shared.metadata.model.Metadata;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
+import org.kie.workbench.common.dmn.api.DMNContentResource;
+import org.kie.workbench.common.dmn.api.DMNContentService;
 import org.kie.workbench.common.dmn.api.DMNDefinitionSet;
 import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
@@ -43,8 +45,6 @@ import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramSelect
 import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
 import org.kie.workbench.common.dmn.client.marshaller.marshall.DMNMarshaller;
 import org.kie.workbench.common.dmn.client.marshaller.unmarshall.DMNUnmarshaller;
-import org.kie.workbench.common.dmn.project.api.factory.impl.DMNProjectContentResource;
-import org.kie.workbench.common.dmn.project.api.factory.impl.DMNProjectContentService;
 import org.kie.workbench.common.dmn.project.api.factory.impl.DMNProjectDiagramFactory;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.MainJs;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.callbacks.DMN12MarshallCallback;
@@ -76,7 +76,7 @@ import org.uberfire.client.promise.Promises;
 @DMNEditor
 public class DMNClientProjectDiagramService extends ClientProjectDiagramService {
 
-    private final Caller<DMNProjectContentService> dmnContentServiceCaller;
+    private final Caller<DMNContentService> dmnContentServiceCaller;
     private final DMNUnmarshaller dmnMarshallerKogitoUnmarshaller;
     private final DMNMarshaller dmnMarshallerKogitoMarshaller;
     private final DMNProjectDiagramFactory dmnDiagramFactory;
@@ -92,7 +92,7 @@ public class DMNClientProjectDiagramService extends ClientProjectDiagramService 
                                           final Caller<ProjectDiagramService> diagramServiceCaller,
                                           final Caller<DiagramLookupService> diagramLookupServiceCaller,
                                           final Event<SessionDiagramSavedEvent> saveEvent,
-                                          final Caller<DMNProjectContentService> dmnContentServiceCaller,
+                                          final Caller<DMNContentService> dmnContentServiceCaller,
                                           final DMNUnmarshaller dmnMarshallerKogitoUnmarshaller,
                                           final DMNMarshaller dmnMarshallerKogitoMarshaller,
                                           final DMNProjectDiagramFactory dmnDiagramFactory,
@@ -120,15 +120,16 @@ public class DMNClientProjectDiagramService extends ClientProjectDiagramService 
         MainJs.initializeJsInteropConstructors(MainJs.getConstructorsMap());
     }
 
+    @Override
     public void getByPath(final Path path,
                           final ServiceCallback<ProjectDiagram> callback) {
 
         DomGlobal.console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> GET BY PATH");
         final String defSetId = BindableAdapterUtils.getDefinitionSetId(DMNDefinitionSet.class);
 
-        dmnContentServiceCaller.call(new RemoteCallback<DMNProjectContentResource>() {
+        dmnContentServiceCaller.call(new RemoteCallback<DMNContentResource>() {
             @Override
-            public void callback(final DMNProjectContentResource resource) {
+            public void callback(final DMNContentResource resource) {
 
                 try {
                     final DMN12UnmarshallCallback jsCallback = dmn12 -> {
@@ -147,7 +148,7 @@ public class DMNClientProjectDiagramService extends ClientProjectDiagramService 
                             }
                         };
 
-                        final ProjectMetadata metadata = resource.getMetadata();// buildMetadataInstance(path);
+                        final ProjectMetadata metadata = (ProjectMetadata) resource.getMetadata();// buildMetadataInstance(path);
 
                         if (Objects.nonNull(metadata) && StringUtils.isEmpty(metadata.getShapeSetId())) {
                             final String shapeSetId = BindableAdapterUtils.getShapeSetId(DMNShapeSet.class);
@@ -176,11 +177,12 @@ public class DMNClientProjectDiagramService extends ClientProjectDiagramService 
         }).getProjectContent(path, defSetId);
     }
 
+    @Override
     public void saveOrUpdate(final Path path,
-                             final Diagram diagram,
+                             final ProjectDiagram diagram,
                              final Metadata metadata,
                              final String comment,
-                             final ServiceCallback<Diagram> callback) {
+                             final ServiceCallback<ProjectDiagram> callback) {
 
         DomGlobal.console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> saveOrUpdate");
 
@@ -262,9 +264,10 @@ public class DMNClientProjectDiagramService extends ClientProjectDiagramService 
             final String diagramId = dmnDiagramElement.getId().getValue();
             final String diagramName = dmnDiagramElement.getName().getValue();
             final Diagram stunnerDiagram = dmnDiagramsSession.getDiagram(diagramId);
-
-            final ProjectMetadata metadata = getMetadata(buildMetadataInstance(stunnerDiagram.getMetadata().getPath()));
-            final Diagram diagram = dmnDiagramFactory.build(diagramName, metadata, stunnerDiagram.getGraph());
+            final org.kie.workbench.common.stunner.core.diagram.Metadata metadata = dmnDiagramsSession.getDRGDiagram().getMetadata();
+//
+//            final ProjectMetadata metadata = getMetadata(buildMetadataInstance(stunnerDiagram.getMetadata().getPath()));
+            final Diagram diagram = dmnDiagramFactory.build(diagramName, (ProjectMetadata) metadata, stunnerDiagram.getGraph());
 
             updateClientShapeSetId(diagram);
             getOnLoadDiagramCallback().get().onSuccess(diagram);

@@ -19,11 +19,9 @@ package org.kie.workbench.common.dmn.client.marshaller.converters;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 
 import javax.xml.namespace.QName;
 
-import com.google.gwt.core.client.GWT;
 import jsinterop.base.Js;
 import org.kie.workbench.common.dmn.api.definition.model.ConstraintType;
 import org.kie.workbench.common.dmn.api.definition.model.DMNModelInstrumentedBase;
@@ -40,8 +38,9 @@ import static org.kie.workbench.common.dmn.api.definition.model.ConstraintType.N
 
 public class UnaryTestsPropertyConverter {
 
-    //Function to perform casts to override for Unit Tests.
-    static Function<Object, Map<QName, String>> ATTRIBUTES_CAST = Js::uncheckedCast;
+    // Instances to support Unit Tests.
+    static AttributesUtils ATTRIBUTES_UTILS = new AttributesUtils();
+    static UnaryTestsFactory UNARY_TESTS_FACTORY = new UnaryTestsFactory();
 
     public static UnaryTests wbFromDMN(final JSITUnaryTests dmn) {
         if (Objects.isNull(dmn)) {
@@ -73,11 +72,11 @@ public class UnaryTestsPropertyConverter {
         if (Objects.isNull(wb)) {
             return null;
         }
-        final JSITUnaryTests result = GWT.create(JSITUnaryTests.class);
+        final JSITUnaryTests result = UNARY_TESTS_FACTORY.make();
         final Map<QName, String> otherAttributes = new HashMap<>();
         result.setId(wb.getId().getValue());
         result.setText(wb.getText().getValue());
-        result.setOtherAttributes(ATTRIBUTES_CAST.apply(JsUtils.fromAttributesMap(otherAttributes)));
+        result.setOtherAttributes(ATTRIBUTES_UTILS.cast(otherAttributes));
 
         final ConstraintType constraint = wb.getConstraintType();
 
@@ -86,7 +85,7 @@ public class UnaryTestsPropertyConverter {
                                         ConstraintType.CONSTRAINT_KEY,
                                         DMNModelInstrumentedBase.Namespace.KIE.getPrefix());
             otherAttributes.put(key, constraint.value());
-            result.setOtherAttributes(ATTRIBUTES_CAST.apply(JsUtils.fromAttributesMap(otherAttributes)));
+            result.setOtherAttributes(ATTRIBUTES_UTILS.cast(otherAttributes));
         }
 
         return result;
@@ -94,5 +93,19 @@ public class UnaryTestsPropertyConverter {
 
     private static boolean isNotNone(final ConstraintType constraint) {
         return !Objects.equals(constraint, NONE);
+    }
+
+    static class UnaryTestsFactory {
+
+        JSITUnaryTests make() {
+            return new JSITUnaryTests();
+        }
+    }
+
+    static class AttributesUtils {
+
+        Map<QName, String> cast(final Map<QName, String> otherAttributes) {
+            return Js.uncheckedCast(JsUtils.fromAttributesMap(otherAttributes));
+        }
     }
 }

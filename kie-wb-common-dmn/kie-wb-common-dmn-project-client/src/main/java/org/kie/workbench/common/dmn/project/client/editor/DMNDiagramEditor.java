@@ -241,11 +241,11 @@ public class DMNDiagramEditor extends AbstractProjectDiagramEditor<DMNDiagramRes
                     }
                 };
             }
-//
-//            @Override
-//            protected void saveOrUpdate(final String commitMessage) {
-//                super.saveOrUpdate(commitMessage);
-//            }
+
+            @Override
+            protected void saveOrUpdate(final String commitMessage) {
+                super.saveOrUpdate(commitMessage);
+            }
         };
     }
 

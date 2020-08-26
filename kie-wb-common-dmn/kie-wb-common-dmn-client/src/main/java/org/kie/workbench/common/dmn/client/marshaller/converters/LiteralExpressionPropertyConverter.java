@@ -59,7 +59,7 @@ public class LiteralExpressionPropertyConverter {
         if (Objects.isNull(wb)) {
             return null;
         }
-        final JSITLiteralExpression result = GWT.create(JSITLiteralExpression.class);
+        final JSITLiteralExpression result = new JSITLiteralExpression();
         result.setId(wb.getId().getValue());
         final String description = wb.getDescription().getValue();
         if (StringUtils.nonEmpty(description)) {

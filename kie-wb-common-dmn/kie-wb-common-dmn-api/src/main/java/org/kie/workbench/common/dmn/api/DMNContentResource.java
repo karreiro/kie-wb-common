@@ -21,14 +21,14 @@ import org.jboss.errai.common.client.api.annotations.Portable;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
 
 @Portable
-public class DMNContentResource<M extends Metadata> {
+public class DMNContentResource {
 
     private String content;
 
-    private M metadata;
+    private Metadata metadata;
 
     public DMNContentResource(final @MapsTo("content") String content,
-                              final @MapsTo("metadata") M metadata) {
+                              final @MapsTo("metadata") Metadata metadata) {
         this.content = content;
         this.metadata = metadata;
     }
@@ -37,7 +37,7 @@ public class DMNContentResource<M extends Metadata> {
         return content;
     }
 
-    public M getMetadata() {
+    public Metadata getMetadata() {
         return metadata;
     }
 }

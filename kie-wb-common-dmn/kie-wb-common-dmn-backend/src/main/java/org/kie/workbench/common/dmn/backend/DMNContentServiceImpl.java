@@ -39,7 +39,7 @@ import org.uberfire.backend.vfs.Path;
 
 @Service
 @ApplicationScoped
-public class DMNContentServiceImpl extends KieService<String> implements DMNContentService<ProjectMetadata, DMNContentResource<ProjectMetadata>> {
+public class DMNContentServiceImpl extends KieService<String> implements DMNContentService {
 
     @Inject
     private CommentedOptionFactory commentedOptionFactory;
@@ -53,14 +53,14 @@ public class DMNContentServiceImpl extends KieService<String> implements DMNCont
     }
 
     @Override
-    public DMNContentResource<ProjectMetadata> getProjectContent(final Path path,
-                                                                 final String defSetId) {
+    public DMNContentResource getProjectContent(final Path path,
+                                                final String defSetId) {
 
         final String content = getSource(path);
         final String title = path.getFileName();
         final ProjectMetadata metadata = buildMetadataInstance(path, defSetId, title);
 
-        return new DMNContentResource<>(content, metadata);
+        return new DMNContentResource(content, metadata);
     }
 
     @Override

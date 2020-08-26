@@ -17,11 +17,9 @@ package org.kie.workbench.common.dmn.client.marshaller.converters;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 import javax.xml.namespace.QName;
 
-import com.google.gwtmockito.GwtMock;
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -31,6 +29,7 @@ import org.kie.workbench.common.dmn.api.definition.model.OutputClauseUnaryTests;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSITUnaryTests;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -39,22 +38,32 @@ public class OutputClauseUnaryTestsPropertyConverterTest {
 
     private static final String TEXT = "text";
 
-    private static Function<Object, Map<QName, String>> attributesCast;
-
-    @GwtMock
-    @SuppressWarnings("unused")
-    private JSITUnaryTests jsitUnaryTests;
+    private static final JSITUnaryTests jsitUnaryTests = mock(JSITUnaryTests.class);
 
     @BeforeClass
     public static void setupAttributesCast() {
-        attributesCast = UnaryTestsPropertyConverter.ATTRIBUTES_CAST;
 
-        UnaryTestsPropertyConverter.ATTRIBUTES_CAST = (o) -> new HashMap<>();
+        UnaryTestsPropertyConverter.UNARY_TESTS_FACTORY = new UnaryTestsPropertyConverter.UnaryTestsFactory() {
+
+            @Override
+            JSITUnaryTests make() {
+                return jsitUnaryTests;
+            }
+        };
+
+        UnaryTestsPropertyConverter.ATTRIBUTES_UTILS = new UnaryTestsPropertyConverter.AttributesUtils() {
+
+            @Override
+            Map<QName, String> cast(final Map<QName, String> o) {
+                return new HashMap<>();
+            }
+        };
     }
 
     @AfterClass
     public static void restoreAttributesCast() {
-        UnaryTestsPropertyConverter.ATTRIBUTES_CAST = attributesCast;
+        UnaryTestsPropertyConverter.UNARY_TESTS_FACTORY = new UnaryTestsPropertyConverter.UnaryTestsFactory();
+        UnaryTestsPropertyConverter.ATTRIBUTES_UTILS = new UnaryTestsPropertyConverter.AttributesUtils();
     }
 
     @Test

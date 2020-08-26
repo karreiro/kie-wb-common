@@ -21,12 +21,12 @@ import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.uberfire.backend.vfs.Path;
 
 @Remote
-public interface DMNContentService<M extends Metadata, C extends DMNContentResource<M>> {
+public interface DMNContentService {
 
     String getContent(final Path path);
 
-    C getProjectContent(final Path path,
-                        final String defSetId);
+    DMNContentResource getProjectContent(final Path path,
+                                         final String defSetId);
 
     void saveContent(final Path path,
                      final String content,

@@ -48,10 +48,10 @@ public class DecisionNavigatorItemsProvider {
 
     @Inject
     public DecisionNavigatorItemsProvider(final DecisionNavigatorItemFactory itemFactory,
-                                          final DMNDiagramsSession dmnDiagramsStore,
+                                          final DMNDiagramsSession dmnDiagramsSession,
                                           final DMNDiagramUtils dmnDiagramUtils) {
         this.itemFactory = itemFactory;
-        this.dmnDiagramsSession = dmnDiagramsStore;
+        this.dmnDiagramsSession = dmnDiagramsSession;
         this.dmnDiagramUtils = dmnDiagramUtils;
     }
 
@@ -59,9 +59,7 @@ public class DecisionNavigatorItemsProvider {
 
         final List<DecisionNavigatorItem> items = new ArrayList<>();
 
-        dmnDiagramsSession
-                .getDMNDiagrams()
-                .stream()
+        dmnDiagramsSession.getDMNDiagrams().stream()
                 .sorted((e1, e2) -> {
                     final String dmnElementName1 = e1.getDMDNDiagram().getName().getValue();
                     final String dmnElementName2 = e2.getDMDNDiagram().getName().getValue();

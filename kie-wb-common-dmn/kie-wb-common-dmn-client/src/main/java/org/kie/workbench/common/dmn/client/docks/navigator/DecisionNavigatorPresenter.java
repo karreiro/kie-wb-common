@@ -24,6 +24,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import elemental2.dom.DomGlobal;
 import org.appformer.client.context.Channel;
 import org.appformer.client.context.EditorContextProvider;
 import org.jboss.errai.ui.client.local.api.elemental2.IsElement;
@@ -64,11 +65,7 @@ public class DecisionNavigatorPresenter {
 
     private DecisionNavigatorItemsProvider navigatorItemsProvider;
 
-    private boolean isRefreshHandlersEnabled = true;
-
-    protected DecisionNavigatorPresenter() {
-        //CDI proxy
-    }
+    private boolean isRefreshHandlersEnabled = false;
 
     @Inject
     public DecisionNavigatorPresenter(final View view,
@@ -106,6 +103,8 @@ public class DecisionNavigatorPresenter {
     void setup() {
         initialize();
         setupView();
+        enableRefreshHandlers();
+        refreshComponentsView();
     }
 
     public void onRefreshDecisionComponents(final @Observes RefreshDecisionComponents events) {
@@ -147,6 +146,7 @@ public class DecisionNavigatorPresenter {
                 treePresenter.setupItems(getItems());
             }
         } catch (Exception e) {
+            DomGlobal.console.log("1 =====================>>>>>> ", e);
             // TODO {karreiro}: Fix decision component
         }
     }
@@ -154,9 +154,11 @@ public class DecisionNavigatorPresenter {
     void refreshComponentsView() {
         try {
             if (isRefreshHandlersEnabled) {
+                DomGlobal.console.log("2.0 ===================>>>>>> ", decisionComponents);
                 decisionComponents.refresh();
             }
         } catch (Exception e) {
+            DomGlobal.console.log("2.1 ===================>>>>>> ", e);
             // TODO {karreiro}: Fix decision component
         }
     }

@@ -16,6 +16,8 @@
 package org.kie.workbench.common.dmn.showcase.client.editor;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -31,6 +33,10 @@ import com.google.gwt.logging.client.LogConfiguration;
 import com.google.gwt.user.client.ui.IsWidget;
 import elemental2.dom.HTMLElement;
 import org.jboss.errai.common.client.ui.ElementWrapperWidget;
+import org.kie.workbench.common.dmn.api.definition.model.DMNDiagram;
+import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
+import org.kie.workbench.common.dmn.api.property.dmn.Id;
+import org.kie.workbench.common.dmn.api.property.dmn.Name;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.commands.general.NavigateToExpressionEditorCommand;
 import org.kie.workbench.common.dmn.client.docks.navigator.DecisionNavigatorDock;
@@ -45,6 +51,7 @@ import org.kie.workbench.common.dmn.client.editors.types.DataTypePageTabActiveEv
 import org.kie.workbench.common.dmn.client.editors.types.DataTypesPage;
 import org.kie.workbench.common.dmn.client.editors.types.listview.common.DataTypeEditModeToggleEvent;
 import org.kie.workbench.common.dmn.client.events.EditExpressionEvent;
+import org.kie.workbench.common.dmn.client.marshaller.common.DMNGraphUtils;
 import org.kie.workbench.common.dmn.client.session.DMNSession;
 import org.kie.workbench.common.dmn.client.widgets.codecompletion.MonacoFEELInitializer;
 import org.kie.workbench.common.dmn.client.widgets.toolbar.DMNEditorToolbar;
@@ -78,6 +85,8 @@ import org.kie.workbench.common.stunner.core.diagram.MetadataImpl;
 import org.kie.workbench.common.stunner.core.documentation.DocumentationPage;
 import org.kie.workbench.common.stunner.core.documentation.DocumentationView;
 import org.kie.workbench.common.stunner.core.graph.Graph;
+import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.core.graph.content.view.View;
 import org.kie.workbench.common.stunner.core.rule.RuleViolation;
 import org.kie.workbench.common.stunner.core.util.UUID;
 import org.kie.workbench.common.stunner.core.validation.DiagramElementViolation;
@@ -384,6 +393,22 @@ public class DMNDiagramEditor implements KieEditorWrapperView.KieEditorWrapperPr
                                                  final Metadata metadata = diagram.getMetadata();
                                                  metadata.setShapeSetId(shapeSetId);
                                                  metadata.setTitle(title);
+
+
+                                                 final Node<?, ?> dmnDiagramRoot = DMNGraphUtils.findDMNDiagramRoot(diagram.getGraph());
+                                                 final DMNDiagram definition = ((View<DMNDiagram>) dmnDiagramRoot.getContent()).getDefinition();
+                                                 final DMNDiagramElement drgDiagram = new DMNDiagramElement(new Id(), new Name("DRG"));
+                                                 definition.getDefinitions().getDmnDiagramElements().add(drgDiagram);
+                                                 final String diagramId = drgDiagram.getId().getValue();
+
+                                                 final Map<String, Diagram> diagramsByDiagramElementId = new HashMap<>();
+                                                 final Map<String, DMNDiagramElement> dmnDiagramsByDiagramElementId = new HashMap<>();
+
+                                                 diagramsByDiagramElementId.put(diagramId, diagram);
+                                                 dmnDiagramsByDiagramElementId.put(diagramId, drgDiagram);
+
+                                                 dmnDiagramsSession.setState(metadata, diagramsByDiagramElementId, dmnDiagramsByDiagramElementId);
+
                                                  open(diagram,
                                                       callback);
                                              }
@@ -425,6 +450,7 @@ public class DMNDiagramEditor implements KieEditorWrapperView.KieEditorWrapperPr
                                                callback);
                                           DMNDiagramEditor.this.metadata = diagram.getMetadata();
                                           DMNDiagramEditor.this.kieView.getMultiPage().selectPage(MAIN_EDITOR_PAGE_INDEX);
+                                          DMNDiagramEditor.this.decisionNavigatorDock.reload();
                                       }
 
                                       @Override

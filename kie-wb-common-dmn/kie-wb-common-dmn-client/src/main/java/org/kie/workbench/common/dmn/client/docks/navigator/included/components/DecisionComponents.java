@@ -59,6 +59,10 @@ public class DecisionComponents {
 
     private final DMNDiagramsSession dmnDiagramsSession;
 
+    public DecisionComponents() {
+        this(null, null, null, null, null);
+    }
+
     @Inject
     public DecisionComponents(final View view,
                               final DMNIncludeModelsClient client,

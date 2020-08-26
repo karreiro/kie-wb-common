@@ -18,6 +18,7 @@ package org.kie.workbench.common.dmn.showcase.client.services;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import elemental2.dom.DomGlobal;
 import org.jboss.errai.common.client.api.Caller;
 import org.kie.workbench.common.dmn.api.DMNContentService;
 import org.kie.workbench.common.dmn.client.marshaller.DMNMarshallerService;
@@ -95,22 +96,28 @@ public class DMNShowcaseDiagramService {
     public void save(final Diagram diagram,
                      final ServiceCallback<Diagram<Graph, Metadata>> diagramServiceCallback) {
 
-        dmnMarshallerService.marshall(diagram.getMetadata().getPath(),
-                                      diagram,
-                                      diagram.getMetadata(),
-                                      "Saved.",
-                                      dmnContentServiceCaller,
-                                      new ServiceCallback<Diagram>() {
-                                          @Override
-                                          public void onSuccess(final Diagram diagram) {
-                                              diagramServiceCallback.onSuccess(diagram);
-                                          }
+        DomGlobal.console.log("~> ", diagram.getMetadata());
 
-                                          @Override
-                                          public void onError(final ClientRuntimeError e) {
-                                              diagramServiceCallback.onError(e);
-                                          }
-                                      });
+        dmnMarshallerService.marshall(diagram, new ServiceCallback<String>() {
+            @Override
+            public void onSuccess(final String xml) {
+                final Metadata metadata = diagram.getMetadata();
+                final String title = metadata.getTitle();
+                final Path path = metadata.getPath();
+                dmnContentServiceCaller.call(
+                        (_obj) -> diagramServiceCallback.onSuccess(diagram),
+                        (message, throwable) -> {
+                            diagramServiceCallback.onError(new ClientRuntimeError(throwable));
+                            return false;
+                        })
+                        .saveContent(path, xml, null, "Saved.");
+            }
+
+            @Override
+            public void onError(final ClientRuntimeError e) {
+                diagramServiceCallback.onError(e);
+            }
+        });
     }
 
     public void save(final EditorSession session,

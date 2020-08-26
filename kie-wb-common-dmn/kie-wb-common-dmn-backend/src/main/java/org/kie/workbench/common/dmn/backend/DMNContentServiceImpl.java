@@ -17,6 +17,8 @@
 package org.kie.workbench.common.dmn.backend;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -24,6 +26,7 @@ import javax.inject.Inject;
 
 import org.guvnor.common.services.backend.util.CommentedOptionFactory;
 import org.guvnor.common.services.project.model.Package;
+import org.guvnor.common.services.shared.metadata.model.Metadata;
 import org.guvnor.common.services.shared.metadata.model.Overview;
 import org.jboss.errai.bus.server.annotations.Service;
 import org.kie.workbench.common.dmn.api.DMNContentResource;
@@ -31,11 +34,11 @@ import org.kie.workbench.common.dmn.api.DMNContentService;
 import org.kie.workbench.common.dmn.backend.common.DMNIOHelper;
 import org.kie.workbench.common.services.backend.service.KieService;
 import org.kie.workbench.common.services.shared.project.KieModule;
-import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.kie.workbench.common.stunner.project.diagram.ProjectMetadata;
 import org.kie.workbench.common.stunner.project.diagram.impl.ProjectMetadataImpl;
 import org.uberfire.backend.server.util.Paths;
 import org.uberfire.backend.vfs.Path;
+import org.uberfire.java.nio.base.options.CommentedOption;
 
 @Service
 @ApplicationScoped
@@ -70,9 +73,10 @@ public class DMNContentServiceImpl extends KieService<String> implements DMNCont
                             final String comment) {
 
         try {
-            ioService.write(Paths.convert(path),
+            ioService.write(convertPath(path),
                             content,
-                            commentedOptionFactory.makeCommentedOption(comment));
+                            getAttrs(path, metadata),
+                            getCommentedOption(comment));
         } catch (final Exception e) {
             logger.error("Error while saving diagram.", e);
             throw new RuntimeException(e);
@@ -88,6 +92,18 @@ public class DMNContentServiceImpl extends KieService<String> implements DMNCont
     @Override
     public String getSource(final Path path) {
         return loadPath(path).map(dmnIOHelper::isAsString).orElse("");
+    }
+
+    private CommentedOption getCommentedOption(final String comment) {
+        return commentedOptionFactory.makeCommentedOption(comment);
+    }
+
+    private Map<String, Object> getAttrs(final Path path,
+                                         final Metadata metadata) {
+        if (metadata == null) {
+            return new HashMap<>();
+        }
+        return metadataService.setUpAttributes(path, metadata);
     }
 
     private ProjectMetadata buildMetadataInstance(final Path path,

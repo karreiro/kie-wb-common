@@ -55,7 +55,6 @@ import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.kie.workbench.common.stunner.core.diagram.MetadataImpl;
 import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.util.StringUtils;
-import org.kie.workbench.common.stunner.project.diagram.ProjectDiagram;
 import org.uberfire.backend.vfs.Path;
 import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.client.promise.Promises;
@@ -123,12 +122,8 @@ public class DMNMarshallerService {
         }).getContent(path);
     }
 
-    public void marshall(final Path path,
-                         final Diagram diagram,
-                         final Metadata metadata,
-                         final String comment,
-                         final Caller<? extends DMNContentService> contentServiceCaller,
-                         final ServiceCallback<Diagram> contentServiceCallback) {
+    public void marshall(final Diagram diagram,
+                         final ServiceCallback<String> contentServiceCallback) {
 
         DomGlobal.console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SAVING DIAGRAM...");
 
@@ -142,15 +137,17 @@ public class DMNMarshallerService {
                 xml = prefix + result;
             }
 
-            contentServiceCaller.call((o) -> contentServiceCallback.onSuccess(diagram)).saveContent(path, xml, metadata, comment);
+            contentServiceCallback.onSuccess(xml);
         };
 
         if (Objects.isNull(diagram)) {
+            contentServiceCallback.onError(new ClientRuntimeError("Diagram cannot be null.")); // TODO better error message
             return;
         }
 
         final Graph graph = diagram.getGraph();
         if (Objects.isNull(graph)) {
+            contentServiceCallback.onError(new ClientRuntimeError("Graph cannot be null.")); // TODO better error message
             return;
         }
 
@@ -164,7 +161,7 @@ public class DMNMarshallerService {
                                                                  jsitDefinitions.getNamespace());
             MainJs.marshall(dmn12, namespaces, jsCallback);
         } catch (final Exception e) {
-            DomGlobal.console.error(e.getMessage(), e);
+            contentServiceCallback.onError(new ClientRuntimeError("Marshaller error.")); // TODO better error message
         }
     }
 

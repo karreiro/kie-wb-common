@@ -94,6 +94,8 @@ import org.kie.workbench.common.stunner.forms.client.event.RefreshFormProperties
 import org.kie.workbench.common.stunner.kogito.client.docks.DiagramEditorPropertiesDock;
 import org.kie.workbench.common.widgets.client.search.component.SearchBarComponent;
 import org.kie.workbench.common.widgets.metadata.client.KieEditorWrapperView;
+import org.uberfire.backend.vfs.Path;
+import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.client.annotations.WorkbenchContextId;
 import org.uberfire.client.annotations.WorkbenchMenu;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
@@ -117,6 +119,8 @@ import org.uberfire.workbench.model.menu.Menus;
 public class DMNDiagramEditor implements KieEditorWrapperView.KieEditorWrapperPresenter {
 
     public static final String EDITOR_ID = "DMNDiagramEditor";
+
+    private static final String ROOT = "default://master@system/stunner/diagrams";
 
     //Editor tabs: [0] Main editor, [1] Documentation, [2] Data-Types, [3] Imported Models
     public static final int MAIN_EDITOR_PAGE_INDEX = 0;
@@ -273,6 +277,7 @@ public class DMNDiagramEditor implements KieEditorWrapperView.KieEditorWrapperPr
         this.menu = makeMenuBar();
         final String name = placeRequest.getParameter("name",
                                                       "");
+
         final boolean isCreate = name == null || name.trim().length() == 0;
         final Command callback = getOnStartupDiagramEditorCallback();
         if (isCreate) {
@@ -394,7 +399,6 @@ public class DMNDiagramEditor implements KieEditorWrapperView.KieEditorWrapperPr
                                                  metadata.setShapeSetId(shapeSetId);
                                                  metadata.setTitle(title);
 
-
                                                  final Node<?, ?> dmnDiagramRoot = DMNGraphUtils.findDMNDiagramRoot(diagram.getGraph());
                                                  final DMNDiagram definition = ((View<DMNDiagram>) dmnDiagramRoot.getContent()).getDefinition();
                                                  final DMNDiagramElement drgDiagram = new DMNDiagramElement(new Id(), new Name("DRG"));
@@ -424,9 +428,12 @@ public class DMNDiagramEditor implements KieEditorWrapperView.KieEditorWrapperPr
     private Metadata buildMetadata(final String defSetId,
                                    final String shapeSetId,
                                    final String title) {
+        final Path root = PathFactory.newPath(".", ROOT);
         return new MetadataImpl.MetadataImplBuilder(defSetId,
                                                     definitionManager)
                 .setTitle(title)
+                .setRoot(root)
+                .setPath(PathFactory.newPath(title, root.toURI() + "/" + UUID.uuid(8) + ".dmn"))
                 .setShapeSetId(shapeSetId)
                 .build();
     }

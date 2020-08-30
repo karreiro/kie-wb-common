@@ -79,7 +79,6 @@ import org.kie.workbench.common.stunner.project.client.editor.AbstractProjectDia
 import org.kie.workbench.common.stunner.project.client.editor.AbstractProjectDiagramEditorCore;
 import org.kie.workbench.common.stunner.project.client.editor.ProjectDiagramEditorProxy;
 import org.kie.workbench.common.stunner.project.client.screens.ProjectMessagesListener;
-import org.kie.workbench.common.stunner.project.client.service.ClientProjectDiagramService;
 import org.kie.workbench.common.stunner.project.diagram.ProjectDiagram;
 import org.kie.workbench.common.stunner.project.diagram.ProjectMetadata;
 import org.kie.workbench.common.stunner.project.diagram.editor.ProjectDiagramResource;
@@ -149,7 +148,7 @@ public class DMNDiagramEditor extends AbstractProjectDiagramEditor<DMNDiagramRes
                             final DMNEditorMenuSessionItems menuSessionItems,
                             final ProjectMessagesListener projectMessagesListener,
                             final ClientTranslationService translationService,
-                            final ClientProjectDiagramService projectDiagramServices,
+                            final @DMNEditor DMNClientProjectDiagramService projectDiagramServices,
                             final Caller<ProjectDiagramResourceService> projectDiagramResourceServiceCaller,
                             final SessionManager sessionManager,
                             final SessionCommandManager<AbstractCanvasHandler> sessionCommandManager,
@@ -245,6 +244,11 @@ public class DMNDiagramEditor extends AbstractProjectDiagramEditor<DMNDiagramRes
                         continueSaveOnceValid.execute();
                     }
                 };
+            }
+
+            @Override
+            protected void saveOrUpdate(final String commitMessage) {
+                super.saveOrUpdate(commitMessage);
             }
         };
     }
@@ -380,7 +384,7 @@ public class DMNDiagramEditor extends AbstractProjectDiagramEditor<DMNDiagramRes
         canvasHandler.ifPresent(c -> {
             final ExpressionEditorView.Presenter expressionEditor = ((DMNSession) sessionManager.getCurrentSession()).getExpressionEditor();
             expressionEditor.setToolbarStateHandler(new DMNProjectToolbarStateHandler(getMenuSessionItems()));
-            decisionNavigatorDock.setupCanvasHandler(c);
+            decisionNavigatorDock.reload();
             dataTypesPage.reload();
             includedModelsPage.setup(importsPageProvider.withDiagram(c.getDiagram()));
         });
@@ -485,6 +489,15 @@ public class DMNDiagramEditor extends AbstractProjectDiagramEditor<DMNDiagramRes
                         final PlaceRequest place) {
         super.doStartUp(path, place);
     }
+
+//    @Override
+//    protected void loadContent() {
+//        final ProjectDiagram diagram = null;
+//        final Viewer.Callback callback = null;
+//        super.loadContent();
+//        super.open(diagram,
+//                   callback);
+//    }
 
     ElementWrapperWidget<?> getWidget(final HTMLElement element) {
         return ElementWrapperWidget.getWidget(element);

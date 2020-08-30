@@ -132,7 +132,7 @@ public class DMNDesignerKogitoSeleniumIT {
     public void openDMNDesigner() {
 
         final FirefoxOptions firefoxOptions = new FirefoxOptions();
-        firefoxOptions.setHeadless(HEADLESS);
+//        firefoxOptions.setHeadless(HEADLESS);
         driver = new FirefoxDriver(firefoxOptions);
         driver.manage().window().maximize();
 

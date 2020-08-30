@@ -76,6 +76,7 @@ import org.kie.workbench.common.stunner.core.diagram.Diagram;
 import org.kie.workbench.common.stunner.core.graph.Edge;
 import org.kie.workbench.common.stunner.core.graph.Graph;
 import org.kie.workbench.common.stunner.core.graph.Node;
+import org.kie.workbench.common.stunner.core.graph.content.HasContentDefinitionId;
 import org.kie.workbench.common.stunner.core.graph.content.view.Connection;
 import org.kie.workbench.common.stunner.core.graph.content.view.ControlPoint;
 import org.kie.workbench.common.stunner.core.graph.content.view.Point2D;
@@ -147,6 +148,7 @@ public class DMNMarshaller {
 
     public JSITDefinitions marshall(final Graph<?, Node<View, ?>> _graph) {
         final Map<String, JSITDRGElement> nodes = new HashMap<>();
+        final Map<String, JSITTextAnnotation> textAnnotations = new HashMap<>();
         final Node<View<DMNDiagram>, ?> dmnDiagramRoot = (Node<View<DMNDiagram>, ?>) DMNGraphUtils.findDMNDiagramRoot(dmnDiagramsSession.getDRGDiagram().getGraph());
         final Definitions definitionsStunnerPojo = ((DMNDiagram) DefinitionUtils.getElementDefinition(dmnDiagramRoot)).getDefinitions();
         final List<String> dmnDiagramElementIds = new ArrayList<>();
@@ -160,10 +162,9 @@ public class DMNMarshaller {
         final List<JSIDMNDiagram> dmnDiagrams = definitions.getDMNDI().getDMNDiagram();
         forEach(dmnDiagrams, diagram -> {
 
-            final String id = diagram.getId();
+            final String elementDiagramId = diagram.getId();
             final List<JSIDMNEdge> dmnEdges = new ArrayList<>();
-            final Map<String, JSITTextAnnotation> textAnnotations = new HashMap<>();
-            final List<Node> diagramNodes = getNodeStream(dmnDiagramsSession.getDiagram(id));
+            final List<Node> diagramNodes = getNodeStream(dmnDiagramsSession.getDiagram(elementDiagramId));
 
             //Setup callback for marshalling ComponentWidths
             if (Objects.isNull(diagram.getExtension())) {
@@ -177,65 +178,67 @@ public class DMNMarshaller {
             final Consumer<JSITComponentWidths> componentWidthsConsumer = (cw) -> componentsWidthsExtension.addComponentWidths(cw);
 
             //Convert relative positioning to absolute
-            for (Node<?, ?> node : diagramNodes) {
+            for (final Node<?, ?> node : diagramNodes) {
                 PointUtils.convertToAbsoluteBounds(node);
             }
 
             //Iterate Graph processing nodes..
-            for (Node<?, ?> node : diagramNodes) {
+            for (final Node<?, ?> node : diagramNodes) {
 
-                if (node.getContent() instanceof View<?>) {
-                    final View<?> view = (View<?>) node.getContent();
-                    if (view.getDefinition() instanceof DRGElement) {
-
-                        final DRGElement drgElement = (DRGElement) view.getDefinition();
-                        final String dmnDiagramId = drgElement.getDiagramId();
-
-                        if (Objects.equals(dmnDiagramId, id)) {
-
-                            if (!drgElement.isAllowOnlyVisualChange()) {
-                                nodes.put(drgElement.getId().getValue(),
-                                          stunnerToDMN(node,
-                                                       componentWidthsConsumer));
-                            }
-
-                            final String namespaceURI = definitionsStunnerPojo.getDefaultNamespace();
-                            diagram.addDMNDiagramElement(WrapperUtils.getWrappedJSIDMNShape(diagram,
-                                                                                            dmnDiagramElementIds,
-                                                                                            definitionsStunnerPojo,
-                                                                                            (View<? extends DMNElement>) view,
-                                                                                            namespaceURI));
-
-                            connect(diagram, dmnDiagramElementIds, definitionsStunnerPojo, dmnEdges, node, view);
-                        }
-                    } else if (view.getDefinition() instanceof TextAnnotation) {
-
-                        final TextAnnotation textAnnotation = (TextAnnotation) view.getDefinition();
-                        final String dmnDiagramId = textAnnotation.getDiagramId();
-
-                        if (Objects.equals(dmnDiagramId, id)) {
-
-                            if (!textAnnotation.isAllowOnlyVisualChange()) {
-                                textAnnotations.put(textAnnotation.getId().getValue(),
-                                                    textAnnotationConverter.dmnFromNode((Node<View<TextAnnotation>, ?>) node,
-                                                                                        componentWidthsConsumer));
-                            }
-
-                            final String namespaceURI = definitionsStunnerPojo.getDefaultNamespace();
-                            diagram.addDMNDiagramElement(WrapperUtils.getWrappedJSIDMNShape(diagram,
-                                                                                            dmnDiagramElementIds,
-                                                                                            definitionsStunnerPojo,
-                                                                                            (View<? extends DMNElement>) view,
-                                                                                            namespaceURI));
-
-                            final List<JSITAssociation> associations = AssociationConverter.dmnFromWB((Node<View<TextAnnotation>, ?>) node);
-                            forEach(associations, association -> {
-                                final JSITAssociation wrappedJSITAssociation = WrapperUtils.getWrappedJSITAssociation(Js.uncheckedCast(association));
-                                definitions.addArtifact(wrappedJSITAssociation);
-                            });
-                        }
-                    }
+                if (!(node.getContent() instanceof View<?>)) {
+                    continue;
                 }
+
+                final View<?> view = (View<?>) node.getContent();
+                final Object viewDefinition = view.getDefinition();
+
+                if (!(viewDefinition instanceof HasContentDefinitionId)) {
+                    continue;
+                }
+
+                final HasContentDefinitionId hasContentDefinitionId = (HasContentDefinitionId) viewDefinition;
+                final String nodeDiagramId = hasContentDefinitionId.getDiagramId();
+
+                if (!Objects.equals(nodeDiagramId, elementDiagramId)) {
+                    continue;
+                }
+
+                if (viewDefinition instanceof DRGElement) {
+                    final DRGElement drgElement = (DRGElement) viewDefinition;
+                    if (!drgElement.isAllowOnlyVisualChange()) {
+                        nodes.put(drgElement.getId().getValue(),
+                                  stunnerToDMN(node,
+                                               componentWidthsConsumer));
+                    }
+                    final String namespaceURI = definitionsStunnerPojo.getDefaultNamespace();
+                    diagram.addDMNDiagramElement(WrapperUtils.getWrappedJSIDMNShape(diagram,
+                                                                                    dmnDiagramElementIds,
+                                                                                    definitionsStunnerPojo,
+                                                                                    (View<? extends DMNElement>) view,
+                                                                                    namespaceURI));
+                }
+
+                if (viewDefinition instanceof TextAnnotation) {
+                    final TextAnnotation textAnnotation = (TextAnnotation) viewDefinition;
+                    if (!textAnnotation.isAllowOnlyVisualChange()) {
+                        textAnnotations.put(textAnnotation.getId().getValue(),
+                                            textAnnotationConverter.dmnFromNode((Node<View<TextAnnotation>, ?>) node,
+                                                                                componentWidthsConsumer));
+                    }
+                    final String namespaceURI = definitionsStunnerPojo.getDefaultNamespace();
+                    diagram.addDMNDiagramElement(WrapperUtils.getWrappedJSIDMNShape(diagram,
+                                                                                    dmnDiagramElementIds,
+                                                                                    definitionsStunnerPojo,
+                                                                                    (View<? extends DMNElement>) view,
+                                                                                    namespaceURI));
+
+                    final List<JSITAssociation> associations = AssociationConverter.dmnFromWB((Node<View<TextAnnotation>, ?>) node);
+                    forEach(associations, association -> {
+                        final JSITAssociation wrappedJSITAssociation = WrapperUtils.getWrappedJSITAssociation(Js.uncheckedCast(association));
+                        definitions.addArtifact(wrappedJSITAssociation);
+                    });
+                }
+                connect(diagram, dmnDiagramElementIds, definitionsStunnerPojo, dmnEdges, node, view);
             }
 
             nodes.values().forEach(n -> {

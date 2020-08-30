@@ -29,11 +29,14 @@ import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import com.ait.lienzo.client.core.types.Point2D;
+import elemental2.dom.DomGlobal;
 import jsinterop.base.Js;
 import org.kie.workbench.common.dmn.api.definition.model.Association;
 import org.kie.workbench.common.dmn.api.definition.model.AuthorityRequirement;
 import org.kie.workbench.common.dmn.api.definition.model.InformationRequirement;
 import org.kie.workbench.common.dmn.api.definition.model.KnowledgeRequirement;
+import org.kie.workbench.common.dmn.api.property.dmn.Description;
+import org.kie.workbench.common.dmn.api.property.dmn.Id;
 import org.kie.workbench.common.dmn.client.marshaller.converters.dd.PointUtils;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dc.JSIBounds;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dc.JSIPoint;
@@ -244,17 +247,20 @@ public class NodeConnector {
                 final Node sourceNode = sourceEntry.getNode();
                 final Node targetNode = targetEntry.getNode();
 
-                // print association id aqui
-
                 @SuppressWarnings("unchecked")
                 final Edge<View<Association>, ?> myEdge = (Edge<View<Association>, ?>) factoryManager.newElement(diagramId + "#" + association.getId(), // or build id
                                                                                                                  ASSOCIATION_ID).asEdge();
 
                 final ViewConnector connectionContent = (ViewConnector) myEdge.getContent();
+                final Id id = new Id(association.getId());
+                final Description description = new Description(association.getDescription());
+                final Association definition = new Association(id, description);
+
                 connectEdge(myEdge,
                             sourceNode,
                             targetNode);
 
+                connectionContent.setDefinition(definition);
                 connectionContent.setTargetConnection(MagnetConnection.Builder.atCenter(targetNode));
                 connectionContent.setSourceConnection(MagnetConnection.Builder.atCenter(sourceNode));
             }

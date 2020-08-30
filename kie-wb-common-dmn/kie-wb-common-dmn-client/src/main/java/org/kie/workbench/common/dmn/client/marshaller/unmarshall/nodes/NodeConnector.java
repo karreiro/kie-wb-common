@@ -29,7 +29,6 @@ import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import com.ait.lienzo.client.core.types.Point2D;
-import elemental2.dom.DomGlobal;
 import jsinterop.base.Js;
 import org.kie.workbench.common.dmn.api.definition.model.Association;
 import org.kie.workbench.common.dmn.api.definition.model.AuthorityRequirement;

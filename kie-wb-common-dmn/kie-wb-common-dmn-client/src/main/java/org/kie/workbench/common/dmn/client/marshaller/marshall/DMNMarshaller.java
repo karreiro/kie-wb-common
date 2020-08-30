@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
+import elemental2.dom.DomGlobal;
 import jsinterop.base.Js;
 import org.kie.workbench.common.dmn.api.definition.DMNViewDefinition;
 import org.kie.workbench.common.dmn.api.definition.model.Association;
@@ -350,6 +351,7 @@ public class DMNMarshaller {
                         dmnEdge.addWaypoint(PointUtils.point2dToDMNDIPoint(cp.getLocation()));
                     }
                     dmnEdge.addWaypoint(PointUtils.point2dToDMNDIPoint(targetPoint));
+                    DomGlobal.console.log(" >> Edge: ", dmnEdge);
                     dmnEdges.add(dmnEdge);
                 }
             }

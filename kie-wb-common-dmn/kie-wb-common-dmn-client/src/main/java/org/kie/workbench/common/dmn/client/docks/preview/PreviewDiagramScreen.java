@@ -47,8 +47,6 @@ import org.uberfire.lifecycle.OnOpen;
 import org.uberfire.lifecycle.OnStartup;
 import org.uberfire.mvp.PlaceRequest;
 
-import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
-
 @Dependent
 @WorkbenchScreen(identifier = PreviewDiagramScreen.SCREEN_ID)
 public class PreviewDiagramScreen {

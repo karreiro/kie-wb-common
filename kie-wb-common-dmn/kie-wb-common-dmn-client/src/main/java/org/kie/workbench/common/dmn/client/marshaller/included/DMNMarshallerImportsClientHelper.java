@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -59,7 +59,6 @@ import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.kie.workbench.common.stunner.core.util.FileUtils;
-import org.kie.workbench.common.stunner.core.util.StringUtils;
 import org.uberfire.client.promise.Promises;
 
 import static org.kie.workbench.common.dmn.api.editors.types.BuiltInTypeUtils.isBuiltInType;
@@ -242,8 +241,8 @@ public class DMNMarshallerImportsClientHelper implements DMNMarshallerImportsHel
     }
 
     private ServiceCallback<Object> getCallback(final String filePath,
-                                                         final Map<String, JSITDefinitions> otherDefinitions,
-                                                         final Promise.PromiseExecutorCallbackFn.ResolveCallbackFn<Void> success) {
+                                                final Map<String, JSITDefinitions> otherDefinitions,
+                                                final Promise.PromiseExecutorCallbackFn.ResolveCallbackFn<Void> success) {
         return new ServiceCallback<Object>() {
             @Override
             public void onSuccess(final Object item) {

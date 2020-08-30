@@ -19,7 +19,6 @@ package org.kie.workbench.common.dmn.client.docks.navigator.tree;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;

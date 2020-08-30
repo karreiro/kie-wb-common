@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +24,7 @@ import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
@@ -51,6 +52,7 @@ import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
 import org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.kie.workbench.common.stunner.core.diagram.MetadataImpl;
 import org.kie.workbench.common.stunner.core.graph.Graph;
@@ -100,6 +102,8 @@ public class DMNMarshallerService {
 
         DomGlobal.console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> LOADING DIAGRAM...");
 
+        final Metadata metadata = buildMetadataInstance(path);
+
         setOnDiagramLoad(contentServiceCallback);
         contentServiceCaller.call((final String xml) -> {
             try {
@@ -107,7 +111,6 @@ public class DMNMarshallerService {
                 final DMN12UnmarshallCallback jsCallback = dmn12 -> {
 
                     final JSITDefinitions definitions = Js.uncheckedCast(JsUtils.getUnwrappedElement(dmn12));
-                    final Metadata metadata = buildMetadataInstance(path);
 
                     dmnUnmarshaller.unmarshall(metadata, definitions).then(graph -> {
                         onDiagramLoad(dmnDiagramFactory.build("DRG", metadata, graph));
@@ -117,7 +120,8 @@ public class DMNMarshallerService {
 
                 MainJs.unmarshall(xml, "", jsCallback);
             } catch (final Exception e) {
-                DomGlobal.console.error(e.getMessage(), e);
+                GWT.log(e.getMessage(), e);
+                throw new DiagramParsingException(metadata, xml);
             }
         }).getContent(path);
     }

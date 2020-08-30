@@ -18,7 +18,6 @@ package org.kie.workbench.common.dmn.client.marshaller.converters;
 
 import java.util.Objects;
 
-import com.google.gwt.core.client.GWT;
 import org.kie.workbench.common.dmn.api.definition.model.ImportedValues;
 import org.kie.workbench.common.dmn.api.definition.model.IsLiteralExpression;
 import org.kie.workbench.common.dmn.api.definition.model.LiteralExpression;

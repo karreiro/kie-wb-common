@@ -191,11 +191,11 @@
       </dmndi:DMNEdge>
       <dmndi:DMNEdge id='dmnedge-drg-_CF4E2334-8F8D-4870-8934-509484AB19D3' dmnElementRef='_CF4E2334-8F8D-4870-8934-509484AB19D3'>
         <di:waypoint x='733' y='189.5'/>
-        <di:waypoint x='895' y='187.5'/>
+        <di:waypoint x='945' y='187.5'/>
       </dmndi:DMNEdge>
       <dmndi:DMNEdge id='dmnedge-drg-_E83BCDB7-4E87-414F-AF62-BCC7A7D8B9E3' dmnElementRef='_E83BCDB7-4E87-414F-AF62-BCC7A7D8B9E3'>
         <di:waypoint x='945' y='187.5'/>
-        <di:waypoint x='895' y='93'/>
+        <di:waypoint x='945' y='93'/>
       </dmndi:DMNEdge>
     </dmndi:DMNDiagram>
   </dmndi:DMNDI>

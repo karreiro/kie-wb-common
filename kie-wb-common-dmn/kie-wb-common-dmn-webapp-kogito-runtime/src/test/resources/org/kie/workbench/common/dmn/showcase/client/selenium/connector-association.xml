@@ -46,7 +46,7 @@
       </dmndi:DMNShape>
       <dmndi:DMNEdge id='dmnedge-drg-_EECC6338-81FC-4E36-BDF9-C70214830E6B' dmnElementRef='_EECC6338-81FC-4E36-BDF9-C70214830E6B'>
         <di:waypoint x='335' y='232'/>
-        <di:waypoint x='482' y='130'/>
+        <di:waypoint x='532' y='130'/>
       </dmndi:DMNEdge>
     </dmndi:DMNDiagram>
   </dmndi:DMNDI>

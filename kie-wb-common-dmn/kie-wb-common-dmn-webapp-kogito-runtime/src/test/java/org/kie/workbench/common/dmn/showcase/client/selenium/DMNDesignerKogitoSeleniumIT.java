@@ -1454,7 +1454,7 @@ public class DMNDesignerKogitoSeleniumIT {
                 .hasXPath("/dmn:definitions" +
                                   "/dmndi:DMNDI" +
                                   "/dmndi:DMNDiagram" +
-                                  "/dmndi:DMNShape[@id='dmnshape-_E5D538FB-D142-4CC6-9F11-229A0A766B7C' and @dmnElementRef='_E5D538FB-D142-4CC6-9F11-229A0A766B7C']" +
+                                  "/dmndi:DMNShape[@id='dmnshape-drg-_E5D538FB-D142-4CC6-9F11-229A0A766B7C' and @dmnElementRef='_E5D538FB-D142-4CC6-9F11-229A0A766B7C']" +
                                   "/dmndi:DMNStyle[@fontFamily='sans serif' and @fontSize='12']" +
                                   "/dmndi:FillColor[@red='248' and @green='4' and @blue='4']");
         XmlAssert.assertThat(actual)
@@ -1462,7 +1462,7 @@ public class DMNDesignerKogitoSeleniumIT {
                 .hasXPath("/dmn:definitions" +
                                   "/dmndi:DMNDI" +
                                   "/dmndi:DMNDiagram" +
-                                  "/dmndi:DMNShape[@id='dmnshape-_E5D538FB-D142-4CC6-9F11-229A0A766B7C' and @dmnElementRef='_E5D538FB-D142-4CC6-9F11-229A0A766B7C']" +
+                                  "/dmndi:DMNShape[@id='dmnshape-drg-_E5D538FB-D142-4CC6-9F11-229A0A766B7C' and @dmnElementRef='_E5D538FB-D142-4CC6-9F11-229A0A766B7C']" +
                                   "/dmndi:DMNStyle[@fontFamily='sans serif' and @fontSize='12']" +
                                   "/dmndi:StrokeColor[@red='9' and @green='252' and @blue='17']");
         XmlAssert.assertThat(actual)
@@ -1470,7 +1470,7 @@ public class DMNDesignerKogitoSeleniumIT {
                 .hasXPath("/dmn:definitions" +
                                   "/dmndi:DMNDI" +
                                   "/dmndi:DMNDiagram" +
-                                  "/dmndi:DMNShape[@id='dmnshape-_E5D538FB-D142-4CC6-9F11-229A0A766B7C' and @dmnElementRef='_E5D538FB-D142-4CC6-9F11-229A0A766B7C']" +
+                                  "/dmndi:DMNShape[@id='dmnshape-drg-_E5D538FB-D142-4CC6-9F11-229A0A766B7C' and @dmnElementRef='_E5D538FB-D142-4CC6-9F11-229A0A766B7C']" +
                                   "/dmndi:DMNStyle[@fontFamily='sans serif' and @fontSize='12']" +
                                   "/dmndi:FontColor[@red='39' and @green='16' and @blue='237']");
         XmlAssert.assertThat(actual)
@@ -1478,7 +1478,7 @@ public class DMNDesignerKogitoSeleniumIT {
                 .hasXPath("/dmn:definitions" +
                                   "/dmndi:DMNDI" +
                                   "/dmndi:DMNDiagram" +
-                                  "/dmndi:DMNShape[@id='dmnshape-_E5D538FB-D142-4CC6-9F11-229A0A766B7C' and @dmnElementRef='_E5D538FB-D142-4CC6-9F11-229A0A766B7C']" +
+                                  "/dmndi:DMNShape[@id='dmnshape-drg-_E5D538FB-D142-4CC6-9F11-229A0A766B7C' and @dmnElementRef='_E5D538FB-D142-4CC6-9F11-229A0A766B7C']" +
                                   "/dc:Bounds[@x='556' and @y='156' and @width='200' and @height='100']");
     }
 
@@ -1747,42 +1747,42 @@ public class DMNDesignerKogitoSeleniumIT {
                 .hasXPath("/dmn:definitions" +
                                   "/dmndi:DMNDI" +
                                   "/dmndi:DMNDiagram" +
-                                  "/dmndi:DMNShape[@id='dmnshape-_4CEF4A0F-B605-4551-9403-7FA31C97DCD1']" +
+                                  "/dmndi:DMNShape[@id='dmnshape-drg-_4CEF4A0F-B605-4551-9403-7FA31C97DCD1']" +
                                   "/dc:Bounds[@x='670' and @y='153' and @width='200' and @height='200']");
         XmlAssert.assertThat(actual)
                 .withNamespaceContext(NAMESPACES)
                 .hasXPath("/dmn:definitions" +
                                   "/dmndi:DMNDI" +
                                   "/dmndi:DMNDiagram" +
-                                  "/dmndi:DMNShape[@id='dmnshape-_B067B665-3343-495F-8257-608689084A91']" +
+                                  "/dmndi:DMNShape[@id='dmnshape-drg-_B067B665-3343-495F-8257-608689084A91']" +
                                   "/dc:Bounds[@x='510' and @y='265' and @width='100' and @height='50']");
         XmlAssert.assertThat(actual)
                 .withNamespaceContext(NAMESPACES)
                 .hasXPath("/dmn:definitions" +
                                   "/dmndi:DMNDI" +
                                   "/dmndi:DMNDiagram" +
-                                  "/dmndi:DMNShape[@id='dmnshape-_964EF7FB-010B-4698-9954-BB95ABBDF2A2']" +
+                                  "/dmndi:DMNShape[@id='dmnshape-drg-_964EF7FB-010B-4698-9954-BB95ABBDF2A2']" +
                                   "/dc:Bounds[@x='720' and @y='265' and @width='100' and @height='50']");
         XmlAssert.assertThat(actual)
                 .withNamespaceContext(NAMESPACES)
                 .hasXPath("/dmn:definitions" +
                                   "/dmndi:DMNDI" +
                                   "/dmndi:DMNDiagram" +
-                                  "/dmndi:DMNShape[@id='dmnshape-_A531F162-5032-40CF-B53A-E5818BD2C21A']" +
+                                  "/dmndi:DMNShape[@id='dmnshape-drg-_A531F162-5032-40CF-B53A-E5818BD2C21A']" +
                                   "/dc:Bounds[@x='720' and @y='195' and @width='100' and @height='50']");
         XmlAssert.assertThat(actual)
                 .withNamespaceContext(NAMESPACES)
                 .hasXPath("/dmn:definitions" +
                                   "/dmndi:DMNDI" +
                                   "/dmndi:DMNDiagram" +
-                                  "/dmndi:DMNShape[@id='dmnshape-_4C183144-7DAC-42FB-8243-A666FFDA2177']" +
+                                  "/dmndi:DMNShape[@id='dmnshape-drg-_4C183144-7DAC-42FB-8243-A666FFDA2177']" +
                                   "/dc:Bounds[@x='930' and @y='195' and @width='100' and @height='50']");
         XmlAssert.assertThat(actual)
                 .withNamespaceContext(NAMESPACES)
                 .hasXPath("/dmn:definitions" +
                                   "/dmndi:DMNDI" +
                                   "/dmndi:DMNDiagram" +
-                                  "/dmndi:DMNShape[@id='dmnshape-_93FD724C-DF9A-4B85-B048-6E26F28B987A']" +
+                                  "/dmndi:DMNShape[@id='dmnshape-drg-_93FD724C-DF9A-4B85-B048-6E26F28B987A']" +
                                   "/dc:Bounds[@x='930' and @y='265' and @width='100' and @height='50']");
     }
 
@@ -2060,6 +2060,7 @@ public class DMNDesignerKogitoSeleniumIT {
         XmlAssert.assertThat(actual)
                 .and(expected)
                 .ignoreComments()
+                .ignoreChildNodesOrder()
                 .ignoreWhitespace()
                 .withDifferenceEvaluator(DifferenceEvaluators.chain(firstEvaluator, secondEvaluator))
                 .withNodeFilter(nodeFilter)

@@ -98,13 +98,13 @@ public class DMNMarshallerService {
 
     public void unmarshall(final Path path,
                            final Caller<? extends DMNContentService> contentServiceCaller,
-                           final ServiceCallback<Diagram> contentServiceCallback) {
+                           final ServiceCallback<Diagram> callback) {
 
         DomGlobal.console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> LOADING DIAGRAM...");
 
         final Metadata metadata = buildMetadataInstance(path);
 
-        setOnDiagramLoad(contentServiceCallback);
+        setOnDiagramLoad(callback);
         contentServiceCaller.call((final String xml) -> {
             try {
 
@@ -121,7 +121,7 @@ public class DMNMarshallerService {
                 MainJs.unmarshall(xml, "", jsCallback);
             } catch (final Exception e) {
                 GWT.log(e.getMessage(), e);
-                contentServiceCallback.onError(new ClientRuntimeError(new DiagramParsingException(metadata, xml)));
+                callback.onError(new ClientRuntimeError(new DiagramParsingException(metadata, xml)));
             }
         }).getContent(path);
     }

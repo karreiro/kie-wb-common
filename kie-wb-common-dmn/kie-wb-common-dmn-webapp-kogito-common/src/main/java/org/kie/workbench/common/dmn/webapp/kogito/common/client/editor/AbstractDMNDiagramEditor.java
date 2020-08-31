@@ -265,7 +265,7 @@ public abstract class AbstractDMNDiagramEditor extends AbstractDiagramEditor {
     @Override
     public void open(final Diagram diagram,
                      final Viewer.Callback callback) {
-        this.layoutHelper.applyLayout(diagram, openDiagramLayoutExecutor);
+        layoutHelper.applyLayout(diagram, openDiagramLayoutExecutor);
         feelInitializer.initializeFEELEditor();
         super.open(diagram, callback);
     }

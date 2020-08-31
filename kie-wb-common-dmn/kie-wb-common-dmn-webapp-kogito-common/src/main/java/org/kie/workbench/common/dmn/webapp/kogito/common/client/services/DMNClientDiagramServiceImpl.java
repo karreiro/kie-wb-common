@@ -30,7 +30,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
-import elemental2.dom.DomGlobal;
 import elemental2.promise.Promise;
 import jsinterop.base.Js;
 import org.kie.workbench.common.dmn.api.DMNDefinitionSet;
@@ -56,9 +55,11 @@ import org.kie.workbench.common.dmn.webapp.kogito.marshaller.mapper.JsUtils;
 import org.kie.workbench.common.stunner.core.api.DefinitionManager;
 import org.kie.workbench.common.stunner.core.api.FactoryManager;
 import org.kie.workbench.common.stunner.core.client.api.SessionManager;
+import org.kie.workbench.common.stunner.core.client.service.ClientRuntimeError;
 import org.kie.workbench.common.stunner.core.client.service.ServiceCallback;
 import org.kie.workbench.common.stunner.core.definition.adapter.binding.BindableAdapterUtils;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
+import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.kie.workbench.common.stunner.core.diagram.MetadataImpl;
 import org.kie.workbench.common.stunner.core.graph.Graph;
@@ -217,9 +218,8 @@ public class DMNClientDiagramServiceImpl extends AbstractKogitoClientDiagramServ
 
             MainJs.unmarshall(xml, "", jsCallback);
         } catch (Exception e) {
-            DomGlobal.console.log("-------------->", e);
-//            GWT.log(e.getMessage(), e);
-//            callback.onError(new ClientRuntimeError(new DiagramParsingException(metadata, xml)));
+            GWT.log(e.getMessage(), e);
+            callback.onError(new ClientRuntimeError(new DiagramParsingException(metadata, xml)));
         }
     }
 

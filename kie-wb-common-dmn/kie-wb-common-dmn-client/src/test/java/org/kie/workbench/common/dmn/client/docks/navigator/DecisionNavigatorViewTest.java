@@ -21,6 +21,7 @@ import elemental2.dom.DOMTokenList;
 import elemental2.dom.HTMLDivElement;
 import elemental2.dom.HTMLElement;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.client.docks.navigator.included.components.DecisionComponents;
@@ -34,6 +35,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(GwtMockitoTestRunner.class)
+@Ignore
 public class DecisionNavigatorViewTest {
 
     @Mock

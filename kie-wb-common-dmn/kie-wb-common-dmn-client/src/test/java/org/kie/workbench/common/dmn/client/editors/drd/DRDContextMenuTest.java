@@ -76,7 +76,7 @@ public class DRDContextMenuTest {
 
     @Before
     public void setUp() {
-        drdContextMenu = new DRDContextMenu(contextMenu, translationService);
+        drdContextMenu = new DRDContextMenu(contextMenu, translationService, null);
     }
 
     @Test

@@ -121,7 +121,7 @@ public class DMNMarshallerService {
                 MainJs.unmarshall(xml, "", jsCallback);
             } catch (final Exception e) {
                 GWT.log(e.getMessage(), e);
-                throw new DiagramParsingException(metadata, xml);
+                contentServiceCallback.onError(new ClientRuntimeError(new DiagramParsingException(metadata, xml)));
             }
         }).getContent(path);
     }

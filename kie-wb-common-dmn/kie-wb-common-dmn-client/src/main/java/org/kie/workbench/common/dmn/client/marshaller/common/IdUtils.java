@@ -17,7 +17,6 @@
 package org.kie.workbench.common.dmn.client.marshaller.common;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -85,7 +84,7 @@ public class IdUtils {
                                       final int seed,
                                       final List<String> dmnElementIds) {
 
-        final String count = seed == 1 ? ""  : Integer.toString(seed);
+        final String count = seed == 1 ? "" : Integer.toString(seed);
         final String id = getComposedId(prefix, diagramName, count, dmnElementId);
 
         if (dmnElementIds.contains(id)) {
@@ -94,11 +93,6 @@ public class IdUtils {
 
         dmnElementIds.add(id);
         return id;
-    }
-
-    private static String count(final List<String> dmnElementIds,
-                                final String dmnElementId) {
-        return Long.toString(dmnElementIds.stream().filter(e -> Objects.equals(e, dmnElementId)).count() + 1);
     }
 
     public static String uniqueId() {

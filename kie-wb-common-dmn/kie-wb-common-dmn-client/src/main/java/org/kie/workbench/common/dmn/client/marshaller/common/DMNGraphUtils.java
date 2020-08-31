@@ -33,6 +33,6 @@ public class DMNGraphUtils {
         return StreamSupport.stream(graph.nodes().spliterator(), false)
                 .filter(n -> DefinitionUtils.getElementDefinition(n) instanceof DMNDiagram)
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("DMNDiagram root not found."));
+                .orElseThrow(() -> new IllegalStateException("DMN Diagram root could not be found."));
     }
 }

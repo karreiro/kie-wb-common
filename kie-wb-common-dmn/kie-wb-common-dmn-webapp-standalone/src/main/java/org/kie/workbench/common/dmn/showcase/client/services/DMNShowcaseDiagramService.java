@@ -18,6 +18,9 @@ package org.kie.workbench.common.dmn.showcase.client.services;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.jboss.errai.common.client.api.Caller;
+import org.kie.workbench.common.dmn.api.DMNContentService;
+import org.kie.workbench.common.dmn.client.marshaller.DMNMarshallerService;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.CanvasHandler;
 import org.kie.workbench.common.stunner.core.client.canvas.export.CanvasExport;
@@ -39,17 +42,25 @@ public class DMNShowcaseDiagramService {
 
     private final ClientDiagramServiceImpl clientDiagramServices;
     private final CanvasExport<AbstractCanvasHandler> canvasExport;
+    private final DMNMarshallerService dmnMarshallerService;
+    private final Caller<DMNContentService> dmnContentServiceCaller;
 
     protected DMNShowcaseDiagramService() {
         this(null,
+             null,
+             null,
              null);
     }
 
     @Inject
     public DMNShowcaseDiagramService(final ClientDiagramServiceImpl clientDiagramServices,
-                                     final CanvasExport<AbstractCanvasHandler> canvasExport) {
+                                     final CanvasExport<AbstractCanvasHandler> canvasExport,
+                                     final DMNMarshallerService dmnMarshallerService,
+                                     final Caller<DMNContentService> dmnContentServiceCaller) {
         this.clientDiagramServices = clientDiagramServices;
         this.canvasExport = canvasExport;
+        this.dmnMarshallerService = dmnMarshallerService;
+        this.dmnContentServiceCaller = dmnContentServiceCaller;
     }
 
     public void loadByName(final String name,
@@ -76,26 +87,34 @@ public class DMNShowcaseDiagramService {
     @SuppressWarnings("unchecked")
     public void loadByPath(final Path path,
                            final ServiceCallback<Diagram> callback) {
-        clientDiagramServices.getByPath(path,
-                                        new ServiceCallback<Diagram<Graph, Metadata>>() {
-                                            @Override
-                                            public void onSuccess(final Diagram<Graph, Metadata> diagram) {
-                                                callback.onSuccess(diagram);
-                                            }
-
-                                            @Override
-                                            public void onError(final ClientRuntimeError error) {
-                                                callback.onError(error);
-                                            }
-                                        });
+        dmnMarshallerService.unmarshall(path,
+                                        dmnContentServiceCaller,
+                                        callback);
     }
 
     @SuppressWarnings("unchecked")
     public void save(final Diagram diagram,
                      final ServiceCallback<Diagram<Graph, Metadata>> diagramServiceCallback) {
-        // Perform update operation remote call.
-        clientDiagramServices.saveOrUpdate(diagram,
-                                           diagramServiceCallback);
+
+        dmnMarshallerService.marshall(diagram, new ServiceCallback<String>() {
+            @Override
+            public void onSuccess(final String xml) {
+                final Metadata metadata = diagram.getMetadata();
+                final Path path = metadata.getPath();
+                dmnContentServiceCaller.call(
+                        (_obj) -> diagramServiceCallback.onSuccess(diagram),
+                        (message, throwable) -> {
+                            diagramServiceCallback.onError(new ClientRuntimeError(throwable));
+                            return false;
+                        })
+                        .saveContent(path, xml, null, "Saved.");
+            }
+
+            @Override
+            public void onError(final ClientRuntimeError e) {
+                diagramServiceCallback.onError(e);
+            }
+        });
     }
 
     public void save(final EditorSession session,

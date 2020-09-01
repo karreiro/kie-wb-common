@@ -80,9 +80,9 @@ public class DMNShowcaseDiagramService {
     @SuppressWarnings("unchecked")
     public void loadByPath(final Path path,
                            final ServiceCallback<Diagram> callback) {
-        dmnMarshallerService.unmarshall(path,
-                                        dmnContentServiceCaller,
-                                        callback);
+        dmnContentServiceCaller.call((final String xml) -> {
+            dmnMarshallerService.unmarshall(path, xml, callback);
+        }).getContent(path);
     }
 
     @SuppressWarnings("unchecked")

@@ -32,8 +32,6 @@ import com.google.gwt.json.client.JSONString;
 import jsinterop.base.Js;
 import org.guvnor.common.services.project.client.context.WorkspaceProjectContext;
 import org.guvnor.common.services.project.model.WorkspaceProject;
-import org.jboss.errai.common.client.api.Caller;
-import org.kie.workbench.common.dmn.api.DMNContentService;
 import org.kie.workbench.common.dmn.api.DMNDefinitionSet;
 import org.kie.workbench.common.dmn.api.definition.model.DMNDiagram;
 import org.kie.workbench.common.dmn.api.definition.model.DMNDiagramElement;
@@ -107,26 +105,31 @@ public class DMNMarshallerService {
     }
 
     public void unmarshall(final Path path,
-                           final Caller<? extends DMNContentService> contentServiceCaller,
+                           final String xml,
+                           final ServiceCallback<Diagram> callback) {
+        final Metadata metadata = buildMetadataInstance(path);
+        unmarshall(metadata, xml, callback);
+    }
+
+    public void unmarshall(final Metadata metadata,
+                           final String xml,
                            final ServiceCallback<Diagram> callback) {
 
-        final Metadata metadata = buildMetadataInstance(path);
         setOnDiagramLoad(callback);
-        contentServiceCaller.call((final String xml) -> {
-            try {
-                final DMN12UnmarshallCallback jsCallback = dmn12 -> {
-                    final JSITDefinitions definitions = Js.uncheckedCast(JsUtils.getUnwrappedElement(dmn12));
-                    dmnUnmarshaller.unmarshall(metadata, definitions).then(graph -> {
-                        onDiagramLoad(dmnDiagramFactory.build(DRGDiagramUtils.DRG, metadata, graph));
-                        return promises.resolve();
-                    });
-                };
-                MainJs.unmarshall(xml, "", jsCallback);
-            } catch (final Exception e) {
-                GWT.log(e.getMessage(), e);
-                callback.onError(new ClientRuntimeError(new DiagramParsingException(metadata, xml)));
-            }
-        }).getContent(path);
+
+        try {
+            final DMN12UnmarshallCallback jsCallback = dmn12 -> {
+                final JSITDefinitions definitions = Js.uncheckedCast(JsUtils.getUnwrappedElement(dmn12));
+                dmnUnmarshaller.unmarshall(metadata, definitions).then(graph -> {
+                    onDiagramLoad(dmnDiagramFactory.build(DRGDiagramUtils.DRG, metadata, graph));
+                    return promises.resolve();
+                });
+            };
+            MainJs.unmarshall(xml, "", jsCallback);
+        } catch (final Exception e) {
+            GWT.log(e.getMessage(), e);
+            callback.onError(new ClientRuntimeError(new DiagramParsingException(metadata, xml)));
+        }
     }
 
     public void marshall(final Diagram diagram,

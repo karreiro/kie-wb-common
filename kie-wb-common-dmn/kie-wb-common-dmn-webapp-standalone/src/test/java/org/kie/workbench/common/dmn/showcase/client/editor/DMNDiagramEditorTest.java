@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.client.docks.navigator.DecisionNavigatorDock;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
 import org.kie.workbench.common.dmn.client.editors.expressions.ExpressionEditorView;
 import org.kie.workbench.common.dmn.client.editors.included.IncludedModelsPage;
 import org.kie.workbench.common.dmn.client.editors.included.imports.IncludedModelsPageStateProviderImpl;
@@ -37,8 +38,10 @@ import org.kie.workbench.common.dmn.client.editors.types.DataTypePageTabActiveEv
 import org.kie.workbench.common.dmn.client.editors.types.DataTypesPage;
 import org.kie.workbench.common.dmn.client.editors.types.listview.common.DataTypeEditModeToggleEvent;
 import org.kie.workbench.common.dmn.client.events.EditExpressionEvent;
+import org.kie.workbench.common.dmn.client.marshaller.DMNMarshallerService;
 import org.kie.workbench.common.dmn.client.session.DMNEditorSession;
 import org.kie.workbench.common.dmn.client.widgets.codecompletion.MonacoFEELInitializer;
+import org.kie.workbench.common.dmn.client.widgets.toolbar.DMNLayoutHelper;
 import org.kie.workbench.common.dmn.showcase.client.perspectives.AuthoringPerspective;
 import org.kie.workbench.common.dmn.webapp.common.client.docks.preview.PreviewDiagramDock;
 import org.kie.workbench.common.stunner.client.widgets.presenters.session.SessionPresenter;
@@ -46,7 +49,6 @@ import org.kie.workbench.common.stunner.client.widgets.presenters.session.impl.S
 import org.kie.workbench.common.stunner.client.widgets.views.session.ScreenPanelView;
 import org.kie.workbench.common.stunner.core.client.api.SessionManager;
 import org.kie.workbench.common.stunner.core.client.canvas.AbstractCanvasHandler;
-import org.kie.workbench.common.stunner.core.client.components.layout.LayoutHelper;
 import org.kie.workbench.common.stunner.core.client.components.layout.OpenDiagramLayoutExecutor;
 import org.kie.workbench.common.stunner.core.client.session.impl.EditorSession;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
@@ -106,7 +108,7 @@ public class DMNDiagramEditorTest {
     private PreviewDiagramDock diagramPreviewAndExplorerDock;
 
     @Mock
-    private LayoutHelper layoutHelper;
+    private DMNLayoutHelper layoutHelper;
 
     @Mock
     private OpenDiagramLayoutExecutor layoutExecutor;
@@ -149,6 +151,12 @@ public class DMNDiagramEditorTest {
 
     @Mock
     private MonacoFEELInitializer feelInitializer;
+
+    @Mock
+    private DMNDiagramsSession dmnDiagramsSession;
+
+    @Mock
+    private DMNMarshallerService marshallerService;
 
     @Mock
     private ElementWrapperWidget searchBarComponentWidget;
@@ -200,7 +208,9 @@ public class DMNDiagramEditorTest {
                                           screenPanelView,
                                           null,
                                           kieView,
-                                          feelInitializer));
+                                          feelInitializer,
+                                          dmnDiagramsSession,
+                                          marshallerService));
 
         doReturn(searchBarComponentWidget).when(editor).getWidget(searchBarComponentViewElement);
     }
@@ -302,7 +312,7 @@ public class DMNDiagramEditorTest {
         verify(layoutHelper).applyLayout(diagram, layoutExecutor);
 
         final InOrder inOrder = inOrder(decisionNavigatorDock, diagramPreviewAndExplorerDock, diagramPropertiesDock);
-        inOrder.verify(decisionNavigatorDock).setupCanvasHandler(canvasHandler);
+        inOrder.verify(decisionNavigatorDock).reload();
         inOrder.verify(decisionNavigatorDock).open();
         inOrder.verify(diagramPropertiesDock).open();
         inOrder.verify(diagramPreviewAndExplorerDock).open();

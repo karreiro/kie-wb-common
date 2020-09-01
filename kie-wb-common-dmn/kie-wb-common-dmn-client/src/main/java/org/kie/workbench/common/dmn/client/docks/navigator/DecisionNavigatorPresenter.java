@@ -24,6 +24,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import elemental2.dom.DomGlobal;
 import org.appformer.client.context.Channel;
 import org.appformer.client.context.EditorContextProvider;
 import org.jboss.errai.ui.client.local.api.elemental2.IsElement;
@@ -145,14 +146,24 @@ public class DecisionNavigatorPresenter {
     }
 
     public void refreshTreeView() {
-        if (isRefreshHandlersEnabled()) {
-            treePresenter.setupItems(getItems());
+        try {
+            if (isRefreshHandlersEnabled()) {
+                treePresenter.setupItems(getItems());
+            }
+        } catch (Exception e) {
+            DomGlobal.console.log("1 =====================>>>>>> ", e);
+            // TODO {karreiro}: Fix decision component
         }
     }
 
     void refreshComponentsView() {
-        if (isRefreshHandlersEnabled()) {
-            decisionComponents.refresh();
+        try {
+            if (isRefreshHandlersEnabled()) {
+                decisionComponents.refresh();
+            }
+        } catch (Exception e) {
+            DomGlobal.console.log("2 ===================>>>>>> ", e);
+            // TODO {karreiro}: Fix decision component
         }
     }
 

@@ -30,14 +30,14 @@ import com.google.gwt.json.client.JSONString;
 import elemental2.promise.Promise;
 import jsinterop.base.Js;
 import org.kie.workbench.common.dmn.api.DMNDefinitionSet;
-import org.kie.workbench.common.dmn.api.definition.model.DMNDiagram;
 import org.kie.workbench.common.dmn.api.factory.DMNDiagramFactory;
 import org.kie.workbench.common.dmn.client.DMNShapeSet;
-import org.kie.workbench.common.dmn.webapp.kogito.common.client.converters.DMNMarshallerKogitoMarshaller;
-import org.kie.workbench.common.dmn.webapp.kogito.common.client.converters.DMNMarshallerKogitoUnmarshaller;
+import org.kie.workbench.common.dmn.client.docks.navigator.drds.DMNDiagramsSession;
+import org.kie.workbench.common.dmn.client.marshaller.DMNMarshallerService;
+import org.kie.workbench.common.dmn.client.marshaller.marshall.DMNMarshaller;
+import org.kie.workbench.common.dmn.client.marshaller.unmarshall.DMNUnmarshaller;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.MainJs;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.callbacks.DMN12MarshallCallback;
-import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.callbacks.DMN12UnmarshallCallback;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.DMN12;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.js.model.dmn12.JSITDefinitions;
 import org.kie.workbench.common.dmn.webapp.kogito.marshaller.mapper.JSIName;
@@ -52,10 +52,6 @@ import org.kie.workbench.common.stunner.core.diagram.DiagramParsingException;
 import org.kie.workbench.common.stunner.core.diagram.Metadata;
 import org.kie.workbench.common.stunner.core.diagram.MetadataImpl;
 import org.kie.workbench.common.stunner.core.graph.Graph;
-import org.kie.workbench.common.stunner.core.graph.Node;
-import org.kie.workbench.common.stunner.core.graph.content.definition.Definition;
-import org.kie.workbench.common.stunner.core.graph.util.GraphUtils;
-import org.kie.workbench.common.stunner.core.util.DefinitionUtils;
 import org.kie.workbench.common.stunner.core.util.StringUtils;
 import org.kie.workbench.common.stunner.kogito.api.editor.DiagramType;
 import org.kie.workbench.common.stunner.kogito.api.editor.impl.KogitoDiagramResourceImpl;
@@ -72,30 +68,36 @@ public class DMNClientDiagramServiceImpl extends AbstractKogitoClientDiagramServ
     //This path is needed by DiagramsNavigatorImpl's use of AbstractClientDiagramService.lookup(..) to retrieve a list of diagrams
     private static final String ROOT = "default://master@system/stunner/" + DIAGRAMS_PATH;
 
-    private DMNMarshallerKogitoUnmarshaller dmnMarshallerKogitoUnmarshaller;
-    private DMNMarshallerKogitoMarshaller dmnMarshallerKogitoMarshaller;
+    private DMNUnmarshaller dmnMarshallerKogitoUnmarshaller;
+    private DMNMarshaller dmnMarshallerKogitoMarshaller;
     private FactoryManager factoryManager;
     private DefinitionManager definitionManager;
     private DMNDiagramFactory dmnDiagramFactory;
     private Promises promises;
+    private DMNMarshallerService marshallerService;
+
+    @Inject
+    private DMNDiagramsSession dmnDiagramsSession;
 
     public DMNClientDiagramServiceImpl() {
         //CDI proxy
     }
-
+ // WORK IN PROGRESS!!!
     @Inject
-    public DMNClientDiagramServiceImpl(final DMNMarshallerKogitoUnmarshaller dmnMarshallerKogitoUnmarshaller,
-                                       final DMNMarshallerKogitoMarshaller dmnMarshallerKogitoMarshaller,
+    public DMNClientDiagramServiceImpl(final DMNUnmarshaller dmnMarshallerKogitoUnmarshaller,
+                                       final DMNMarshaller dmnMarshallerKogitoMarshaller,
                                        final FactoryManager factoryManager,
                                        final DefinitionManager definitionManager,
                                        final DMNDiagramFactory dmnDiagramFactory,
-                                       final Promises promises) {
+                                       final Promises promises,
+                                       final DMNMarshallerService marshallerService) {
         this.dmnMarshallerKogitoUnmarshaller = dmnMarshallerKogitoUnmarshaller;
         this.dmnMarshallerKogitoMarshaller = dmnMarshallerKogitoMarshaller;
         this.factoryManager = factoryManager;
         this.definitionManager = definitionManager;
         this.dmnDiagramFactory = dmnDiagramFactory;
         this.promises = promises;
+        this.marshallerService = marshallerService;
     }
 
     //Kogito requirements
@@ -105,9 +107,9 @@ public class DMNClientDiagramServiceImpl extends AbstractKogitoClientDiagramServ
                           final String xml,
                           final ServiceCallback<Diagram> callback) {
         if (Objects.isNull(xml) || xml.isEmpty()) {
-            doNewDiagram(createDiagramTitleFromFilePath(fileName), callback);
+            doNewDiagram(fileName, callback);
         } else {
-            doTransformation(xml, callback);
+            doTransformation(fileName, xml, callback);
         }
     }
 
@@ -122,14 +124,18 @@ public class DMNClientDiagramServiceImpl extends AbstractKogitoClientDiagramServ
         transform(UUID.uuid(), xml, callback);
     }
 
-    void doNewDiagram(final String title,
+    void doNewDiagram(final String fileName,
                       final ServiceCallback<Diagram> callback) {
-        final Metadata metadata = buildMetadataInstance();
-
         try {
+
+            final String title = createDiagramTitleFromFilePath(fileName);
+            final Metadata metadata = buildMetadataInstance(fileName);
             final String defSetId = BindableAdapterUtils.getDefinitionSetId(DMNDefinitionSet.class);
+            final String shapeSetId = BindableAdapterUtils.getShapeSetId(DMNShapeSet.class);
             final Diagram diagram = factoryManager.newDiagram(title, defSetId, metadata);
-            updateClientShapeSetId(diagram);
+
+            marshallerService.setOnDiagramLoad(callback);
+            marshallerService.registerDiagramInstance(diagram, title, shapeSetId);
 
             callback.onSuccess(diagram);
         } catch (final Exception e) {
@@ -137,60 +143,29 @@ public class DMNClientDiagramServiceImpl extends AbstractKogitoClientDiagramServ
         }
     }
 
-    private Metadata buildMetadataInstance() {
+    private Metadata buildMetadataInstance(final String fileName) {
         final String defSetId = BindableAdapterUtils.getDefinitionSetId(DMNDefinitionSet.class);
         final String shapeSetId = BindableAdapterUtils.getShapeSetId(DMNShapeSet.class);
         return new MetadataImpl.MetadataImplBuilder(defSetId,
                                                     definitionManager)
                 .setRoot(PathFactory.newPath(".", ROOT))
+                .setPath(PathFactory.newPath(".", ROOT + "/" + fileName))
                 .setShapeSetId(shapeSetId)
                 .build();
     }
 
-    private void updateClientShapeSetId(final Diagram diagram) {
-        if (Objects.nonNull(diagram)) {
-            final Metadata metadata = diagram.getMetadata();
-            if (Objects.nonNull(metadata) && StringUtils.isEmpty(metadata.getShapeSetId())) {
-                final String shapeSetId = BindableAdapterUtils.getShapeSetId(DMNShapeSet.class);
-                metadata.setShapeSetId(shapeSetId);
-            }
-        }
-    }
-
     @SuppressWarnings("unchecked")
-    void doTransformation(final String xml,
+    void doTransformation(final String fileName,
+                          final String xml,
                           final ServiceCallback<Diagram> callback) {
-        final Metadata metadata = buildMetadataInstance();
 
+        final Metadata metadata = buildMetadataInstance(fileName);
         try {
-
-            final DMN12UnmarshallCallback jsCallback = dmn12 -> {
-                final JSITDefinitions definitions = Js.uncheckedCast(JsUtils.getUnwrappedElement(dmn12));
-                dmnMarshallerKogitoUnmarshaller.unmarshall(metadata, definitions).then(graph -> {
-                    final Node<Definition<DMNDiagram>, ?> diagramNode = GraphUtils.getFirstNode((Graph<?, Node>) graph, DMNDiagram.class);
-                    final String title = ((DMNDiagram) DefinitionUtils.getElementDefinition(diagramNode)).getDefinitions().getName().getValue();
-                    final Diagram diagram = dmnDiagramFactory.build(title, metadata, graph);
-                    updateClientShapeSetId(diagram);
-
-                    callback.onSuccess(diagram);
-                    return promises.resolve();
-                });
-            };
-
-            MainJs.unmarshall(xml, "", jsCallback);
-        } catch (Exception e) {
+            marshallerService.unmarshall(metadata, xml, callback);
+        } catch (final Exception e) {
             GWT.log(e.getMessage(), e);
             callback.onError(new ClientRuntimeError(new DiagramParsingException(metadata, xml)));
         }
-    }
-
-    public void getDefinitions(final String xml,
-                               final ServiceCallback<Object> callback) {
-        final DMN12UnmarshallCallback jsCallback = dmn12 -> {
-            final JSITDefinitions definitions = Js.uncheckedCast(JsUtils.getUnwrappedElement(dmn12));
-            callback.onSuccess(definitions);
-        };
-        MainJs.unmarshall(xml, "", jsCallback);
     }
 
     @Override
@@ -231,7 +206,7 @@ public class DMNClientDiagramServiceImpl extends AbstractKogitoClientDiagramServ
         };
 
         try {
-            final JSITDefinitions jsitDefinitions = dmnMarshallerKogitoMarshaller.marshall(graph);
+            final JSITDefinitions jsitDefinitions = dmnMarshallerKogitoMarshaller.marshall();
             final DMN12 dmn12 = Js.uncheckedCast(JsUtils.newWrappedInstance());
             JsUtils.setNameOnWrapped(dmn12, makeJSINameForDMN12());
             JsUtils.setValueOnWrapped(dmn12, jsitDefinitions);

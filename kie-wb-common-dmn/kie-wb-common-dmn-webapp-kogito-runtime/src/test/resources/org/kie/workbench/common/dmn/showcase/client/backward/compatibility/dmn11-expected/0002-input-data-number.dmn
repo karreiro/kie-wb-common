@@ -1,0 +1,41 @@
+<dmn:definitions xmlns:dmn="http://www.omg.org/spec/DMN/20180521/MODEL/" xmlns="https://github.com/agilepro/dmn-tck" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/" xmlns:feel="http://www.omg.org/spec/DMN/20180521/FEEL/" xmlns:kie="http://www.drools.org/kie/dmn/1.2" id="_0002-input-data-number" name="0002-input-data-number" namespace="https://github.com/agilepro/dmn-tck" typeLanguage="http://www.omg.org/spec/DMN/20180521/FEEL/">
+  <dmn:extensionElements/>
+  <dmn:decision id="d_YearlySalary" name="Yearly Salary">
+    <dmn:extensionElements/>
+    <dmn:variable id="_975DB782-814D-4CC0-8CBC-BBF74B551D63" name="Yearly Salary" typeRef="feel:number"/>
+    <dmn:literalExpression id="_F93C94CB-6950-4D9F-A92F-4F9CC46A129D">
+      <dmn:text>12 * Monthly Salary</dmn:text>
+    </dmn:literalExpression>
+  </dmn:decision>
+  <dmn:inputData id="i_MonthlySalary" name="Monthly Salary">
+    <dmn:extensionElements/>
+    <dmn:variable id="_04261BC2-2C98-4BD8-9359-0BBA44C75A34" name="Monthly Salary" typeRef="feel:number"/>
+  </dmn:inputData>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="_B1D1E59C-3822-446C-80BC-1DA257EA6B45" name="DRG">
+      <di:extension>
+        <kie:ComponentsWidthsExtension>
+          <kie:ComponentWidths dmnElementRef="_F93C94CB-6950-4D9F-A92F-4F9CC46A129D"/>
+        </kie:ComponentsWidthsExtension>
+      </di:extension>
+      <dmndi:DMNShape dmnElementRef="d_YearlySalary" id="dmnshape-drg-d_YearlySalary" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor blue="255" green="255" red="255"/>
+          <dmndi:StrokeColor blue="0" green="0" red="0"/>
+          <dmndi:FontColor blue="0" green="0" red="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds height="50" width="100" x="50" y="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape dmnElementRef="i_MonthlySalary" id="dmnshape-drg-i_MonthlySalary" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor blue="255" green="255" red="255"/>
+          <dmndi:StrokeColor blue="0" green="0" red="0"/>
+          <dmndi:FontColor blue="0" green="0" red="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds height="50" width="100" x="225" y="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</dmn:definitions>

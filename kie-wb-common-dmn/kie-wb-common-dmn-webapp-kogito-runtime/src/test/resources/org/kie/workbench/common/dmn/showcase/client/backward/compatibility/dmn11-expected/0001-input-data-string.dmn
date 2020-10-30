@@ -1,0 +1,41 @@
+<dmn:definitions xmlns:dmn="http://www.omg.org/spec/DMN/20180521/MODEL/" xmlns="https://github.com/agilepro/dmn-tck" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/" xmlns:feel="http://www.omg.org/spec/DMN/20180521/FEEL/" xmlns:kie="http://www.drools.org/kie/dmn/1.2" id="_0001-input-data-string" name="0001-input-data-string" namespace="https://github.com/agilepro/dmn-tck" typeLanguage="http://www.omg.org/spec/DMN/20180521/FEEL/">
+  <dmn:extensionElements/>
+  <dmn:decision id="d_GreetingMessage" name="Greeting Message">
+    <dmn:extensionElements/>
+    <dmn:variable id="_370B680F-774A-4B94-BCD0-AF208E6B4B83" name="Greeting Message" typeRef="feel:string"/>
+    <dmn:literalExpression id="_040122BE-0C28-453C-8B2F-BD297A0512CE">
+      <dmn:text>"Hello " + Full Name</dmn:text>
+    </dmn:literalExpression>
+  </dmn:decision>
+  <dmn:inputData id="i_FullName" name="Full Name">
+    <dmn:extensionElements/>
+    <dmn:variable id="_B9047F1A-4349-472C-BF65-A9067008AFB5" name="Full Name" typeRef="feel:string"/>
+  </dmn:inputData>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="_822BD362-6ACE-4921-8D64-2CC1FA7AC681" name="DRG">
+      <di:extension>
+        <kie:ComponentsWidthsExtension>
+          <kie:ComponentWidths dmnElementRef="_040122BE-0C28-453C-8B2F-BD297A0512CE"/>
+        </kie:ComponentsWidthsExtension>
+      </di:extension>
+      <dmndi:DMNShape dmnElementRef="d_GreetingMessage" id="dmnshape-drg-d_GreetingMessage" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor blue="255" green="255" red="255"/>
+          <dmndi:StrokeColor blue="0" green="0" red="0"/>
+          <dmndi:FontColor blue="0" green="0" red="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds height="50" width="100" x="50" y="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape dmnElementRef="i_FullName" id="dmnshape-drg-i_FullName" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor blue="255" green="255" red="255"/>
+          <dmndi:StrokeColor blue="0" green="0" red="0"/>
+          <dmndi:FontColor blue="0" green="0" red="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds height="50" width="100" x="225" y="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</dmn:definitions>

@@ -66,9 +66,11 @@ public class NodeEntriesFactory {
                                      final BiConsumer<String, HasComponentWidths> componentWidthsConsumer) {
 
         final List<JSIDMNDiagram> dmnDiagrams = definitions.getDMNDI().getDMNDiagram();
+        List<JSITDRGElement> drgElements = getDRGElements(definitions);
+        Map<JSIDMNShape, String> shapesByDiagramId = getShapesByDiagramId(definitions);
         final List<NodeEntry> nodeEntries = entriesBuilder()
-                .withShapesByDiagramId(getShapesByDiagramId(definitions))
-                .withDRGElements(getDRGElements(definitions))
+                .withShapesByDiagramId(shapesByDiagramId)
+                .withDRGElements(drgElements)
                 .withIncludedDRGElements(getIncludedDRGElements(importDefinitions))
                 .withTextAnnotations(getTextAnnotations(definitions))
                 .withDMNDiagrams(dmnDiagrams)

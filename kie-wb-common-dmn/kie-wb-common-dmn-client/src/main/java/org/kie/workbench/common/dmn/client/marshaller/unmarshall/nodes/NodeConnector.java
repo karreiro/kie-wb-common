@@ -29,6 +29,7 @@ import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import com.ait.lienzo.client.core.types.Point2D;
+import elemental2.dom.DomGlobal;
 import jsinterop.base.Js;
 import org.kie.workbench.common.dmn.api.definition.model.Association;
 import org.kie.workbench.common.dmn.api.definition.model.AuthorityRequirement;
@@ -351,6 +352,8 @@ public class NodeConnector {
                                     final List<JSIDMNEdge> edges,
                                     final List<JSIDMNEdge> pendingEdges,
                                     final Node currentNode) {
+
+        DomGlobal.console.log(">> ", jsiDMNElement);
 
         if (Objects.nonNull(jsiDMNElementReference) && !edges.isEmpty()) {
             final String reqInputID = getId(jsiDMNElementReference);

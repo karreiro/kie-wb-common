@@ -1,0 +1,158 @@
+<dmn:definitions xmlns:dmn="http://www.omg.org/spec/DMN/20180521/MODEL/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/" xmlns:feel="http://www.omg.org/spec/DMN/20180521/FEEL/" xmlns:kie="http://www.drools.org/kie/dmn/1.2" xmlns:tns="http://www.trisotech.com/definitions/_6029a6d3-d2f1-484b-a99d-4bedb5858a3e" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" id="_6029a6d3-d2f1-484b-a99d-4bedb5858a3e" name="insert-remove" namespace="http://www.trisotech.com/definitions/_6029a6d3-d2f1-484b-a99d-4bedb5858a3e" typeLanguage="http://www.omg.org/spec/DMN/20180521/FEEL/">
+  <dmn:extensionElements/>
+  <dmn:itemDefinition id="_02DB5FD9-E867-44E1-944E-BEC4D0288352" isCollection="true" name="tStringList">
+    <dmn:typeRef>feel:string</dmn:typeRef>
+  </dmn:itemDefinition>
+  <dmn:itemDefinition id="_4DBC9354-02CC-46E7-B88C-271F855F1A37" isCollection="true" name="tNestedList">
+    <dmn:typeRef>tns:tStringList</dmn:typeRef>
+  </dmn:itemDefinition>
+  <dmn:inputData id="_8713a7d7-bae7-484e-b1d5-788b3979d659" name="simpleList">
+    <dmn:extensionElements/>
+    <dmn:variable id="_C3FCACAD-DA38-4BEE-A97D-9F31AD880E29" name="simpleList" typeRef="tns:tStringList"/>
+  </dmn:inputData>
+  <dmn:inputData id="_722095a4-3116-4d71-b225-58795b3ec654" name="nestedList">
+    <dmn:extensionElements/>
+    <dmn:variable id="_4B7AE890-9244-4CF0-8B4C-C6B300497095" name="nestedList" typeRef="tns:tNestedList"/>
+  </dmn:inputData>
+  <dmn:inputData id="_4688d5d9-3a03-4377-89e3-9ccd50e1624e" name="position">
+    <dmn:extensionElements/>
+    <dmn:variable id="_65845E22-24AE-4A7D-BD03-9AD26652E580" name="position" typeRef="feel:number"/>
+  </dmn:inputData>
+  <dmn:decision id="_7a7f2263-5d9b-4a18-aee8-43783f417b07" name="literalNestedList">
+    <dmn:extensionElements/>
+    <dmn:variable id="_278D82E7-1B02-45F5-860E-E3C0E0DB8D17" name="literalNestedList" typeRef="tns:tNestedList"/>
+    <dmn:literalExpression id="_CEB99C00-C87E-4950-9501-67B4E91341EB">
+      <dmn:text>[["a","b"],["b","c"]]</dmn:text>
+    </dmn:literalExpression>
+  </dmn:decision>
+  <dmn:decision id="_c169428e-2a57-42d2-a26d-cf22039da762" name="remove1">
+    <dmn:extensionElements/>
+    <dmn:variable id="_9D66C53B-D3D8-4135-8CBB-94DB121B0F7B" name="remove1" typeRef="tns:tStringList"/>
+    <dmn:literalExpression id="_563A1FA4-4F63-4D4A-81D6-0055A042431E">
+      <dmn:text>remove(simpleList,position)</dmn:text>
+    </dmn:literalExpression>
+  </dmn:decision>
+  <dmn:decision id="_12fdd98a-00da-47af-80e6-f70906e359c0" name="insert2">
+    <dmn:extensionElements/>
+    <dmn:variable id="_0C1D568A-21E7-4762-A8C3-87B3FD7D57D1" name="insert2" typeRef="tns:tNestedList"/>
+    <dmn:literalExpression id="_0C6B0835-4D9F-4265-A1E6-655A8B7B326B">
+      <dmn:text>insert before(literalNestedList,position,simpleList)</dmn:text>
+    </dmn:literalExpression>
+  </dmn:decision>
+  <dmn:decision id="_93786c60-d986-4c40-b836-4b2f0bc218ce" name="remove2">
+    <dmn:extensionElements/>
+    <dmn:variable id="_D67C9EC9-C592-41B7-9B67-49A9FBF8F9CD" name="remove2" typeRef="tns:tNestedList"/>
+    <dmn:literalExpression id="_2816ECBF-89E4-4755-A1B3-5B9E0B585ECA">
+      <dmn:text>remove(literalNestedList,position)</dmn:text>
+    </dmn:literalExpression>
+  </dmn:decision>
+  <dmn:decision id="_d1465880-49ca-4182-ae74-7670fc834f2c" name="insert1">
+    <dmn:extensionElements/>
+    <dmn:variable id="_18CAC5F3-2284-4111-9CE7-CBE3B254A6C9" name="insert1" typeRef="tns:tStringList"/>
+    <dmn:literalExpression id="_ED44E692-4662-40A1-83BD-FAEA91D8EC23">
+      <dmn:text>insert before(simpleList,position,"x")</dmn:text>
+    </dmn:literalExpression>
+  </dmn:decision>
+  <dmn:decision id="_d6beae1e-c23f-4fdb-8c63-6c9835337eff" name="insert3">
+    <dmn:extensionElements/>
+    <dmn:variable id="_AB3AB5D4-1EF6-472A-B507-E6787903192E" name="insert3" typeRef="tns:tNestedList"/>
+    <dmn:literalExpression id="_D75D3F6F-9BD7-4B63-B8A8-B9F662AE277A">
+      <dmn:text>insert before(nestedList,position,simpleList)</dmn:text>
+    </dmn:literalExpression>
+  </dmn:decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="_6A804B0C-43A4-46D5-AB59-73367E791928" name="DRG">
+      <di:extension>
+        <kie:ComponentsWidthsExtension>
+          <kie:ComponentWidths dmnElementRef="_CEB99C00-C87E-4950-9501-67B4E91341EB"/>
+          <kie:ComponentWidths dmnElementRef="_563A1FA4-4F63-4D4A-81D6-0055A042431E"/>
+          <kie:ComponentWidths dmnElementRef="_0C6B0835-4D9F-4265-A1E6-655A8B7B326B"/>
+          <kie:ComponentWidths dmnElementRef="_2816ECBF-89E4-4755-A1B3-5B9E0B585ECA"/>
+          <kie:ComponentWidths dmnElementRef="_ED44E692-4662-40A1-83BD-FAEA91D8EC23"/>
+          <kie:ComponentWidths dmnElementRef="_D75D3F6F-9BD7-4B63-B8A8-B9F662AE277A"/>
+        </kie:ComponentsWidthsExtension>
+      </di:extension>
+      <dmndi:DMNShape dmnElementRef="tns:_8713a7d7-bae7-484e-b1d5-788b3979d659" id="dmnshape-drg-_8713a7d7-bae7-484e-b1d5-788b3979d659" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor blue="255" green="255" red="255"/>
+          <dmndi:StrokeColor blue="0" green="0" red="0"/>
+          <dmndi:FontColor blue="0" green="0" red="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds height="50" width="100" x="50" y="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape dmnElementRef="tns:_722095a4-3116-4d71-b225-58795b3ec654" id="dmnshape-drg-_722095a4-3116-4d71-b225-58795b3ec654" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor blue="255" green="255" red="255"/>
+          <dmndi:StrokeColor blue="0" green="0" red="0"/>
+          <dmndi:FontColor blue="0" green="0" red="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds height="50" width="100" x="225" y="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape dmnElementRef="tns:_4688d5d9-3a03-4377-89e3-9ccd50e1624e" id="dmnshape-drg-_4688d5d9-3a03-4377-89e3-9ccd50e1624e" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor blue="255" green="255" red="255"/>
+          <dmndi:StrokeColor blue="0" green="0" red="0"/>
+          <dmndi:FontColor blue="0" green="0" red="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds height="50" width="100" x="400" y="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape dmnElementRef="tns:_7a7f2263-5d9b-4a18-aee8-43783f417b07" id="dmnshape-drg-_7a7f2263-5d9b-4a18-aee8-43783f417b07" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor blue="255" green="255" red="255"/>
+          <dmndi:StrokeColor blue="0" green="0" red="0"/>
+          <dmndi:FontColor blue="0" green="0" red="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds height="50" width="100" x="575" y="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape dmnElementRef="tns:_c169428e-2a57-42d2-a26d-cf22039da762" id="dmnshape-drg-_c169428e-2a57-42d2-a26d-cf22039da762" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor blue="255" green="255" red="255"/>
+          <dmndi:StrokeColor blue="0" green="0" red="0"/>
+          <dmndi:FontColor blue="0" green="0" red="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds height="50" width="100" x="750" y="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape dmnElementRef="tns:_12fdd98a-00da-47af-80e6-f70906e359c0" id="dmnshape-drg-_12fdd98a-00da-47af-80e6-f70906e359c0" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor blue="255" green="255" red="255"/>
+          <dmndi:StrokeColor blue="0" green="0" red="0"/>
+          <dmndi:FontColor blue="0" green="0" red="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds height="50" width="100" x="925" y="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape dmnElementRef="tns:_93786c60-d986-4c40-b836-4b2f0bc218ce" id="dmnshape-drg-_93786c60-d986-4c40-b836-4b2f0bc218ce" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor blue="255" green="255" red="255"/>
+          <dmndi:StrokeColor blue="0" green="0" red="0"/>
+          <dmndi:FontColor blue="0" green="0" red="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds height="50" width="100" x="1100" y="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape dmnElementRef="tns:_d1465880-49ca-4182-ae74-7670fc834f2c" id="dmnshape-drg-_d1465880-49ca-4182-ae74-7670fc834f2c" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor blue="255" green="255" red="255"/>
+          <dmndi:StrokeColor blue="0" green="0" red="0"/>
+          <dmndi:FontColor blue="0" green="0" red="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds height="50" width="100" x="1275" y="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape dmnElementRef="tns:_d6beae1e-c23f-4fdb-8c63-6c9835337eff" id="dmnshape-drg-_d6beae1e-c23f-4fdb-8c63-6c9835337eff" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor blue="255" green="255" red="255"/>
+          <dmndi:StrokeColor blue="0" green="0" red="0"/>
+          <dmndi:FontColor blue="0" green="0" red="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds height="50" width="100" x="1450" y="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</dmn:definitions>

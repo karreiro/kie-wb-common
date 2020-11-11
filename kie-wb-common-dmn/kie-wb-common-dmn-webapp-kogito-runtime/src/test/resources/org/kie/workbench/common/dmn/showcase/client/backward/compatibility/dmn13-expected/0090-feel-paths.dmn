@@ -4,40 +4,40 @@
   <dmn:extensionElements/>
   <dmn:decision id="_nested_list_001" name="nested_list_001">
     <dmn:extensionElements/>
-    <dmn:variable id="_78A72F50-12DC-4B0F-A7BF-B46EEB80CD4B" name="nested_list_001"/>
-    <dmn:literalExpression id="_0F903A61-37CB-4394-8D9C-13D6D2AB7265">
-      <dmn:text>[{a: {b: 1}}, {a: {b: [2.1, 2.2]}}, {a: {b: 3}}, {a: {b: 4}}, {a: {b: 5}}].a.b = [{b: 1}, {b: [2.1, 2.2]}, {b: 3}, {b: 4}, {b: 5}].b</dmn:text>
+    <dmn:variable id="_E7D21064-6503-45D5-AC4E-F925827EC83A" name="nested_list_001"/>
+    <dmn:literalExpression id="_F4202DD4-40B0-491B-BF86-6A97C891D24E">
+      <dmn:text xmlns:dmn="http://www.omg.org/spec/DMN/20180521/MODEL/">[{a: {b: 1}}, {a: {b: [2.1, 2.2]}}, {a: {b: 3}}, {a: {b: 4}}, {a: {b: 5}}].a.b =                [{b: 1}, {b: [2.1, 2.2]}, {b: 3}, {b: 4}, {b: 5}].b</dmn:text>
     </dmn:literalExpression>
   </dmn:decision>
   <dmn:decision id="_nested_list_002" name="nested_list_002">
     <dmn:extensionElements/>
-    <dmn:variable id="_49EA1E3D-BEAD-4663-9A28-CE48CEAD4164" name="nested_list_002"/>
-    <dmn:literalExpression id="_F200BCB8-81C3-4CA7-BA7B-CCA4BFF6CB2D">
-      <dmn:text>[{b: 1}, {b: [2.1, 2.2]}, {b: 3}, {b: 4}, {b: 5}].b = [1, [2.1, 2.2], 3, 4, 5]</dmn:text>
+    <dmn:variable id="_8DAB32C8-2470-4AD1-ADD5-0048A2CFA1FF" name="nested_list_002"/>
+    <dmn:literalExpression id="_2B8D625E-6BFF-406F-8F31-52CA8327DD92">
+      <dmn:text>[{b: 1}, {b: [2.1, 2.2]}, {b: 3}, {b: 4}, {b: 5}].b =                [1, [2.1, 2.2], 3, 4, 5]</dmn:text>
     </dmn:literalExpression>
   </dmn:decision>
   <dmn:decision id="_nested_list_003" name="nested_list_003">
     <dmn:extensionElements/>
-    <dmn:variable id="_EBA1CFF7-0823-4B99-BFD4-4B96751A652E" name="nested_list_003"/>
-    <dmn:literalExpression id="_DB484203-66DB-40B7-9F96-C67608268133">
-      <dmn:text>[{a: {b: [1]}}, {a: {b: [2.1, 2.2]}}, {a: {b: [3]}}, {a: {b: [4, 5]}}].a.b = [{b: [1]}, {b: [2.1,2.2]}, {b: [3]}, {b: [4, 5]}].b</dmn:text>
+    <dmn:variable id="_D059CB60-9E10-4820-B1E5-B627141FDD14" name="nested_list_003"/>
+    <dmn:literalExpression id="_42754115-4E82-4B55-8738-6A1B8EA3CB6B">
+      <dmn:text>[{a: {b: [1]}}, {a: {b: [2.1, 2.2]}}, {a: {b: [3]}}, {a: {b: [4, 5]}}].a.b =                [{b: [1]}, {b: [2.1,2.2]}, {b: [3]}, {b: [4, 5]}].b</dmn:text>
     </dmn:literalExpression>
   </dmn:decision>
   <dmn:decision id="_nested_list_004" name="nested_list_004">
     <dmn:extensionElements/>
-    <dmn:variable id="_9B609DBF-DC6C-4403-9170-434026B2EB46" name="nested_list_004"/>
-    <dmn:literalExpression id="_427C6E1C-8F8D-4CAA-BD89-70A3DB83FDC4">
-      <dmn:text>[{b: [1]}, {b: [2.1,2.2]}, {b: [3]}, {b: [4, 5]}].b = [[1], [2.1, 2.2], [3], [4, 5]]</dmn:text>
+    <dmn:variable id="_26BC4345-D260-4FEC-8A43-84D449A18C40" name="nested_list_004"/>
+    <dmn:literalExpression id="_19B16875-FE74-41E5-8C71-4ACAA385BD74">
+      <dmn:text>[{b: [1]}, {b: [2.1,2.2]}, {b: [3]}, {b: [4, 5]}].b =                [[1], [2.1, 2.2], [3], [4, 5]]</dmn:text>
     </dmn:literalExpression>
   </dmn:decision>
   <dmndi:DMNDI>
-    <dmndi:DMNDiagram id="_B46339B9-245D-4483-95BD-3F2015C9C5B9" name="DRG">
+    <dmndi:DMNDiagram id="_326F3670-C85B-4B86-9BE8-0F41B14A0C05" name="DRG">
       <di:extension>
         <kie:ComponentsWidthsExtension>
-          <kie:ComponentWidths dmnElementRef="_0F903A61-37CB-4394-8D9C-13D6D2AB7265"/>
-          <kie:ComponentWidths dmnElementRef="_F200BCB8-81C3-4CA7-BA7B-CCA4BFF6CB2D"/>
-          <kie:ComponentWidths dmnElementRef="_DB484203-66DB-40B7-9F96-C67608268133"/>
-          <kie:ComponentWidths dmnElementRef="_427C6E1C-8F8D-4CAA-BD89-70A3DB83FDC4"/>
+          <kie:ComponentWidths dmnElementRef="_F4202DD4-40B0-491B-BF86-6A97C891D24E"/>
+          <kie:ComponentWidths dmnElementRef="_2B8D625E-6BFF-406F-8F31-52CA8327DD92"/>
+          <kie:ComponentWidths dmnElementRef="_42754115-4E82-4B55-8738-6A1B8EA3CB6B"/>
+          <kie:ComponentWidths dmnElementRef="_19B16875-FE74-41E5-8C71-4ACAA385BD74"/>
         </kie:ComponentsWidthsExtension>
       </di:extension>
       <dmndi:DMNShape id="dmnshape-drg-_nested_list_001" dmnElementRef="_nested_list_001" isCollapsed="false">

@@ -18,6 +18,7 @@ package org.kie.workbench.common.dmn.showcase.client.editor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
@@ -25,7 +26,9 @@ import javax.inject.Inject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
+import elemental2.dom.DomGlobal;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.kie.dmn.feel.gwt.functions.api.FunctionOverrideVariation;
 import org.kie.dmn.feel.gwt.functions.client.FEELFunctionProvider;
 import org.kie.dmn.feel.lang.ast.ASTNode;
@@ -36,6 +39,7 @@ import org.kie.dmn.feel.parser.feel11.FEEL_1_1Parser;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
+import org.uberfire.client.views.pfly.widgets.Moment;
 import org.uberfire.lifecycle.OnStartup;
 import org.uberfire.mvp.PlaceRequest;
 
@@ -85,28 +89,6 @@ public class FEELEditor {
     public void onClick(String text) {
     }
 
-    private void c3(BaseNode root, FEEL_1_1Parser parser) {
-
-        CodeCompletionCore core = new CodeCompletionCore(parser, null, null);
-
-        int caretIndex = view.getCaretIndex();
-
-        CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(caretIndex, null);
-
-        List<String> keywords = new ArrayList<>();
-        String test = "";
-        for (Integer integer : candidates.tokens.keySet()) {
-            String displayName = parser.getVocabulary().getDisplayName(integer);
-            keywords.add(displayName);
-            test = test + "\n " + displayName + " -- " + candidates.tokens.get(integer);
-        }
-        for (Integer integer : candidates.rules.keySet()) {
-
-        }
-        view.setC3("caretIndex [ " + caretIndex + " ] " + core.candidates.toString());
-//        view.setC3(test);
-    }
-
     private void dump(final StringBuilder stringBuilder,
                       final ASTNode expr) {
         stringBuilder.append(expr.toString());
@@ -126,19 +108,91 @@ public class FEELEditor {
                                                        null);
 
         final ParseTree tree = parser.expression();
-
         final ASTBuilderVisitor v = new ASTBuilderVisitor(Collections.emptyMap(),
                                                           null);
         final BaseNode expr = v.visit(tree);
 
-//        final String s = expr.getText() + " - " + expr.getResultType() + " - " + expr.toString();
         final StringBuilder stringBuilder = new StringBuilder();
         dump(stringBuilder, expr);
-
         view.setASTDump(stringBuilder.toString());
 
-        view.setEvaluation(expr.accept(new DMNDTAnalyserValueFromNodeVisitor(Collections.EMPTY_LIST)).toString());
+//        view.setEvaluation(expr.accept(new DMNDTAnalyserValueFromNodeVisitor(Collections.EMPTY_LIST)).toString());
 
-        c3(expr, parser);
+        CodeCompletionCore core = new CodeCompletionCore(parser, null, null);
+
+        int caretPositionLine = -1;
+        try {
+            caretPositionLine = view.getCursor().getRow();
+        } catch (Exception e) {
+            DomGlobal.console.log("______>> 1");
+        }
+        int caretPositionColumn = -1;
+        try {
+            caretPositionColumn = view.getCursor().getColumn();
+        } catch (Exception e) {
+            DomGlobal.console.log("______>> 2");
+        }
+
+        int caretIndex = computeTokenIndex(tree, caretPositionLine, caretPositionColumn);
+        DomGlobal.console.log("Line => " + caretPositionLine + ", Column => " + caretPositionColumn);
+
+        CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(caretIndex, parser.getContext());
+
+        List<String> keywords = new ArrayList<>();
+        String test = "===" + Moment.Builder.moment().format("HH:mm:ss.SSS") + "===" + caretIndex;
+        test += "-------";
+        for (Map.Entry<Integer, List<Integer>> entry : candidates.tokens.entrySet()) {
+            Integer key = entry.getKey();
+            List<Integer> value = entry.getValue();
+            String reduce = value.stream().map(Object::toString).reduce((i, j) -> {
+                return i.toString() + ", " + j.toString();
+            }).orElse("");
+            String displayName = parser.getVocabulary().getDisplayName(key) + ", key =>" + key.toString() + ", value =>" + reduce;
+            ;
+//            keywords.add(displayName);]
+            if (displayName != null) {
+                test = test + "\n " + displayName;
+            }
+        }
+        test += "-------" + candidates.rules.keySet().size();
+        for (Integer integer : candidates.rules.keySet()) {
+            String displayName = parser.getVocabulary().getSymbolicName(integer) + " - " + parser.getVocabulary().getDisplayName(integer) + " - " + parser.getVocabulary().getLiteralName(integer);
+            test = test + "\n " + displayName;
+//            test = test + "\n " + displayName + " -- " + candidates.rules.get(integer);
+        }
+
+//        DomGlobal.console.log("\n\n===== SUGGESTIONS");
+//        DomGlobal.console.log(test);
+
+//        view.setC3("caretIndex [ " + caretIndex + " ] " + core.candidates.toString());
+        view.setC3(test);
+    }
+
+    private Integer computeTokenIndex(ParseTree parseTree, int caretPositionLine, int caretPositionColumn) {
+        if (parseTree instanceof TerminalNode) {
+            return computeTokenIndexOfTerminalNode((TerminalNode) parseTree, caretPositionLine, caretPositionColumn);
+        } else {
+            return computeTokenIndexOfChildNode(parseTree, caretPositionLine, caretPositionColumn);
+        }
+    }
+
+    private Integer computeTokenIndexOfTerminalNode(TerminalNode parseTree, int caretPositionLine, int caretPositionColumn) {
+        int start = parseTree.getSymbol().getCharPositionInLine();
+        int stop = parseTree.getSymbol().getCharPositionInLine() + parseTree.getText().length();
+        if (parseTree.getSymbol().getLine() == caretPositionLine && start <= caretPositionColumn && stop >= caretPositionColumn) {
+            return parseTree.getSymbol().getTokenIndex();
+        } else {
+            return null;
+        }
+    }
+
+    private Integer computeTokenIndexOfChildNode(ParseTree parseTree, int caretPositionLine, int caretPositionColumn) {
+        for (int i = 0; i < parseTree.getChildCount(); i++) {
+            Integer index = computeTokenIndex(parseTree.getChild(i), caretPositionLine, caretPositionColumn);
+            if (index != null) {
+                return index;
+            }
+        }
+        return null;
     }
 }

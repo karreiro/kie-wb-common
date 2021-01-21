@@ -17,6 +17,7 @@ package org.kie.workbench.common.dmn.showcase.client.editor;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import org.uberfire.ext.widgets.common.client.ace.AceEditor;
+import org.uberfire.ext.widgets.common.client.ace.AceEditorCursorPosition;
 
 public interface FeelEditorView
         extends IsWidget {
@@ -35,4 +36,5 @@ public interface FeelEditorView
 
     int getCaretIndex();
 
+    AceEditorCursorPosition getCursor();
 }

@@ -33,7 +33,6 @@ public abstract class DMNModelInstrumentedBase implements DMNDefinition {
 
     private DMNModelInstrumentedBase parent;
 
-    @Portable
     public enum Namespace {
 
         FEEL("feel", org.kie.dmn.model.v1_2.KieDMNModelInstrumentedBase.URI_FEEL),

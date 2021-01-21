@@ -24,12 +24,13 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.uberfire.ext.widgets.common.client.ace.AceEditor;
+import org.uberfire.ext.widgets.common.client.ace.AceEditorCursorPosition;
 import org.uberfire.ext.widgets.common.client.ace.AceEditorTheme;
 
 public class FeelEditorViewImpl
         implements FeelEditorView {
 
-    private final String TOP_ROW_HEIGHT = "400px";
+    private final String TOP_ROW_HEIGHT = "1500px";
 
     //    private TextArea text = new TextArea();
     private TextArea astDump = new TextArea();
@@ -60,7 +61,7 @@ public class FeelEditorViewImpl
         aceEditor.setWidth("500px");
         c3.setEnabled(false);
         c3.setHeight(TOP_ROW_HEIGHT);
-        c3.setWidth("250px");
+        c3.setWidth("300px");
         availableMethods.setEnabled(false);
         availableMethods.setHeight(TOP_ROW_HEIGHT);
         availableMethods.setWidth("250px");
@@ -122,5 +123,10 @@ public class FeelEditorViewImpl
         } catch (Exception e) {
             return -1;
         }
+    }
+
+    @Override
+    public AceEditorCursorPosition getCursor() {
+        return aceEditor.getCursorPosition();
     }
 }

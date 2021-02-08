@@ -28,6 +28,7 @@ import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.kie.workbench.common.dmn.api.qualifiers.DMNEditor;
 import org.kie.workbench.common.dmn.client.editors.documentation.common.DMNDocumentationService;
+import org.kie.workbench.common.dmn.client.editors.documentation.common.DMNDocumentationServiceImpl;
 import org.kie.workbench.common.dmn.client.editors.documentation.common.HTMLDownloadHelper;
 import org.kie.workbench.common.stunner.core.client.util.PrintHelper;
 import org.kie.workbench.common.stunner.core.diagram.Diagram;
@@ -59,7 +60,7 @@ public class DMNDocumentationView extends DefaultDiagramDocumentationView {
 
     private final PrintHelper printHelper;
 
-    private final DMNDocumentationService documentationService;
+    private final DMNDocumentationServiceImpl documentationService;
 
     private final HTMLDownloadHelper downloadHelper;
 
@@ -71,7 +72,7 @@ public class DMNDocumentationView extends DefaultDiagramDocumentationView {
                                 final HTMLButtonElement printButton,
                                 final HTMLButtonElement downloadHtmlFile,
                                 final PrintHelper printHelper,
-                                final DMNDocumentationService documentationService,
+                                final DMNDocumentationServiceImpl documentationService,
                                 final HTMLDownloadHelper downloadHelper,
                                 final DMNDocumentationViewButtonsVisibilitySupplier buttonsVisibilitySupplier) {
         this.documentationPanel = documentationPanel;

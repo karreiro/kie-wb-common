@@ -596,6 +596,28 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-dmn-feel-gwt</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-dmn-feel-gwt</artifactId>
+      <classifier>sources</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-dmn-feel</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-dmn-feel</artifactId>
+      <classifier>sources</classifier>
+    </dependency>
+
     <!-- Core utility classes -->
     <dependency>
       <groupId>org.kie.soup</groupId>
@@ -804,6 +826,34 @@
     <outputDirectory>src/main/webapp/WEB-INF/classes</outputDirectory>
 
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+<!--                 <source>/Users/karreiro/Projects/forks/appformer/uberfire-extensions/uberfire-widgets/uberfire-widgets-core/uberfire-widgets-core-ace/java</source>
+                <source>/Users/karreiro/Projects/forks/appformer/uberfire-extensions/uberfire-widgets/uberfire-widgets-core/uberfire-widgets-core-ace/resources</source>
+                <source>/Users/karreiro/Projects/forks/kie-wb-common/kie-wb-common-dmn/kie-wb-common-dmn-webapp-kogito-marshaller/src/main/java</source>
+                <source>/Users/karreiro/Projects/forks/kie-wb-common/kie-wb-common-dmn/kie-wb-common-dmn-webapp-kogito-marshaller/src/main/resources</source>
+                <source>/Users/karreiro/Projects/forks/kie-wb-common/kie-wb-common-dmn/kie-wb-common-dmn-webapp-standalone/src/main/java</source>
+                <source>/Users/karreiro/Projects/forks/kie-wb-common/kie-wb-common-dmn/kie-wb-common-dmn-webapp-standalone/src/main/resources</source>
+                <source>/Users/karreiro/Projects/forks/kie-wb-common/kie-wb-common-dmn/kie-wb-common-dmn-client/src/main/java</source>
+                <source>/Users/karreiro/Projects/forks/kie-wb-common/kie-wb-common-dmn/kie-wb-common-dmn-client/src/main/resources</source> -->
+                <source>/Users/karreiro/Projects/forks/kie-wb-common/kie-wb-common-dmn/kie-wb-common-dmn-webapp-common/src/main/java</source>
+                <source>/Users/karreiro/Projects/forks/kie-wb-common/kie-wb-common-dmn/kie-wb-common-dmn-webapp-common/src/main/resources</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+</plugin>
 
       <!-- Exclude generated code from checkstyle validation -->
       <plugin>
@@ -888,7 +938,7 @@
               <localWorkers>${gwt.compiler.localWorkers}</localWorkers>
               <deploy>${project.build.directory}/gwt-symbols-deploy</deploy>
               <draftCompile>true</draftCompile>
-              <extraJvmArgs>-Xmx4096m -Xms1024m -Xss1M -XX:CompileThreshold=7000 -Derrai.dynamic_validation.enabled=true -Derrai.jboss.home=${errai.jboss.home}</extraJvmArgs>
+              <extraJvmArgs>-Xmx16g -Xms8g -Xss4M -XX:CompileThreshold=7000 -Derrai.dynamic_validation.enabled=true -Derrai.jboss.home=${errai.jboss.home}</extraJvmArgs>
               <module>org.kie.workbench.common.dmn.showcase.FastCompiledDMNShowcase</module>
               <logLevel>INFO</logLevel>
               <noServer>false</noServer>
@@ -934,6 +984,14 @@
                 <compileSourcesArtifact>org.kie.workbench.services:kie-wb-common-datamodel-api</compileSourcesArtifact>
                 <compileSourcesArtifact>org.kie.workbench.services:kie-wb-common-services-api</compileSourcesArtifact>
                 <compileSourcesArtifact>org.kie.workbench:kie-wb-common-kogito-client</compileSourcesArtifact>
+
+                <!-- Clietnt side FEEL -->
+                <compileSourcesArtifact>org.rikkola.gwt:antlr4-c3-gwt</compileSourcesArtifact>
+                <compileSourcesArtifact>org.kie:kie-dmn-api</compileSourcesArtifact>
+                <compileSourcesArtifact>org.kie:kie-dmn-feel</compileSourcesArtifact>
+                <compileSourcesArtifact>org.kie:kie-dmn-feel-gwt</compileSourcesArtifact>
+                <compileSourcesArtifact>org.kie:kie-dmn-feel-gwt-functions</compileSourcesArtifact>
+                <compileSourcesArtifact>org.kie:kie-dmn-model</compileSourcesArtifact>
 
                 <!-- UF-ext -->
                 <compileSourcesArtifact>org.uberfire:uberfire-runtime-plugins-api</compileSourcesArtifact>

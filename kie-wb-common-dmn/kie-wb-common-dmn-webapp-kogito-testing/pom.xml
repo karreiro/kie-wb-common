@@ -650,6 +650,14 @@
                 <compileSourcesArtifact>org.kie.workbench.services:kie-wb-common-services-api</compileSourcesArtifact>
                 <compileSourcesArtifact>org.kie.workbench:kie-wb-common-kogito-client</compileSourcesArtifact>
 
+                <!-- Clietnt side FEEL -->
+                <compileSourcesArtifact>org.rikkola.gwt:antlr4-c3-gwt</compileSourcesArtifact>
+                <compileSourcesArtifact>org.kie:kie-dmn-api</compileSourcesArtifact>
+                <compileSourcesArtifact>org.kie:kie-dmn-feel</compileSourcesArtifact>
+                <compileSourcesArtifact>org.kie:kie-dmn-feel-gwt</compileSourcesArtifact>
+                <compileSourcesArtifact>org.kie:kie-dmn-feel-gwt-functions</compileSourcesArtifact>
+                <compileSourcesArtifact>org.kie:kie-dmn-model</compileSourcesArtifact>
+
                 <!-- UF-ext -->
                 <compileSourcesArtifact>org.uberfire:uberfire-runtime-plugins-api</compileSourcesArtifact>
                 <compileSourcesArtifact>org.uberfire:uberfire-commons-editor-api</compileSourcesArtifact>

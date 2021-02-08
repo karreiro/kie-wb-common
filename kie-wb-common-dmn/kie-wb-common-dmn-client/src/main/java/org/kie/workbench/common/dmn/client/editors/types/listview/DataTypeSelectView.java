@@ -23,6 +23,8 @@ import java.util.function.Function;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOverEvent;
 import elemental2.dom.Element;
 import elemental2.dom.HTMLDivElement;
 import elemental2.dom.HTMLOptGroupElement;
@@ -30,9 +32,11 @@ import elemental2.dom.HTMLOptionElement;
 import elemental2.dom.HTMLSelectElement;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
+import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.kie.workbench.common.dmn.client.editors.common.RemoveHelper;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
+import org.kie.workbench.common.dmn.client.editors.types.listview.tooltip.StructureTypesTooltip;
 import org.uberfire.client.views.pfly.selectpicker.JQuerySelectPickerEvent;
 
 import static org.kie.workbench.common.dmn.api.editors.types.BuiltInTypeUtils.isBuiltInType;
@@ -66,6 +70,9 @@ public class DataTypeSelectView implements DataTypeSelect.View {
     private DataTypeSelect presenter;
 
     private String value;
+
+    @Inject
+    private StructureTypesTooltip structureTypesTooltip;
 
     @Inject
     public DataTypeSelectView(final HTMLDivElement typeText,
@@ -176,6 +183,16 @@ public class DataTypeSelectView implements DataTypeSelect.View {
     @Override
     public String getValue() {
         return value;
+    }
+
+    @EventHandler("type-text")
+    public void onTypeTextMouseMoveEvent(final MouseOverEvent event) {
+        structureTypesTooltip.show(getElement(), presenter.getDataType());
+    }
+
+    @EventHandler("type-text")
+    public void onTypeTextMouseMoveEvent(final MouseOutEvent event) {
+        structureTypesTooltip.hide();
     }
 
     void setPickerValue(final String value) {

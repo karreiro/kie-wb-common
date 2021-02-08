@@ -35,6 +35,7 @@ import org.kie.workbench.common.dmn.client.editors.common.RemoveHelper;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
 import org.uberfire.client.views.pfly.selectpicker.JQuerySelectPickerEvent;
 
+import static org.kie.workbench.common.dmn.api.editors.types.BuiltInTypeUtils.isBuiltInType;
 import static org.kie.workbench.common.dmn.client.editors.types.common.HiddenHelper.hide;
 import static org.kie.workbench.common.dmn.client.editors.types.common.HiddenHelper.show;
 import static org.kie.workbench.common.dmn.client.resources.i18n.DMNEditorConstants.DataTypeSelectView_CustomTitle;
@@ -149,7 +150,7 @@ public class DataTypeSelectView implements DataTypeSelect.View {
 
     @Override
     public void disableEditMode() {
-        typeText.textContent = "(" + presenter.getDataType().getType() + ")";
+        typeText.textContent = presenter.getDataType().getType();
         hideSelectPicker();
         show(typeText);
     }
@@ -157,8 +158,9 @@ public class DataTypeSelectView implements DataTypeSelect.View {
     @Override
     public void setDataType(final DataType dataType) {
         final String type = dataType.getType();
-        typeText.textContent = "(" + type + ")";
-        value = type;
+        typeText.setAttribute("data-is-built-in-type", isBuiltInType(type) || type.equals("Structure"));
+        typeText.textContent = type;
+        this.value = type;
     }
 
     public void onSelectChange(final JQuerySelectPickerEvent event) {

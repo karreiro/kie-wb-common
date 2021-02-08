@@ -306,15 +306,15 @@ public class DataTypeManager {
 
         final List<ItemDefinition> itemComponent = itemDefinition.getItemComponent();
         final String type = itemDefinitionType(itemDefinition);
-        final Optional<ItemDefinition> existingItemDefinition = itemDefinitionUtils.findByName(type);
-        final boolean existingDataType = existingItemDefinition.isPresent();
+//        final Optional<ItemDefinition> existingItemDefinition = Optional.empty(); //itemDefinitionUtils.findByName(type);
+//        final boolean existingDataType = existingItemDefinition.isPresent();
 
         if (isTypeAlreadyRepresented(type)) {
             return new ArrayList<>();
         }
 
         if (itemComponent.isEmpty()) {
-            return createSubDataTypes(existingDataType ? existingItemDefinition.get().getItemComponent() : new ArrayList<>());
+            return createSubDataTypes(new ArrayList<>());
         } else {
             return createSubDataTypes(itemComponent);
         }

@@ -16,50 +16,39 @@
 
 package org.kie.workbench.common.dmn.showcase.client.toolbar;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kie.workbench.common.dmn.client.widgets.toolbar.DMNEditorToolbar;
-import org.kie.workbench.common.dmn.showcase.client.editor.DMNStandaloneToolbarStateHandler;
-import org.kie.workbench.common.stunner.client.widgets.toolbar.ToolbarCommand;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DMNStandaloneToolbarStateHandlerTest {
 
-    @Mock
-    private DMNEditorToolbar toolbar;
-
-    private DMNStandaloneToolbarStateHandler toolbarStateHandler;
-
-    @Before
-    @SuppressWarnings("unchecked")
-    public void setUp() {
-        this.toolbarStateHandler = new DMNStandaloneToolbarStateHandler(toolbar);
-        when(toolbar.isEnabled(Mockito.<ToolbarCommand>any())).thenReturn(true);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testEnterGridView() {
-        toolbarStateHandler.enterGridView();
-
-        verify(toolbar, atLeast(1)).disable(Mockito.<ToolbarCommand>any());
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testEnterGraphView() {
-        toolbarStateHandler.enterGridView();
-
-        toolbarStateHandler.enterGraphView();
-
-        verify(toolbar, atLeast(1)).enable(Mockito.<ToolbarCommand>any());
-    }
+//    @Mock
+//    private DMNEditorToolbar toolbar;
+//
+//    private DMNStandaloneToolbarStateHandler toolbarStateHandler;
+//
+//    @Before
+//    @SuppressWarnings("unchecked")
+//    public void setUp() {
+//        this.toolbarStateHandler = new DMNStandaloneToolbarStateHandler(toolbar);
+//        when(toolbar.isEnabled(Mockito.<ToolbarCommand>any())).thenReturn(true);
+//    }
+//
+//    @Test
+//    @SuppressWarnings("unchecked")
+//    public void testEnterGridView() {
+//        toolbarStateHandler.enterGridView();
+//
+//        verify(toolbar, atLeast(1)).disable(Mockito.<ToolbarCommand>any());
+//    }
+//
+//    @Test
+//    @SuppressWarnings("unchecked")
+//    public void testEnterGraphView() {
+//        toolbarStateHandler.enterGridView();
+//
+//        toolbarStateHandler.enterGraphView();
+//
+//        verify(toolbar, atLeast(1)).enable(Mockito.<ToolbarCommand>any());
+//    }
 }

@@ -187,13 +187,13 @@ public class FEELEditor {
         final StringBuilder stringBuilder = new StringBuilder();
 
         dump(stringBuilder, expr);
-//        view.setASTDump(stringBuilder.toString());
-//        try {
-//            DMNDTAnalyserValueFromNodeVisitor v = new DMNDTAnalyserValueFromNodeVisitor(profiles);
-//            view.setEvaluation(expr.accept(v).toString());
-//        } catch (Exception e) {
-//            view.setEvaluation("ERROR EVAL");
-//        }
+        view.setASTDump(stringBuilder.toString());
+        try {
+            DMNDTAnalyserValueFromNodeVisitor v = new DMNDTAnalyserValueFromNodeVisitor(profiles);
+            view.setEvaluation(expr.accept(v).toString());
+        } catch (Exception e) {
+            view.setEvaluation("ERROR EVAL");
+        }
         final CodeCompletionCore core = new CodeCompletionCore(parser, null, ignoredTokens());
 
 

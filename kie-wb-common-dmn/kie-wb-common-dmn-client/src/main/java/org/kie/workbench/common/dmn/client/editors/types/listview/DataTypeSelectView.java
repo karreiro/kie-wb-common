@@ -23,8 +23,7 @@ import java.util.function.Function;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
-import com.google.gwt.event.dom.client.MouseOutEvent;
-import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.ClickEvent;
 import elemental2.dom.Element;
 import elemental2.dom.HTMLDivElement;
 import elemental2.dom.HTMLOptGroupElement;
@@ -34,12 +33,12 @@ import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
+import org.kie.workbench.common.dmn.api.editors.types.BuiltInTypeUtils;
 import org.kie.workbench.common.dmn.client.editors.common.RemoveHelper;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
 import org.kie.workbench.common.dmn.client.editors.types.listview.tooltip.StructureTypesTooltip;
 import org.uberfire.client.views.pfly.selectpicker.JQuerySelectPickerEvent;
 
-import static org.kie.workbench.common.dmn.api.editors.types.BuiltInTypeUtils.isBuiltInType;
 import static org.kie.workbench.common.dmn.client.editors.types.common.HiddenHelper.hide;
 import static org.kie.workbench.common.dmn.client.editors.types.common.HiddenHelper.show;
 import static org.kie.workbench.common.dmn.client.resources.i18n.DMNEditorConstants.DataTypeSelectView_CustomTitle;
@@ -165,7 +164,7 @@ public class DataTypeSelectView implements DataTypeSelect.View {
     @Override
     public void setDataType(final DataType dataType) {
         final String type = dataType.getType();
-        typeText.setAttribute("data-is-built-in-type", isBuiltInType(type) || type.equals("Structure"));
+        typeText.setAttribute("data-is-built-in-type", isBuiltInType(type));
         typeText.textContent = type;
         this.value = type;
     }
@@ -186,13 +185,11 @@ public class DataTypeSelectView implements DataTypeSelect.View {
     }
 
     @EventHandler("type-text")
-    public void onTypeTextMouseMoveEvent(final MouseOverEvent event) {
-        structureTypesTooltip.show(getElement(), presenter.getDataType());
-    }
-
-    @EventHandler("type-text")
-    public void onTypeTextMouseMoveEvent(final MouseOutEvent event) {
-        structureTypesTooltip.hide();
+    public void onTypeTextClick(final ClickEvent event) {
+        final String type = presenter.getDataType().getType();
+        if (!isBuiltInType(type)) {
+            structureTypesTooltip.show(getElement(), type);
+        }
     }
 
     void setPickerValue(final String value) {
@@ -243,5 +240,10 @@ public class DataTypeSelectView implements DataTypeSelect.View {
 
     void setupOnChangeHandler(final Element element) {
         $(element).on("hidden.bs.select", this::onSelectChange);
+    }
+
+    private boolean isBuiltInType(final String type) {
+        // i18n
+        return BuiltInTypeUtils.isBuiltInType(type) || "Structure".equals(type);
     }
 }

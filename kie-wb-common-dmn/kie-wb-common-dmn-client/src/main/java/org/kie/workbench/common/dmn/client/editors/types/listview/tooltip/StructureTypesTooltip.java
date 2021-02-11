@@ -16,6 +16,9 @@
 
 package org.kie.workbench.common.dmn.client.editors.types.listview.tooltip;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -25,17 +28,24 @@ import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLDivElement;
 import elemental2.dom.HTMLElement;
 import org.jboss.errai.ui.client.local.api.elemental2.IsElement;
-import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
+import org.kie.workbench.common.dmn.api.definition.model.ItemDefinition;
+import org.kie.workbench.common.dmn.client.editors.types.common.ItemDefinitionUtils;
 import org.uberfire.client.mvp.UberElemental;
+
+import static java.util.stream.Collectors.toList;
 
 @ApplicationScoped
 public class StructureTypesTooltip {
 
     private final View view;
 
+    private final ItemDefinitionUtils itemDefinitionUtils;
+
     @Inject
-    public StructureTypesTooltip(final View view) {
+    public StructureTypesTooltip(final View view,
+                                 final ItemDefinitionUtils itemDefinitionUtils) {
         this.view = view;
+        this.itemDefinitionUtils = itemDefinitionUtils;
     }
 
     @PostConstruct
@@ -46,18 +56,32 @@ public class StructureTypesTooltip {
 
     // On click and not on hover (also, close on mouse wheel)
     public void show(final HTMLElement refElement,
-                     final DataType dataType) {
+                     final String typeName) {
 
         final HTMLDivElement tooltip = view.getTooltip();
         final DOMRect refRect = refElement.getBoundingClientRect();
         final int PADDING = 20;
-        final int TOOLTIP_HEIGHT = 240;
 
-        tooltip.style.top = PADDING / 2 + (refRect.y - TOOLTIP_HEIGHT / 2) + "px";
+        tooltip.style.top = refRect.y + "px";
         tooltip.style.left = PADDING + (refRect.x + refRect.width) + "px";
         tooltip.style.display = "block";
 
-        view.setName(dataType.getName());
+        view.setName(typeName);
+        view.setFields(getTypeFields(typeName));
+    }
+
+    private List<String> getTypeFields(final String typeName) {
+        return itemDefinitionUtils
+                .findByName(typeName)
+                .map(this::getItemDefinitionFields)
+                .orElse(Collections.emptyList());
+    }
+
+    private List<String> getItemDefinitionFields(final ItemDefinition itemDefinition) {
+        return itemDefinition
+                .getItemComponent()
+                .stream()
+                .map(e -> e.getName().getValue()).collect(toList());
     }
 
     public void hide() {
@@ -70,5 +94,7 @@ public class StructureTypesTooltip {
         HTMLDivElement getTooltip();
 
         void setName(String name);
+
+        void setFields(List<String> name);
     }
 }

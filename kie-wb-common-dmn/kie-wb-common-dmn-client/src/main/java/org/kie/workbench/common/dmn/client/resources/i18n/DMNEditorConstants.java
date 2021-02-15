@@ -504,4 +504,7 @@ public class DMNEditorConstants {
 
     @TranslationKey(defaultValue = "")
     public static final String DecisionServiceParameters_EncapsulatedDecisions = "DecisionServiceParameters.EncapsulatedDecisions";
+
+    @TranslationKey(defaultValue = "")
+    public static final String StructureTypesTooltipView_Description = "StructureTypesTooltipView.Description";
 }

@@ -30,7 +30,6 @@ import org.kie.workbench.common.dmn.client.editors.types.common.DataTypeUtils;
 import org.mockito.Mock;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
@@ -49,16 +48,13 @@ public class DataTypeSelectTest {
     private DataTypeUtils dataTypeUtils;
 
     @Mock
-    private DataTypeListItem listItem;
-
-    @Mock
     private DataTypeManager dataTypeManager;
 
     private DataTypeSelect dataTypeSelect;
 
     @Before
     public void setup() {
-        dataTypeSelect = spy(new DataTypeSelect(view, dataTypeUtils, dataTypeManager));
+        dataTypeSelect = spy(new DataTypeSelect(view, dataTypeUtils));
         when(dataTypeManager.structure()).thenReturn("Structure");
     }
 
@@ -66,15 +62,10 @@ public class DataTypeSelectTest {
     public void testInit() {
 
         final DataType dataType = mock(DataType.class);
-        final List<DataType> expectedDataTypes = new ArrayList<DataType>() {{
-            add(mock(DataType.class));
-        }};
-        when(dataType.getSubDataTypes()).thenReturn(expectedDataTypes);
 
-        dataTypeSelect.init(listItem, dataType);
+        dataTypeSelect.init(dataType);
 
         assertEquals(dataType, dataTypeSelect.getDataType());
-        assertEquals(expectedDataTypes, dataTypeSelect.getSubDataTypes());
         verify(view).setDataType(dataType);
     }
 
@@ -150,28 +141,6 @@ public class DataTypeSelectTest {
         dataTypeSelect.refresh();
 
         verify(view).setupDropdown();
-    }
-
-    @Test
-    public void testRefreshView() {
-
-        final String typeName = "typeName";
-        final DataType parent = mock(DataType.class);
-        final DataType subDataType = mock(DataType.class);
-        final List<DataType> expectedDataTypes = singletonList(subDataType);
-
-        doReturn(parent).when(dataTypeSelect).getDataType();
-        when(dataTypeManager.from(parent)).thenReturn(dataTypeManager);
-        when(dataTypeManager.makeExternalDataTypes(typeName)).thenReturn(expectedDataTypes);
-
-        dataTypeSelect.init(listItem, parent);
-        dataTypeSelect.refreshView(typeName);
-
-        assertEquals(expectedDataTypes, dataTypeSelect.getSubDataTypes());
-        verify(listItem).refreshSubItems(expectedDataTypes, false);
-        verify(listItem).refreshConstraintComponent();
-        verify(listItem).expand();
-        verify(listItem).highlightLevel(subDataType);
     }
 
     @Test

@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import elemental2.dom.HTMLElement;
 import org.jboss.errai.ui.client.local.api.elemental2.IsElement;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
-import org.kie.workbench.common.dmn.client.editors.types.common.DataTypeManager;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataTypeUtils;
 import org.uberfire.client.mvp.UberElemental;
 
@@ -38,21 +37,13 @@ public class DataTypeSelect {
 
     private final DataTypeUtils dataTypeUtils;
 
-    private final DataTypeManager dataTypeManager;
-
     private DataType dataType;
-
-    private DataTypeListItem listItem;
-
-    private List<DataType> subDataTypes;
 
     @Inject
     public DataTypeSelect(final View view,
-                          final DataTypeUtils dataTypeUtils,
-                          final DataTypeManager dataTypeManager) {
+                          final DataTypeUtils dataTypeUtils) {
         this.view = view;
         this.dataTypeUtils = dataTypeUtils;
-        this.dataTypeManager = dataTypeManager;
     }
 
     @PostConstruct
@@ -64,12 +55,9 @@ public class DataTypeSelect {
         return view.getElement();
     }
 
-    public void init(final DataTypeListItem gridItem,
-                     final DataType dataType) {
-        this.listItem = gridItem;
+    public void init(final DataType dataType) {
         this.dataType = dataType;
         this.view.setDataType(dataType);
-        this.subDataTypes = dataType.getSubDataTypes();
     }
 
     void refresh() {
@@ -101,20 +89,8 @@ public class DataTypeSelect {
                 .collect(Collectors.toList());
     }
 
-    void refreshView(final String typeName) {
-        subDataTypes = dataTypeManager.from(getDataType()).makeExternalDataTypes(typeName);
-        listItem.refreshSubItems(subDataTypes, false);
-        listItem.refreshConstraintComponent();
-        listItem.expand();
-        subDataTypes.forEach(listItem::highlightLevel);
-    }
-
     public String getValue() {
         return view.getValue();
-    }
-
-    List<DataType> getSubDataTypes() {
-        return subDataTypes;
     }
 
     public interface View extends UberElemental<DataTypeSelect>,

@@ -23,16 +23,21 @@ import java.util.function.Function;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
+import com.google.gwt.event.dom.client.ClickEvent;
 import elemental2.dom.Element;
 import elemental2.dom.HTMLDivElement;
+import elemental2.dom.HTMLElement;
 import elemental2.dom.HTMLOptGroupElement;
 import elemental2.dom.HTMLOptionElement;
 import elemental2.dom.HTMLSelectElement;
 import org.jboss.errai.ui.client.local.spi.TranslationService;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
+import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
+import org.kie.workbench.common.dmn.api.editors.types.BuiltInTypeUtils;
 import org.kie.workbench.common.dmn.client.editors.common.RemoveHelper;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
+import org.kie.workbench.common.dmn.client.editors.types.listview.tooltip.StructureTypesTooltip;
 import org.uberfire.client.views.pfly.selectpicker.JQuerySelectPickerEvent;
 
 import static org.kie.workbench.common.dmn.client.editors.types.common.HiddenHelper.hide;
@@ -62,6 +67,8 @@ public class DataTypeSelectView implements DataTypeSelect.View {
 
     private final TranslationService translationService;
 
+    private final StructureTypesTooltip structureTypesTooltip;
+
     private DataTypeSelect presenter;
 
     private String value;
@@ -72,13 +79,15 @@ public class DataTypeSelectView implements DataTypeSelect.View {
                               final HTMLOptGroupElement typeSelectOptGroup,
                               final HTMLOptionElement typeSelectOption,
                               final HTMLOptGroupElement typeSelectStructureOptGroup,
-                              final TranslationService translationService) {
+                              final TranslationService translationService,
+                              final StructureTypesTooltip structureTypesTooltip) {
         this.typeText = typeText;
         this.typeSelect = typeSelect;
         this.typeSelectOptGroup = typeSelectOptGroup;
         this.typeSelectOption = typeSelectOption;
         this.typeSelectStructureOptGroup = typeSelectStructureOptGroup;
         this.translationService = translationService;
+        this.structureTypesTooltip = structureTypesTooltip;
     }
 
     @Override
@@ -149,7 +158,7 @@ public class DataTypeSelectView implements DataTypeSelect.View {
 
     @Override
     public void disableEditMode() {
-        typeText.textContent = "(" + presenter.getDataType().getType() + ")";
+        typeText.textContent = presenter.getDataType().getType();
         hideSelectPicker();
         show(typeText);
     }
@@ -157,7 +166,8 @@ public class DataTypeSelectView implements DataTypeSelect.View {
     @Override
     public void setDataType(final DataType dataType) {
         final String type = dataType.getType();
-        typeText.textContent = "(" + type + ")";
+        typeText.setAttribute("data-is-built-in-type", isBuiltInType(type));
+        typeText.textContent = type;
         value = type;
     }
 
@@ -167,13 +177,21 @@ public class DataTypeSelectView implements DataTypeSelect.View {
 
         if (!Objects.equals(newValue, getValue())) {
             setPickerValue(newValue);
-            presenter.refreshView(newValue);
         }
     }
 
     @Override
     public String getValue() {
         return value;
+    }
+
+    @EventHandler("type-text")
+    public void onTypeTextClick(final ClickEvent event) {
+        final String type = presenter.getDataType().getType();
+        final HTMLElement element = getElement();
+        if (!isBuiltInType(type)) {
+            structureTypesTooltip.show(event, element, type);
+        }
     }
 
     void setPickerValue(final String value) {
@@ -224,5 +242,9 @@ public class DataTypeSelectView implements DataTypeSelect.View {
 
     void setupOnChangeHandler(final Element element) {
         $(element).on("hidden.bs.select", this::onSelectChange);
+    }
+
+    private boolean isBuiltInType(final String type) {
+        return BuiltInTypeUtils.isBuiltInType(type) || Objects.equals(presenter.structure(), type);
     }
 }

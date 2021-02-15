@@ -41,6 +41,8 @@ import static org.mockito.Mockito.when;
 @RunWith(GwtMockitoTestRunner.class)
 public class DataTypeSelectTest {
 
+    private static final String STRUCTURE = "Structure";
+
     @Mock
     private DataTypeSelect.View view;
 
@@ -54,8 +56,8 @@ public class DataTypeSelectTest {
 
     @Before
     public void setup() {
-        dataTypeSelect = spy(new DataTypeSelect(view, dataTypeUtils));
-        when(dataTypeManager.structure()).thenReturn("Structure");
+        dataTypeSelect = spy(new DataTypeSelect(view, dataTypeUtils, dataTypeManager));
+        when(dataTypeManager.structure()).thenReturn(STRUCTURE);
     }
 
     @Test
@@ -153,5 +155,10 @@ public class DataTypeSelectTest {
         final String actualValue = dataTypeSelect.getValue();
 
         assertEquals(expectedValue, actualValue);
+    }
+
+    @Test
+    public void testStructure() {
+        assertEquals(STRUCTURE, dataTypeSelect.structure());
     }
 }

@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import elemental2.dom.HTMLElement;
 import org.jboss.errai.ui.client.local.api.elemental2.IsElement;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
+import org.kie.workbench.common.dmn.client.editors.types.common.DataTypeManager;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataTypeUtils;
 import org.uberfire.client.mvp.UberElemental;
 
@@ -37,13 +38,17 @@ public class DataTypeSelect {
 
     private final DataTypeUtils dataTypeUtils;
 
+    private final DataTypeManager dataTypeManager;
+
     private DataType dataType;
 
     @Inject
     public DataTypeSelect(final View view,
-                          final DataTypeUtils dataTypeUtils) {
+                          final DataTypeUtils dataTypeUtils,
+                          final DataTypeManager dataTypeManager) {
         this.view = view;
         this.dataTypeUtils = dataTypeUtils;
+        this.dataTypeManager = dataTypeManager;
     }
 
     @PostConstruct
@@ -75,6 +80,10 @@ public class DataTypeSelect {
 
     void disableEditMode() {
         view.disableEditMode();
+    }
+
+    String structure() {
+        return dataTypeManager.structure();
     }
 
     List<DataType> getDefaultDataTypes() {

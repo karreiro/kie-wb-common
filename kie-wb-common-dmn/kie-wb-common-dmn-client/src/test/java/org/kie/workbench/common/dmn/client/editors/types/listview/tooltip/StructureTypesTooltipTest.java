@@ -21,7 +21,6 @@ import java.util.Optional;
 
 import com.google.gwtmockito.GwtMockitoTestRunner;
 import elemental2.dom.HTMLElement;
-import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,13 +34,14 @@ import org.kie.workbench.common.dmn.client.editors.types.listview.DataTypeListIt
 import org.mockito.Mock;
 
 import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(GwtMockitoTestRunner.class)
-public class StructureTypesTooltipTest extends TestCase {
+public class StructureTypesTooltipTest {
 
     @Mock
     private StructureTypesTooltip.View view;

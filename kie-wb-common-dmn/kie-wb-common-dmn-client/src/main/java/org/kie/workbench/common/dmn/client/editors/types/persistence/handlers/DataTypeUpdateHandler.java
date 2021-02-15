@@ -28,8 +28,6 @@ import org.kie.workbench.common.dmn.client.editors.types.common.DataTypeManager;
 import org.kie.workbench.common.dmn.client.editors.types.persistence.DataTypeStore;
 import org.kie.workbench.common.dmn.client.editors.types.persistence.ItemDefinitionStore;
 
-import static org.kie.workbench.common.dmn.api.editors.types.BuiltInTypeUtils.isBuiltInType;
-
 @Dependent
 public class DataTypeUpdateHandler extends DataTypeHandler {
 
@@ -42,17 +40,6 @@ public class DataTypeUpdateHandler extends DataTypeHandler {
         super(dataTypeStore, dataTypeManager);
 
         this.itemDefinitionStore = itemDefinitionStore;
-    }
-
-    public void update(final DataType dataType) {
-
-        final String type = getTypeName(dataType);
-
-        if (!isBuiltInType(type)) {
-            dataTypeManager
-                    .from(dataType)
-                    .withRefreshedSubDataTypes(type);
-        }
     }
 
     public List<DataType> refreshDependentDataTypes(final DataType dataType,
@@ -77,18 +64,11 @@ public class DataTypeUpdateHandler extends DataTypeHandler {
 
         getClosestTopLevelDataType(dataType)
                 .ifPresent(topLevelUpdate -> {
-
-                    refreshSubDataTypes(topLevelUpdate, topLevelUpdate.getName());
-
                     if (!isStructure(topLevelUpdate)) {
-                        forEachSubDataTypesByTypeOrName(topLevelUpdate.getType(), subDataType -> {
-                            refreshSubDataTypes(subDataType, topLevelUpdate.getType());
-                            affectedDataTypes.add(subDataType);
-                        });
+                        forEachSubDataTypesByTypeOrName(topLevelUpdate.getType(), affectedDataTypes::add);
                     } else {
                         affectedDataTypes.addAll(handleTopLevelDataTypeUpdate(topLevelUpdate, topLevelUpdate.getName()));
                     }
-
                     affectedDataTypes.add(topLevelUpdate);
                 });
 
@@ -102,8 +82,6 @@ public class DataTypeUpdateHandler extends DataTypeHandler {
 
         if (dataType.isTopLevel()) {
 
-            refreshSubDataTypes(dataType);
-
             affectedDataTypes.addAll(forEachSubDataTypesByType(oldTypeName, subDataType -> {
                 refreshSubDataType(subDataType, dataType.getName());
             }));
@@ -116,16 +94,8 @@ public class DataTypeUpdateHandler extends DataTypeHandler {
 
     void refreshSubDataType(final DataType dataType,
                             final String newType) {
-
         final ItemDefinition itemDefinition = itemDefinitionStore.get(dataType.getUUID());
-
         dataTypeManager.from(dataType).withType(newType);
         recordEngine.doUpdate(dataType, itemDefinition);
-
-        refreshSubDataTypes(dataType, dataType.getType());
-    }
-
-    private String getTypeName(final DataType dataType) {
-        return dataTypeManager.withDataType(dataType).getTypeName();
     }
 }

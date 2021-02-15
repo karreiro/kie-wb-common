@@ -141,8 +141,6 @@ public class ItemDefinitionRecordEngine implements DataTypeRecordEngine {
 
     public void doUpdate(final DataType dataType,
                          final ItemDefinition itemDefinition) {
-
-        dataTypeUpdateHandler.update(dataType);
         itemDefinitionUpdateHandler.update(dataType, itemDefinition);
     }
 

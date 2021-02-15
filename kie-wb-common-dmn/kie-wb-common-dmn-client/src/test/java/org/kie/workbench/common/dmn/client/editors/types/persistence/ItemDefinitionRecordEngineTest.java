@@ -133,7 +133,6 @@ public class ItemDefinitionRecordEngineTest {
 
         recordEngine.doUpdate(dataType, itemDefinition);
 
-        verify(dataTypeUpdateHandler).update(dataType);
         verify(itemDefinitionUpdateHandler).update(dataType, itemDefinition);
     }
 

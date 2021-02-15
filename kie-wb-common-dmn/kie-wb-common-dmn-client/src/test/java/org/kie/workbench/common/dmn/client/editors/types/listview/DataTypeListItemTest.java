@@ -1385,6 +1385,23 @@ public class DataTypeListItemTest {
         verify(dataTypeList).highlightLevel(dataType);
     }
 
+    @Test
+    public void testEnableShortcutsHighlight() {
+
+        final HTMLElement target = mock(HTMLElement.class);
+        final HTMLElement container = mock(HTMLElement.class);
+
+        doReturn(target).when(listItem).getDragAndDropElement();
+        doReturn(dataTypeList).when(listItem).getDataTypeList();
+        when(dataTypeList.getListItems()).thenReturn(container);
+
+        listItem.enableShortcutsHighlight();
+
+        verify(scrollHelper).scrollTo(target, container);
+        verify(dataTypeList).highlightLevel(target);
+        verify(dataTypeShortcuts).highlight(target);
+    }
+
     private DataType makeDataType() {
         return new DataType(null);
     }

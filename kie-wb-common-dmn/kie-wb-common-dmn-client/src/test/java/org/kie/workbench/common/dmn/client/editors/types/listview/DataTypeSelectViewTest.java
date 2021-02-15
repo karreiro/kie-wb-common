@@ -295,7 +295,9 @@ public class DataTypeSelectViewTest {
 
         view.onTypeTextClick(event);
 
-        verify(structureTypesTooltip).show(event, element, type);
+        verify(structureTypesTooltip).show(element, type);
+        verify(event).preventDefault();
+        verify(event).stopPropagation();
     }
 
     @Test
@@ -311,7 +313,9 @@ public class DataTypeSelectViewTest {
 
         view.onTypeTextClick(event);
 
-        verify(structureTypesTooltip, never()).show(any(), any(), anyString());
+        verify(structureTypesTooltip, never()).show(any(), anyString());
+        verify(event).preventDefault();
+        verify(event).stopPropagation();
     }
 
     @Test

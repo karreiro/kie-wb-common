@@ -190,8 +190,15 @@ public class DataTypeSelectView implements DataTypeSelect.View {
         final String type = presenter.getDataType().getType();
         final HTMLElement element = getElement();
         if (!isBuiltInType(type)) {
-            structureTypesTooltip.show(event, element, type);
+            structureTypesTooltip.show(element, type);
         }
+        skipClickListeners(event);
+    }
+
+    private void skipClickListeners(final ClickEvent event) {
+        // Skip click listeners
+        event.preventDefault();
+        event.stopPropagation();
     }
 
     void setPickerValue(final String value) {

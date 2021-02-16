@@ -44,6 +44,19 @@
       z-index: 1;
     }
 
+    .kie-data-type-type {
+      border-radius: 25px;
+      background-color: #ffffff;
+      padding: 0 8px 1px;
+      margin-left: 10px;
+      border: 1px solid #DDDDDD;
+      color: #555555;
+      font-size: 11px;
+      font-weight: 500;
+      pointer-events: none;
+      user-select: none;
+    }
+
     button {
       position: absolute;
       top: 7px;
@@ -59,10 +72,24 @@
       font-weight: 600;
     }
 
+    h3,
+    h3 + span {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    h3 + span {
+      margin-top: 10px;
+    }
+
     ul {
       padding: 0 0 0 20px;
       max-height: 170px;
       overflow-y: auto;
+
+      li {
+        padding-bottom: 4px;
+      }
     }
   }
 }

@@ -16,23 +16,23 @@
 
 package org.kie.workbench.common.dmn.client.editors.types.listview.tooltip;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import elemental2.dom.HTMLDivElement;
 import elemental2.dom.HTMLElement;
 import org.jboss.errai.ui.client.local.api.elemental2.IsElement;
 import org.kie.workbench.common.dmn.api.definition.model.ItemDefinition;
+import org.kie.workbench.common.dmn.client.editors.types.common.DataType;
 import org.kie.workbench.common.dmn.client.editors.types.common.DataTypeManager;
 import org.kie.workbench.common.dmn.client.editors.types.common.ItemDefinitionUtils;
 import org.kie.workbench.common.dmn.client.editors.types.listview.DataTypeList;
 import org.kie.workbench.common.dmn.client.editors.types.listview.DataTypeListItem;
 import org.uberfire.client.mvp.UberElemental;
 
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 @ApplicationScoped
@@ -67,18 +67,18 @@ public class StructureTypesTooltip {
     public void show(final HTMLElement refElement,
                      final String typeName) {
         this.typeName = typeName;
-        view.show(refElement, typeName);
+        view.show(refElement);
     }
 
     HTMLElement getListItems() {
         return dataTypeList.getListItems();
     }
 
-    List<String> getTypeFields(final String typeName) {
-        return itemDefinitionUtils
-                .findByName(typeName)
-                .map(this::getItemDefinitionFields)
-                .orElse(Collections.emptyList());
+    List<DataType> getTypeFields() {
+        return dataTypeManager
+                .getTopLevelDataTypeWithName(getTypeName())
+                .map(DataType::getSubDataTypes)
+                .orElse(emptyList());
     }
 
     void goToDataType() {
@@ -103,12 +103,6 @@ public class StructureTypesTooltip {
     public interface View extends UberElemental<StructureTypesTooltip>,
                                   IsElement {
 
-        HTMLDivElement getTooltip();
-
-        void setup(final String name,
-                   final List<String> fields);
-
-        void show(HTMLElement refElement,
-                  String typeName);
+        void show(HTMLElement refElement);
     }
 }

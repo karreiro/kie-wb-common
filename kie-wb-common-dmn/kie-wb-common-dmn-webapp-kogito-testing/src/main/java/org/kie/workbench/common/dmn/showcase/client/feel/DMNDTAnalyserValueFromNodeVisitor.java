@@ -19,9 +19,13 @@ package org.kie.workbench.common.dmn.showcase.client.feel;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import elemental2.dom.DomGlobal;
 import jsinterop.base.Js;
+import org.kie.dmn.api.feel.runtime.events.FEELEventListener;
+import org.kie.dmn.feel.lang.CompilerContext;
+import org.kie.dmn.feel.lang.EvaluationContext;
 import org.kie.dmn.feel.lang.FEELProfile;
 import org.kie.dmn.feel.lang.ast.ASTNode;
 import org.kie.dmn.feel.lang.ast.BaseNode;
@@ -50,8 +54,16 @@ public class DMNDTAnalyserValueFromNodeVisitor extends DefaultedVisitor<Comparab
         FEEL = Js.uncheckedCast(org.kie.dmn.feel.FEEL.newInstance(feelProfiles));
     }
 
-//    @Override
-//    public Comparable<?> visit(SignedUnaryNode n) {
+    @Override
+    public Comparable<?> visit(ASTNode n) {
+        return super.visit(n);
+    }
+
+    @Override
+    public Comparable<?> visit(SignedUnaryNode n) {
+        DomGlobal.console.log("visit ASTNode" );
+        return super.visit(n);
+/////////
 //        BaseNode signedExpr = n.getExpression();
 //        if (signedExpr instanceof NumberNode) {
 //            BigDecimal valueFromNode = (BigDecimal) signedExpr.accept(this);
@@ -63,11 +75,15 @@ public class DMNDTAnalyserValueFromNodeVisitor extends DefaultedVisitor<Comparab
 //        } else {
 //            return defaultVisit(n);
 //        }
-//    }
+    }
 
     @Override
     public Comparable<?> defaultVisit(ASTNode n) {
-        return (Comparable<?>) n.evaluate(FEEL.newEvaluationContext(Collections.emptyList(), Collections.emptyMap()));
+        List<FEELEventListener> listeners = Collections.emptyList();
+        Map<String, Object> inputVariables = Collections.emptyMap();
+        EvaluationContext ctx = FEEL.newEvaluationContext(listeners, inputVariables);
+        Object evaluate = n.evaluate(ctx);
+        return (Comparable<?>) evaluate;
     }
 
     @Override

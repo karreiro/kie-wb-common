@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
@@ -35,6 +36,8 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.kie.dmn.feel.gwt.functions.api.FunctionOverrideVariation;
 import org.kie.dmn.feel.gwt.functions.client.FEELFunctionProvider;
 import org.kie.dmn.feel.lang.FEELProfile;
+import org.kie.dmn.feel.lang.Scope;
+import org.kie.dmn.feel.lang.Symbol;
 import org.kie.dmn.feel.lang.Type;
 import org.kie.dmn.feel.lang.ast.ASTNode;
 import org.kie.dmn.feel.lang.ast.BaseNode;
@@ -109,9 +112,9 @@ public class FEELEditor {
 
         StringBuilder builder = new StringBuilder();
         for (final FunctionOverrideVariation definition : getFunctionOverrideVariations()) {
-            builder.append(definition.getReturnType());
-            builder.append(" == ");
-            builder.append(definition.toHumanReadableStrings().getTemplate());
+            builder.append(definition.toHumanReadableStrings().getHumanReadable());
+            builder.append(" => ");
+            builder.append(definition.getReturnType().getName());
             builder.append("\n");
         }
         view.setAvailableMethods(builder.toString());
@@ -172,7 +175,7 @@ public class FEELEditor {
         final Map<String, Type> inputVariableTypes = emptyMap();
         final Map<String, Object> inputVariables = emptyMap();
         final List<FEELProfile> profiles = new ArrayList<>();
-//        profiles.add(new KieExtendedFEELProfile(getFunctionOverrideVariations()));
+        profiles.add(new KieExtendedFEELProfile(getFunctionOverrideVariations()));
 //        KieExtendedFEELProfile e = new KieExtendedFEELProfile();
 //        final List<FEELFunction> additionalFunctions = e.getFEELFunctions();
 //        profiles.add(e);
@@ -183,29 +186,42 @@ public class FEELEditor {
         final Map<String, Type> inputTypes = emptyMap();
         final FEELTypeRegistry typeRegistry1 = null;
         final ASTBuilderVisitor astBuilderVisitor = new ASTBuilderVisitor(inputTypes, typeRegistry1);
+
+//        SymbolTable symbolTable = new SymbolTableVisitor().visit(tree);
+
         final BaseNode expr = astBuilderVisitor.visit(tree);
+
+
+
         final StringBuilder stringBuilder = new StringBuilder();
 
         dump(stringBuilder, expr);
         view.setASTDump(stringBuilder.toString());
+
         try {
             DMNDTAnalyserValueFromNodeVisitor v = new DMNDTAnalyserValueFromNodeVisitor(profiles);
-            view.setEvaluation(expr.accept(v).toString());
+
+            Comparable<?> visit = v.visit(expr);
+;
+            DomGlobal.console.log("SUCCES EVAL 2", visit);
+//            String result = visit.toString();
+//            view.setEvaluation(result);
+            view.setEvaluation(expr.getResultType().getName());
         } catch (Exception e) {
             view.setEvaluation("ERROR EVAL");
         }
         final CodeCompletionCore core = new CodeCompletionCore(parser, null, ignoredTokens());
 
-        DomGlobal.console.log(caretPositionLine + " ___ " + caretPositionColumn);
 
 //        let symbolTable = new SymbolTableVisitor().visit(parseTree);
 //        completions.push(...suggestVariables(symbolTable));
 
         final int caretIndex = computeTokenIndex(tree, caretPositionLine, caretPositionColumn);
+        DomGlobal.console.log(caretPositionLine + " ~~ " + caretPositionColumn + " ~~ " + caretIndex);
         final CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(caretIndex, parser.getContext());
         final List<String> keywords = new ArrayList<>();
         keywords.add(new Date().toString());
-        keywords.addAll(getKeywords(parser, candidates));
+        keywords.addAll(getKeywords(parser, tree, candidates));
         return keywords;
     }
 
@@ -218,25 +234,60 @@ public class FEELEditor {
     }
 
     private List<String> getKeywords(final FEEL_1_1Parser parser,
+                                     final ParseTree tree,
                                      final CodeCompletionCore.CandidatesCollection candidates) {
 
         final List<String> keywords = new ArrayList<>();
 
+        DomGlobal.console.log(" candidates.tokens.keySet >>>>>>>>>>>>>>>> " + candidates.tokens.keySet().size());
         for (final Integer integer : candidates.tokens.keySet()) {
 //            String reduce = entry.getValue().stream().map(Object::toString).reduce((i, j) -> i + ", " + j).orElse("");
             final String displayName = getDisplayName(parser, integer);
             keywords.add(displayName);
         }
 
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+//        DomGlobal.console.log(">>>> [1] ");
+//        SymbolTable symbolTable = new SymbolTableVisitor().visit(tree);
+
+//        for (SymbolTable.Tuple symbol : symbolTable.getSymbols()) {
+//            int integer = Integer.parseInt(symbol.text);
+//            final String displayName = getDisplayName(parser, integer);
+//            DomGlobal.console.log("::::::::::::::::::::: [ ~ ] " + displayName);
+////            DomGlobal.console.log("::::::::::::::::::::: [display] " + symbol.text + " :: " + parser.getVocabulary().getDisplayName(integer));
+////            DomGlobal.console.log("::::::::::::::::::::: [literal] " + symbol.text + " :: " + parser.getVocabulary().getLiteralName(integer));
+////            DomGlobal.console.log("::::::::::::::::::::: [symboli] " + symbol.text + " :: " + parser.getVocabulary().getSymbolicName(integer));
+////            keywords.add(displayName);
+//        }
+
+//        Scope builtInScope = symbolTable.getBuiltInScope();
+//        List<Symbol> symbols = new ArrayList<>(builtInScope.getSymbols().values());
+//        symbols.forEach((s) -> {
+//            DomGlobal.console.log(">>>> [] ", s);
+//        });
+
+//        for (FunctionOverrideVariation functionOverrideVariation : getFunctionOverrideVariations()) {
+//            DomGlobal.console.log(">>>>>>>> ", functionOverrideVariation);
+//        }
+
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+        //////////////////////////////////////////////////
+
+        DomGlobal.console.log(" // candidates.rules ///////////////////// " + candidates.rules.size());
         for (Integer integer : candidates.rules.keySet()) {
             final String displayName = getDisplayName(parser, integer);
             keywords.add(displayName);
         }
 
+        DomGlobal.console.log(" candidates.rulePositions.keySet >>>>>>>>> " + candidates.rulePositions.keySet().size());
         for (Integer integer : candidates.rulePositions.keySet()) {
             final String displayName = getDisplayName(parser, integer);
             keywords.add(displayName);
         }
+
         return keywords;
     }
 

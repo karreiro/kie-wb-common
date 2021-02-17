@@ -47,6 +47,7 @@ import static com.google.gwt.dom.client.BrowserEvents.CLICK;
 import static com.google.gwt.dom.client.BrowserEvents.SCROLL;
 import static org.kie.workbench.common.dmn.client.editors.common.RemoveHelper.removeChildren;
 import static org.kie.workbench.common.dmn.client.resources.i18n.DMNEditorConstants.StructureTypesTooltipView_Description;
+import static org.kie.workbench.common.dmn.client.resources.i18n.DMNEditorConstants.StructureTypesTooltipView_DescriptionEmptyState;
 
 @ApplicationScoped
 @Templated
@@ -138,9 +139,11 @@ public class StructureTypesTooltipView implements StructureTypesTooltip.View {
 
     @Override
     public void show(final HTMLElement refElement) {
+        // toggle
         updateTooltipPosition(refElement);
         updateTooltipAsVisible();
         updateContent();
+        updateTooltipClass();
         setupListeners();
     }
 
@@ -154,11 +157,20 @@ public class StructureTypesTooltipView implements StructureTypesTooltip.View {
         final String typeName = presenter.getTypeName();
         final List<DataType> typeFields = presenter.getTypeFields();
 
-        description.textContent = translationService.format(StructureTypesTooltipView_Description, typeName, typeFields.size());
+        description.textContent = getDescriptionText(typeName, typeFields);
         dataTypeName.textContent = typeName;
 
         removeChildren(dataTypeFields);
         typeFields.forEach(field -> dataTypeFields.appendChild(makeFieldElement(field)));
+    }
+
+    private String getDescriptionText(final String typeName, final List<DataType> typeFields) {
+        final int numberOfFields = typeFields.size();
+        if (numberOfFields == 0) {
+            return translationService.format(StructureTypesTooltipView_DescriptionEmptyState, typeName);
+        } else {
+            return translationService.format(StructureTypesTooltipView_Description, typeName, numberOfFields);
+        }
     }
 
     private void setupListeners() {
@@ -200,6 +212,16 @@ public class StructureTypesTooltipView implements StructureTypesTooltip.View {
         tooltip.style.left = x + "px";
     }
 
+    private void updateTooltipClass() {
+        tooltip.classList.toggle("overflow", isTooltipOverflowing());
+    }
+
+    private boolean isTooltipOverflowing() {
+        final DOMRect dataTypesListRect = getListItems().getBoundingClientRect();
+        final DOMRect tooltipRect = tooltip.getBoundingClientRect();
+        return tooltipRect.y + tooltipRect.height > dataTypesListRect.y + dataTypesListRect.height;
+    }
+
     private HTMLLIElement makeFieldElement(final DataType field) {
 
         final HTMLLIElement htmlLiElement = makeHTMLLIElement();
@@ -215,7 +237,7 @@ public class StructureTypesTooltipView implements StructureTypesTooltip.View {
     private HTMLBodyElement getBody() {
         return DomGlobal.document.body;
     }
-    
+
     private HTMLElement getListItems() {
         return presenter.getListItems();
     }

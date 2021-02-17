@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
+import elemental2.dom.DomGlobal;
 import jsinterop.base.Js;
 import org.kie.dmn.feel.lang.FEELProfile;
 import org.kie.dmn.feel.lang.ast.ASTNode;
@@ -146,9 +147,9 @@ public class DMNDTAnalyserValueFromNodeVisitor extends DefaultedVisitor<Comparab
                 // simple name
                 fnName = n.getName().getText();
             } else {
-                fnName = "";
-//                throw new IllegalStateException("Name of function is not instance of NameRefNode!" + n.toString());
+                throw new IllegalStateException("Name of function is not instance of NameRefNode!" + n.toString());
             }
+            DomGlobal.console.log("PICKY PUCKY");
             List<BaseNode> params = n.getParams().getElements();
             switch (fnName) {
                 case DATE:

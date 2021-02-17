@@ -28,7 +28,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import org.jboss.errai.common.client.api.ErrorCallback;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.kie.workbench.common.dmn.showcase.client.alternatives.DMNClientModels;
-import org.kie.workbench.common.dmn.webapp.common.client.feel.FEELEditor;
+import org.kie.workbench.common.dmn.showcase.client.feel.FEELEditor;
 import org.kie.workbench.common.dmn.webapp.common.client.navigator.BaseDMNDiagramsNavigatorScreen;
 import org.kie.workbench.common.kogito.webapp.base.client.editor.KogitoScreen;
 import org.kie.workbench.common.stunner.client.widgets.event.LoadDiagramEvent;

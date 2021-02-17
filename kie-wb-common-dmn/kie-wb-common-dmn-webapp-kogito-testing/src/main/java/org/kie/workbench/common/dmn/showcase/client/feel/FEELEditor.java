@@ -43,7 +43,6 @@ import org.kie.dmn.feel.lang.types.FEELTypeRegistry;
 import org.kie.dmn.feel.parser.feel11.ASTBuilderVisitor;
 import org.kie.dmn.feel.parser.feel11.FEELParser;
 import org.kie.dmn.feel.parser.feel11.FEEL_1_1Parser;
-import org.kie.dmn.feel.parser.feel11.profiles.KieExtendedFEELProfile;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
@@ -173,7 +172,7 @@ public class FEELEditor {
         final Map<String, Type> inputVariableTypes = emptyMap();
         final Map<String, Object> inputVariables = emptyMap();
         final List<FEELProfile> profiles = new ArrayList<>();
-        profiles.add(new KieExtendedFEELProfile());
+//        profiles.add(new KieExtendedFEELProfile(getFunctionOverrideVariations()));
 //        KieExtendedFEELProfile e = new KieExtendedFEELProfile();
 //        final List<FEELFunction> additionalFunctions = e.getFEELFunctions();
 //        profiles.add(e);
@@ -198,6 +197,9 @@ public class FEELEditor {
         final CodeCompletionCore core = new CodeCompletionCore(parser, null, ignoredTokens());
 
         DomGlobal.console.log(caretPositionLine + " ___ " + caretPositionColumn);
+
+//        let symbolTable = new SymbolTableVisitor().visit(parseTree);
+//        completions.push(...suggestVariables(symbolTable));
 
         final int caretIndex = computeTokenIndex(tree, caretPositionLine, caretPositionColumn);
         final CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(caretIndex, parser.getContext());

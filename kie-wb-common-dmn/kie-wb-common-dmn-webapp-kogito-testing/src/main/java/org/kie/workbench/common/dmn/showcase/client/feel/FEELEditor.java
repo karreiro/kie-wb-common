@@ -206,7 +206,7 @@ public class FEELEditor {
             DomGlobal.console.log("SUCCES EVAL 2", visit);
 //            String result = visit.toString();
 //            view.setEvaluation(result);
-            view.setEvaluation(expr.getResultType().getName());
+            view.setEvaluation(expr.getResultType().getName()); // <=== EXPRESSION RETURN TYPE!!!!
         } catch (Exception e) {
             view.setEvaluation("ERROR EVAL");
         }

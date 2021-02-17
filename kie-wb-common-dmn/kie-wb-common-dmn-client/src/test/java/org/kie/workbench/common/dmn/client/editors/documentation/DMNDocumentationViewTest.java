@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.workbench.common.dmn.client.editors.documentation.common.DMNDocumentationService;
+import org.kie.workbench.common.dmn.client.editors.documentation.common.DMNDocumentationServiceImpl;
 import org.kie.workbench.common.dmn.client.editors.documentation.common.HTMLDownloadHelper;
 import org.kie.workbench.common.dmn.client.editors.types.common.HiddenHelper;
 import org.kie.workbench.common.stunner.core.client.util.PrintHelper;
@@ -67,7 +68,7 @@ public class DMNDocumentationViewTest {
     private PrintHelper printHelper;
 
     @Mock
-    private DMNDocumentationService documentationService;
+    private DMNDocumentationServiceImpl documentationService;
 
     @Mock
     private Diagram diagram;

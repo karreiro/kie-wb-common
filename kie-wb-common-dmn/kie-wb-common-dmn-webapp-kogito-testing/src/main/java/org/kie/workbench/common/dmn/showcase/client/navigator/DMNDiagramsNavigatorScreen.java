@@ -28,6 +28,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import org.jboss.errai.common.client.api.ErrorCallback;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.kie.workbench.common.dmn.showcase.client.alternatives.DMNClientModels;
+import org.kie.workbench.common.dmn.webapp.common.client.feel.FEELEditor;
 import org.kie.workbench.common.dmn.webapp.common.client.navigator.BaseDMNDiagramsNavigatorScreen;
 import org.kie.workbench.common.kogito.webapp.base.client.editor.KogitoScreen;
 import org.kie.workbench.common.stunner.client.widgets.event.LoadDiagramEvent;
@@ -38,6 +39,7 @@ import org.uberfire.client.annotations.WorkbenchMenu;
 import org.uberfire.client.annotations.WorkbenchPartTitle;
 import org.uberfire.client.annotations.WorkbenchPartView;
 import org.uberfire.client.annotations.WorkbenchScreen;
+import org.uberfire.client.mvp.PlaceManager;
 import org.uberfire.lifecycle.OnClose;
 import org.uberfire.lifecycle.OnStartup;
 import org.uberfire.mvp.PlaceRequest;
@@ -54,6 +56,9 @@ public class DMNDiagramsNavigatorScreen extends BaseDMNDiagramsNavigatorScreen i
     private org.kie.workbench.common.kogito.webapp.base.client.workarounds.KogitoResourceContentService contentService;
 
     private DMNVFSService vfsService;
+
+    @Inject
+    private PlaceManager placeManager;
 
     public DMNDiagramsNavigatorScreen() {
         //CDI proxy
@@ -98,7 +103,11 @@ public class DMNDiagramsNavigatorScreen extends BaseDMNDiagramsNavigatorScreen i
     @Override
     protected MenuFactory.TopLevelMenusBuilder<MenuFactory.MenuBuilder> createMenuBuilder() {
         final MenuFactory.TopLevelMenusBuilder<MenuFactory.MenuBuilder> builder = super.createMenuBuilder();
-        builder.newTopLevelMenu("Load diagrams from client")
+        builder
+                .newTopLevelMenu("FEEL Editor")
+                .respondsWith(() -> placeManager.goTo(FEELEditor.EDITOR_ID))
+                .endMenu()
+                .newTopLevelMenu("Load diagrams from client")
                 .respondsWith(this::loadFromClient)
                 .order(-1)
                 .endMenu();

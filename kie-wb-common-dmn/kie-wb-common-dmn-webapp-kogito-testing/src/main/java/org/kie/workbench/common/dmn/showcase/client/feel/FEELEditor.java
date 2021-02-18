@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
@@ -36,12 +35,11 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.kie.dmn.feel.gwt.functions.api.FunctionOverrideVariation;
 import org.kie.dmn.feel.gwt.functions.client.FEELFunctionProvider;
 import org.kie.dmn.feel.lang.FEELProfile;
-import org.kie.dmn.feel.lang.Scope;
-import org.kie.dmn.feel.lang.Symbol;
 import org.kie.dmn.feel.lang.Type;
 import org.kie.dmn.feel.lang.ast.ASTNode;
 import org.kie.dmn.feel.lang.ast.BaseNode;
 import org.kie.dmn.feel.lang.impl.FEELEventListenersManager;
+import org.kie.dmn.feel.lang.types.BuiltInType;
 import org.kie.dmn.feel.lang.types.FEELTypeRegistry;
 import org.kie.dmn.feel.parser.feel11.ASTBuilderVisitor;
 import org.kie.dmn.feel.parser.feel11.FEELParser;
@@ -96,6 +94,8 @@ public class FEELEditor {
 
     public static final String EDITOR_ID = "org.kie.workbench.common.dmn.showcase.client.editor.FEELEditor";
     private FeelEditorView view;
+    private int caretPositionLine;
+    private int caretPositionColumn;
 
     @Inject
     public FEELEditor(FeelEditorView view) {
@@ -140,15 +140,41 @@ public class FEELEditor {
     }
 
     private void dump(final StringBuilder stringBuilder,
-                      final ASTNode expr) {
+                      final ASTNode expr,
+                      final int n,
+                      final List<String> typeStack) {
         if (expr == null) {
             return;
         }
+
+        boolean isBold = (caretPositionLine >= expr.getStartLine() && caretPositionLine <= expr.getEndLine() && caretPositionColumn >= expr.getStartColumn() && caretPositionColumn <= expr.getEndColumn());
+
+        if (isBold) {
+            typeStack.add(expr.getResultType().getName());
+        }
+
+        stringBuilder.append(isBold ? " >>> " : "  .  ");
+        stringBuilder.append(level(n));
         stringBuilder.append(expr.toString());
+        stringBuilder.append(": ");
+        stringBuilder.append(expr.getResultType().getName());
+        stringBuilder.append(" ===>                    ");
+        stringBuilder.append(" Line(" + expr.getStartLine() + ".." + expr.getEndLine() + ")");
+        stringBuilder.append("  Col(" + expr.getStartColumn() + ".." + expr.getEndColumn() + ")");
+        stringBuilder.append(" Char(" + expr.getStartChar() + ".." + expr.getEndChar() + ")");
+
         stringBuilder.append("\n");
         for (ASTNode astNode : expr.getChildrenNode()) {
-            dump(stringBuilder, astNode);
+            dump(stringBuilder, astNode, n + 1, typeStack);
         }
+    }
+
+    private String level(final int n) {
+        StringBuilder append = new StringBuilder();
+        for (int i = 1; i <= n; i++) {
+            append.append("  ");
+        }
+        return append.toString();
     }
 
     public void onChange(String text) {
@@ -189,40 +215,99 @@ public class FEELEditor {
 
 //        SymbolTable symbolTable = new SymbolTableVisitor().visit(tree);
 
+        parser.getHelper().defineVariable("personName", BuiltInType.STRING);
+
         final BaseNode expr = astBuilderVisitor.visit(tree);
 
-
+        extracted(tree, parser);
 
         final StringBuilder stringBuilder = new StringBuilder();
 
-        dump(stringBuilder, expr);
+        this.caretPositionLine = caretPositionLine;
+        this.caretPositionColumn = caretPositionColumn;
+
+        List<String> typeStack = new ArrayList<>();
+
+        dump(stringBuilder, expr, 0, typeStack);
         view.setASTDump(stringBuilder.toString());
+
+        DomGlobal.console.log(">>>>>>>>>>>>>>>>>>>>>>>" + typeStack.get(typeStack.size() - 1));
 
         try {
             DMNDTAnalyserValueFromNodeVisitor v = new DMNDTAnalyserValueFromNodeVisitor(profiles);
 
-            Comparable<?> visit = v.visit(expr);
-;
-            DomGlobal.console.log("SUCCES EVAL 2", visit);
-//            String result = visit.toString();
-//            view.setEvaluation(result);
-            view.setEvaluation(expr.getResultType().getName());
+            view.setEvaluation("Result: " + expr.accept(v).toString() + "\nResult type: " + expr.getResultType().getName()); // <=== EXPRESSION RETURN TYPE!!!!
         } catch (Exception e) {
             view.setEvaluation("ERROR EVAL");
         }
+
         final CodeCompletionCore core = new CodeCompletionCore(parser, null, ignoredTokens());
 
+//
+//        try {
+//            for (Integer preferredRule : core.getPreferredRules()) {
+//                DomGlobal.console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + getDisplayName(parser, preferredRule));
+//            }
+//        } catch (Exception e) {
+//            DomGlobal.console.log(">> 4");
+//            DomGlobal.console.log(" [ERR] >>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + e.getMessage());
+//        }
+        //DomGlobal.console.log("~~~~>> " +core.getPreferredRules().size() );
 
 //        let symbolTable = new SymbolTableVisitor().visit(parseTree);
 //        completions.push(...suggestVariables(symbolTable));
 
         final int caretIndex = computeTokenIndex(tree, caretPositionLine, caretPositionColumn);
-        DomGlobal.console.log(caretPositionLine + " ~~ " + caretPositionColumn + " ~~ " + caretIndex);
+
+//        DomGlobal.console.log(caretPositionLine + " ~~ " + caretPositionColumn + " ~~ " + caretIndex);
         final CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(caretIndex, parser.getContext());
         final List<String> keywords = new ArrayList<>();
         keywords.add(new Date().toString());
         keywords.addAll(getKeywords(parser, tree, candidates));
         return keywords;
+    }
+
+    private void extracted(final ParseTree tree, final FEEL_1_1Parser parser) {
+        try {
+
+            ////////////////////////
+
+//            ParserRuleContext p = tree.getRuleContext();
+//
+//            int objectsSize = p.getChildCount();
+
+//            String text = "";
+//            text += "\n >>> " + parser.endpoint().getText();
+//            text += "\n >>> " + parser.context().getText();
+////            text += "\n >>> " + parser.iterationContext().getText();
+////            text += "\n >>> " + parser.type().getText();
+////            text += "\n >>> " + parser.atLiteral().getText();
+////            text += "\n >>> " + parser.getTokenStream().getText();
+////            text += "\n >>> " + parser.textualExpression().getText();
+//            text += "\n > L " + parser.context().LBRACE().getText();
+//            text += "\n > R " + parser.context().RBRACE().getText();
+////            text += "\n >>> " + parser.type().getText();
+////            text += "\n >>> " + parser.type().getText();
+////            text += "\n >>> " + parser.type().getText();
+////            text += "\n >>> " + parser.type().getText();
+//
+//            DomGlobal.console.log(" [] >>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + text);
+
+//            for (int i = 0; i < objectsSize; i++) {
+//                ParseTree token = p.getChild(i);
+//                DomGlobal.console.log(" [" + i + "] >>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", token.getText());
+//            }
+
+//            DomGlobal.console.log(" [000] >>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", parser.iterationContexts()compilation_unit().getText());
+
+//            SymbolTable accept = tree.accept(new SymbolTableVisitor());
+
+//            DomGlobal.console.log(" [0.0] >>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", accept);
+
+            ////////////////////////
+        } catch (Exception e) {
+//            DomGlobal.console.log(" [ERR] >>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + e.getMessage());
+        }
     }
 
     private int getInt(String i) {
@@ -239,7 +324,7 @@ public class FEELEditor {
 
         final List<String> keywords = new ArrayList<>();
 
-        DomGlobal.console.log(" candidates.tokens.keySet >>>>>>>>>>>>>>>> " + candidates.tokens.keySet().size());
+//        DomGlobal.console.log(" candidates.tokens.keySet >>>>>>>>>>>>>>>> " + candidates.tokens.keySet().size());
         for (final Integer integer : candidates.tokens.keySet()) {
 //            String reduce = entry.getValue().stream().map(Object::toString).reduce((i, j) -> i + ", " + j).orElse("");
             final String displayName = getDisplayName(parser, integer);
@@ -276,13 +361,13 @@ public class FEELEditor {
         //////////////////////////////////////////////////
         //////////////////////////////////////////////////
 
-        DomGlobal.console.log(" // candidates.rules ///////////////////// " + candidates.rules.size());
+//        DomGlobal.console.log(" // candidates.rules ///////////////////// " + candidates.rules.size());
         for (Integer integer : candidates.rules.keySet()) {
             final String displayName = getDisplayName(parser, integer);
             keywords.add(displayName);
         }
 
-        DomGlobal.console.log(" candidates.rulePositions.keySet >>>>>>>>> " + candidates.rulePositions.keySet().size());
+//        DomGlobal.console.log(" candidates.rulePositions.keySet >>>>>>>>> " + candidates.rulePositions.keySet().size());
         for (Integer integer : candidates.rulePositions.keySet()) {
             final String displayName = getDisplayName(parser, integer);
             keywords.add(displayName);

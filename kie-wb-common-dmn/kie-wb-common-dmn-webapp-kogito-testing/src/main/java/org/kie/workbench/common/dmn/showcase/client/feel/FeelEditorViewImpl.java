@@ -61,8 +61,9 @@ public class FeelEditorViewImpl
         aceEditor.setTheme(AceEditorTheme.CHROME);
 
         astDump.setEnabled(false);
+        astDump.getElement().setAttribute("style", "font-family: monospace");
         astDump.setHeight(TOP_ROW_HEIGHT);
-        astDump.setWidth("250px");
+        astDump.setWidth("1000px");
         aceEditor.setHeight(TOP_ROW_HEIGHT);
         aceEditor.setWidth("500px");
         c3.setEnabled(false);

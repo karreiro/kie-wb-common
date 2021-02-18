@@ -32,7 +32,7 @@ import org.uberfire.ext.widgets.common.client.ace.AceEditorTheme;
 public class FeelEditorViewImpl
         implements FeelEditorView {
 
-    private final String TOP_ROW_HEIGHT = "1000px";
+    private final String TOP_ROW_HEIGHT = "600px";
 
     //    private TextArea text = new TextArea();
     private TextArea astDump = new TextArea();
@@ -63,12 +63,12 @@ public class FeelEditorViewImpl
         astDump.setEnabled(false);
         astDump.getElement().setAttribute("style", "font-family: monospace");
         astDump.setHeight(TOP_ROW_HEIGHT);
-        astDump.setWidth("1000px");
+        astDump.setWidth("700px");
         aceEditor.setHeight(TOP_ROW_HEIGHT);
-        aceEditor.setWidth("500px");
+        aceEditor.setWidth("400px");
         c3.setEnabled(false);
         c3.setHeight(TOP_ROW_HEIGHT);
-        c3.setWidth("300px");
+        c3.setWidth("250px");
         availableMethods.setEnabled(false);
         availableMethods.setHeight(TOP_ROW_HEIGHT);
         availableMethods.setWidth("250px");

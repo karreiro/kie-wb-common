@@ -158,7 +158,7 @@ public class FEELEditor {
         stringBuilder.append(expr.toString());
         stringBuilder.append(": ");
         stringBuilder.append(expr.getResultType().getName());
-        stringBuilder.append(" ===>                    ");
+        stringBuilder.append(" ==> ");
         stringBuilder.append(" Line(" + expr.getStartLine() + ".." + expr.getEndLine() + ")");
         stringBuilder.append("  Col(" + expr.getStartColumn() + ".." + expr.getEndColumn() + ")");
         stringBuilder.append(" Char(" + expr.getStartChar() + ".." + expr.getEndChar() + ")");
@@ -323,6 +323,12 @@ public class FEELEditor {
                                      final CodeCompletionCore.CandidatesCollection candidates) {
 
         final List<String> keywords = new ArrayList<>();
+
+        DomGlobal.console.log("///////////////////////////////////");
+        DomGlobal.console.log("// rulePositions // " + candidates.rulePositions.size());
+        DomGlobal.console.log("// rules         // " + candidates.rules.size());
+        DomGlobal.console.log("// tokens        // " + candidates.tokens.size());
+        DomGlobal.console.log("///////////////////////////////////");
 
 //        DomGlobal.console.log(" candidates.tokens.keySet >>>>>>>>>>>>>>>> " + candidates.tokens.keySet().size());
         for (final Integer integer : candidates.tokens.keySet()) {

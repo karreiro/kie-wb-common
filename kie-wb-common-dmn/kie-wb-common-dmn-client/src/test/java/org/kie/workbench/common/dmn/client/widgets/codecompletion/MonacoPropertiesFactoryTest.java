@@ -554,7 +554,7 @@ public class MonacoPropertiesFactoryTest {
         doReturn(suggestions).when(factory).getSuggestions(variableSuggestions);
         when(expectedJSONObjectSuggestions.getJavaScriptObject()).thenReturn(expectedSuggestions);
 
-        final JavaScriptObject actualSuggestions = factory.getProvideCompletionItemsFunction(variableSuggestions).call();
+        final JavaScriptObject actualSuggestions = factory.getProvideCompletionItemsFunction(variableSuggestions).call(null, null);
 
         verify(expectedJSONObjectSuggestions).put("suggestions", suggestions);
         assertEquals(expectedSuggestions, actualSuggestions);

@@ -20,6 +20,7 @@
 
   <inherits name="com.google.gwt.logging.Logging"/>
   <inherits name="org.uberfire.UberfireWorkbenchBackend"/>
+  <inherits name="org.kie.workbench.common.dmn.DMNClient"/>
   <inherits name="org.kie.workbench.common.dmn.webapp.kogito.common.DMNWebappKogitoCommon"/>
 
   <!-- We don't need to support IE10 or older -->

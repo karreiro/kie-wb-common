@@ -148,7 +148,7 @@ public class MonacoPropertiesFactory {
      * https://microsoft.github.io/monaco-editor/api/interfaces/monaco.languages.completionlist.html
      */
     ProvideCompletionItemsFunction getProvideCompletionItemsFunction(final MonacoFEELVariableSuggestions variableSuggestions) {
-        return () -> {
+        return (model, position) -> {
             final JSONObject suggestions = makeJSONObject();
             suggestions.put("suggestions", getSuggestions(variableSuggestions));
             return suggestions.getJavaScriptObject();

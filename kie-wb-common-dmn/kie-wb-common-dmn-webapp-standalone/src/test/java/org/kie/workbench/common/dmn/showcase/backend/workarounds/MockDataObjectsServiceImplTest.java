@@ -15,35 +15,29 @@
  */
 package org.kie.workbench.common.dmn.showcase.backend.workarounds;
 
-import org.guvnor.common.services.project.model.WorkspaceProject;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MockDataObjectsServiceImplTest {
 
-    @Mock
-    private WorkspaceProject workspaceProject;
-
-    private MockDataObjectsServiceImpl dataObjectsService;
-
-    @Before
-    public void setup() {
-        this.dataObjectsService = new MockDataObjectsServiceImpl();
-    }
-
-    @Test
-    public void testLoadDataObjectsWithNullWorkspaceProject() {
-        assertThat(dataObjectsService.loadDataObjects(null)).isEmpty();
-    }
-
-    @Test
-    public void testLoadDataObjectsWithNonNullWorkspaceProject() {
-        assertThat(dataObjectsService.loadDataObjects(workspaceProject)).isEmpty();
-    }
+//    @Mock
+//    private WorkspaceProject workspaceProject;
+//
+//    private MockDataObjectsServiceImpl dataObjectsService;
+//
+//    @Before
+//    public void setup() {
+//        this.dataObjectsService = new MockDataObjectsServiceImpl();
+//    }
+//
+//    @Test
+//    public void testLoadDataObjectsWithNullWorkspaceProject() {
+//        assertThat(dataObjectsService.loadDataObjects(null)).isEmpty();
+//    }
+//
+//    @Test
+//    public void testLoadDataObjectsWithNonNullWorkspaceProject() {
+//        assertThat(dataObjectsService.loadDataObjects(workspaceProject)).isEmpty();
+//    }
 }

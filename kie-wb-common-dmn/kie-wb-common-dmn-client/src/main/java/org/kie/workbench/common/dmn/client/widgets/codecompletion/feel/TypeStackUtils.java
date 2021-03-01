@@ -20,23 +20,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import org.kie.dmn.feel.lang.Type;
 import org.kie.dmn.feel.lang.ast.ASTNode;
+import org.kie.dmn.feel.lang.types.BuiltInType;
 import org.kie.workbench.common.dmn.client.widgets.codecompletion.feel.FEELLanguageService.Position;
 
 public class TypeStackUtils {
 
+    public static final List<String> ALLOWED_TYPE_NAMES = Arrays.stream(BuiltInType.values()).flatMap(builtInType -> Arrays.stream(builtInType.getNames())).collect(Collectors.toList());
+
     public static List<Type> getTypeStack(final ASTNode node,
                                           final Position position) {
-        return getTypeStack(node, null, position);
+        return getTypeStack(node, null, position, false);
     }
 
-    public static List<Type> getTypeStack(final ASTNode currentNode,
-                                          final ASTNode nextNode,
-                                          final Position position) {
+    private static List<Type> getTypeStack(final ASTNode currentNode,
+                                           final ASTNode nextNode,
+                                           final Position position,
+                                           final boolean isParentEligibleType) {
 
         final List<Type> typeStack = new ArrayList<>();
 
@@ -44,13 +48,15 @@ public class TypeStackUtils {
             return typeStack;
         }
 
-        if (isSamePosition(currentNode, nextNode, position)) {
+        final boolean isEligibleType = isEligibleType(currentNode, nextNode, position, isParentEligibleType);
+
+        if (isEligibleType) {
             typeStack.add(currentNode.getResultType());
         }
 
         try {
             forEach(getChildren(currentNode), (current, next) -> {
-                typeStack.addAll(getTypeStack(current, next, position));
+                typeStack.addAll(getTypeStack(current, next, position, isEligibleType));
             });
         } catch (final Exception e) {
             // Ignore errors during node inspection.
@@ -59,18 +65,24 @@ public class TypeStackUtils {
         return typeStack;
     }
 
-    private static boolean isSamePosition(final ASTNode node,
+    private static boolean isEligibleType(final ASTNode node,
                                           final ASTNode next,
-                                          final Position position) {
+                                          final Position position,
+                                          final boolean isParentEligibleType) {
 
-        final boolean isSameLine = isSameLine(node, position.line);
-        final boolean isSameColumn = isSameColumn(node, next, position.column);
+        final boolean isAllowedType = isAllowedType(node);
+        final boolean isEligibleLine = isEligibleLine(node, position.line);
+        final boolean isEligibleColumn = isEligibleColumn(node, next, position.column, isParentEligibleType);
 
-        return isSameLine && isSameColumn;
+        return isAllowedType && isEligibleLine && isEligibleColumn;
     }
 
-    private static boolean isSameLine(final ASTNode node,
-                                      final int line) {
+    private static boolean isAllowedType(final ASTNode node) {
+        return ALLOWED_TYPE_NAMES.contains(node.getResultType().getName());
+    }
+
+    private static boolean isEligibleLine(final ASTNode node,
+                                          final int line) {
 
         final int stop = node.getEndLine();
         final int start = node.getStartLine();
@@ -78,18 +90,46 @@ public class TypeStackUtils {
         return line >= start && line <= stop;
     }
 
-    private static boolean isSameColumn(final ASTNode node,
-                                        final ASTNode next,
-                                        final int column) {
+    private static boolean isEligibleColumn(final ASTNode node,
+                                            final ASTNode next,
+                                            final int column,
+                                            final boolean isParentEligibleType) {
 
-        final Optional<ASTNode> nextNode = Optional.ofNullable(next);
-        final int nextStartColumn = nextNode.map(ASTNode::getStartColumn).orElse(0);
+        return isEligibleColumnStart(node, column) &&
+                isEligibleColumnEnd(node, next, column, isParentEligibleType);
+    }
+
+    private static boolean isEligibleColumnEnd(final ASTNode node,
+                                               final ASTNode next,
+                                               final int column,
+                                               final boolean isParentEligibleType) {
+
+        final boolean hasNextNode = next != null;
+        final int startNextNodeColumn = hasNextNode ? next.getStartColumn() : 0;
+        final int endNodeColumn = node.getEndColumn() + countExtraChar(node);
+
+        final boolean hasGapBetweenNodes = startNextNodeColumn - endNodeColumn > 0;
+        final int stop = hasGapBetweenNodes ? startNextNodeColumn : endNodeColumn;
+
+        return column <= stop || !isParentEligibleType && !hasNextNode;
+    }
+
+    private static boolean isEligibleColumnStart(final ASTNode node,
+                                                 final int column) {
+
+        final int startNodeColumn = node.getStartColumn();
         final boolean isMultiline = node.getEndLine() > node.getStartLine();
-        final boolean hasGapBetweenNodes = nextStartColumn - node.getEndColumn() > 0;
-        final int start = isMultiline ? 0 : node.getStartColumn();
-        final int stop = hasGapBetweenNodes ? nextStartColumn : node.getEndColumn();
+        final int start = isMultiline ? 0 : startNodeColumn;
 
-        return column >= start && (column <= stop || !nextNode.isPresent());
+        return column >= start;
+    }
+
+    private static int countExtraChar(final ASTNode node) {
+        final Type resultType = node.getResultType();
+        if (resultType.conformsTo(BuiltInType.LIST) || resultType.conformsTo(BuiltInType.RANGE)) {
+            return 1;
+        }
+        return 0;
     }
 
     private static Iterator<ASTNode> getChildren(final ASTNode currentNode) {

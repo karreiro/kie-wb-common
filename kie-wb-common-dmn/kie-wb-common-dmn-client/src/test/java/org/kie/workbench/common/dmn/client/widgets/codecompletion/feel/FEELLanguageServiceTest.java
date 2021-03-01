@@ -120,6 +120,48 @@ public class FEELLanguageServiceTest {
     }
 
     @Test
+    public void testUnknownType() {
+        assertGetType("\"\" + 2 |", BuiltInType.UNKNOWN);
+    }
+
+    @Test
+    public void testStringType() {
+        assertGetType("\"\" |", BuiltInType.STRING);
+    }
+
+    @Test
+    public void testListType() {
+        assertGetType("[1, 2, 3] |", BuiltInType.LIST);
+    }
+
+    @Test
+    public void testNumberType() {
+        assertGetType("2 |", BuiltInType.NUMBER);
+    }
+
+    @Test
+    public void testBooleanType() {
+        assertGetType("false |", BuiltInType.BOOLEAN);
+    }
+
+    @Test
+    public void testRangeType() {
+        assertGetType("[1..10] |", BuiltInType.RANGE);
+    }
+
+    @Test
+    public void testFunctionType() {
+        assertGetType("function() { } |", BuiltInType.FUNCTION);
+    }
+
+    @Test
+    @Ignore("Reproducer for KOGITO-0001")
+    public void testDateRelatedTypes() {
+        // Currently, FEEL parser is not handling date-related nodes (date, time, date_and_time, and duration)
+        assertGetType("date(2020, 12, 31) |", BuiltInType.DATE);
+    }
+
+    @Test
     public void testGetTypeMultiLine() {
         assertGetType("" +
                               "(                    \n" +
@@ -153,18 +195,6 @@ public class FEELLanguageServiceTest {
                               "    )                \n" +
                               "  )                  \n" +
                               ")                    \n", BuiltInType.NUMBER);
-    }
-
-    @Test
-    @Ignore("Reproducer for KOGITO-0000")
-    public void testGetType_KOGITO_0000() {
-        assertGetType("[1, 2, 3]|", BuiltInType.LIST);
-    }
-
-    @Test
-    @Ignore("Reproducer for KOGITO-0001")
-    public void testGetType_KOGITO_0001() {
-        assertGetType("date and time(\"2020-12-31T14:59:59\")|", BuiltInType.DATE);
     }
 
     private void assertCandidate(final String expectedLabel,

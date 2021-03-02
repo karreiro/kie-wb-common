@@ -16,6 +16,8 @@
 
 package org.kie.workbench.common.dmn.client.widgets.codecompletion.feel;
 
+import java.util.Objects;
+
 public class Candidate {
 
     private String label;
@@ -45,6 +47,19 @@ public class Candidate {
 
     public CompletionItemKind getKind() {
         return kind;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final Candidate candidate = (Candidate) o;
+        return Objects.equals(insertText, candidate.insertText);
     }
 
     @Override

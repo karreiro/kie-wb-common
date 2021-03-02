@@ -16,6 +16,7 @@
 
 package org.kie.workbench.common.dmn.client.widgets.codecompletion;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import elemental2.dom.DomGlobal;
 import org.kie.dmn.feel.lang.Type;
 import org.kie.dmn.feel.lang.types.BuiltInType;
 import org.kie.workbench.common.dmn.api.definition.HasVariable;
@@ -53,7 +55,12 @@ public class MonacoFEELSuggestions {
 
     public List<Candidate> getCandidates(final String expression,
                                          final FEELLanguageService.Position position) {
-        return feelLanguageService.getCandidates(expression, getNodesVariables(), position);
+        try {
+            return feelLanguageService.getCandidates(expression, getNodesVariables(), position);
+        } catch (final Exception e) {
+            DomGlobal.console.warn("[FEELLanguageService] Error: Candidates could not be processed.");
+            return new ArrayList<>();
+        }
     }
 
     private List<Variable> getNodesVariables() {

@@ -49,7 +49,7 @@ public class MonacoPropertiesFactoryTest {
     private MonacoPropertiesFactory factory;
 
     @Mock
-    private MonacoFEELSuggestions variableSuggestions;
+    private MonacoSuggestionsPropertyFactory suggestionsPropertyFactory;
 
     @Before
     public void setup() {
@@ -534,11 +534,11 @@ public class MonacoPropertiesFactoryTest {
         final JSONObject functionObject = mock(JSONObject.class);
         final JavaScriptObject expectedCompletionItemProvider = mock(JavaScriptObject.class);
 
-        doReturn(provideCompletionItemsFunction).when(factory).getProvideCompletionItemsFunction(variableSuggestions);
+        doReturn(provideCompletionItemsFunction).when(factory).getProvideCompletionItemsFunction(suggestionsPropertyFactory);
         doReturn(functionObject).when(factory).makeJSONObject(provideCompletionItemsFunction);
         doReturn(expectedCompletionItemProvider).when(factory).makeJavaScriptObject("provideCompletionItems", functionObject);
 
-        final JavaScriptObject actualCompletionItemProvider = factory.getCompletionItemProvider(variableSuggestions);
+        final JavaScriptObject actualCompletionItemProvider = factory.getCompletionItemProvider(suggestionsPropertyFactory);
 
         assertEquals(expectedCompletionItemProvider, actualCompletionItemProvider);
     }
@@ -554,7 +554,7 @@ public class MonacoPropertiesFactoryTest {
 //        doReturn(suggestions).when(factory).getSuggestions(variableSuggestions, expression, lspPosition);
         when(expectedJSONObjectSuggestions.getJavaScriptObject()).thenReturn(expectedSuggestions);
 
-        final JavaScriptObject actualSuggestions = factory.getProvideCompletionItemsFunction(variableSuggestions).call(null, null);
+        final JavaScriptObject actualSuggestions = factory.getProvideCompletionItemsFunction(suggestionsPropertyFactory).call(null, null);
 
         verify(expectedJSONObjectSuggestions).put("suggestions", suggestions);
         assertEquals(expectedSuggestions, actualSuggestions);

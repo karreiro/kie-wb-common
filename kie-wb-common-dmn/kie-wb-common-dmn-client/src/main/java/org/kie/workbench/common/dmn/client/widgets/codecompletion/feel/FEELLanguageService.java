@@ -99,14 +99,14 @@ public class FEELLanguageService {
         final BaseNode astNode = getASTNode(parseTree);
         final Type type = getType(astNode, position);
 
-        final List<Candidate> candidateKeyword = getFeelKeywords(parseTree, parser, position);
         final List<Candidate> candidateVariables = getCandidateVariables(type, variables);
+        final List<Candidate> candidateKeyword = getFeelKeywords(parseTree, parser, position);
         final List<Candidate> candidateFunctions = getCandidateFunctions(type);
 
         final List<Candidate> keywords = new ArrayList<>();
 
-        keywords.addAll(candidateFunctions);
         keywords.addAll(candidateVariables);
+        keywords.addAll(candidateFunctions);
         keywords.addAll(candidateKeyword);
 
         return keywords;

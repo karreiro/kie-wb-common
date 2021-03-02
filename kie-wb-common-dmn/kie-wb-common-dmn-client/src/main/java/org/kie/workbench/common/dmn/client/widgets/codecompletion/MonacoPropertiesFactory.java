@@ -18,6 +18,8 @@ package org.kie.workbench.common.dmn.client.widgets.codecompletion;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONArray;
@@ -145,20 +147,20 @@ public class MonacoPropertiesFactory {
      * This method returns a JavaScript object with properties specified here:
      * https://microsoft.github.io/monaco-editor/api/interfaces/monaco.languages.completionitemprovider.html
      */
-    public JavaScriptObject getCompletionItemProvider(final MonacoFEELSuggestions variableSuggestions) {
-        return makeJavaScriptObject("provideCompletionItems", makeJSONObject(getProvideCompletionItemsFunction(variableSuggestions)));
+    public JavaScriptObject getCompletionItemProvider(final MonacoSuggestionsPropertyFactory suggestionsPropertyFactory) {
+        return makeJavaScriptObject("provideCompletionItems", makeJSONObject(getProvideCompletionItemsFunction(suggestionsPropertyFactory)));
     }
 
     /*
      * This method returns a JavaScript object with properties specified here:
      * https://microsoft.github.io/monaco-editor/api/interfaces/monaco.languages.completionlist.html
      */
-    ProvideCompletionItemsFunction getProvideCompletionItemsFunction(final MonacoFEELSuggestions monacoFEELSuggestions) {
+    ProvideCompletionItemsFunction getProvideCompletionItemsFunction(final MonacoSuggestionsPropertyFactory suggestionsPropertyFactory) {
         return (model, position) -> {
             final JSONObject suggestions = makeJSONObject();
             final String expression = model.getValue();
             final Position lspPosition = new Position(position.getLineNumber(), position.getColumn());
-            suggestions.put("suggestions", getSuggestions(monacoFEELSuggestions, expression, lspPosition));
+            suggestions.put("suggestions", getSuggestions(suggestionsPropertyFactory, expression, lspPosition));
             return suggestions.getJavaScriptObject();
         };
     }
@@ -197,19 +199,10 @@ public class MonacoPropertiesFactory {
         return root;
     }
 
-    JSONArray getSuggestions(final MonacoFEELSuggestions monacoFEELSuggestions,
+    JSONArray getSuggestions(final MonacoSuggestionsPropertyFactory suggestionsPropertyFactory,
                              final String expression,
                              final Position position) {
-
-        final JSONArray suggestionTypes = makeJSONArray();
-
-        pushAll(suggestionTypes, monacoFEELSuggestions.getCandidates(expression, position));
-
-//        populateKeywordSuggestions(suggestionTypes);
-//        populateVariableSuggestions(monacoFEELSuggestions, suggestionTypes);
-//        populateFunctionSuggestions(suggestionTypes);
-
-        return suggestionTypes;
+        return suggestionsPropertyFactory.create(expression, position);
     }
 
     private void populateKeywordSuggestions(JSONArray suggestionArray) {

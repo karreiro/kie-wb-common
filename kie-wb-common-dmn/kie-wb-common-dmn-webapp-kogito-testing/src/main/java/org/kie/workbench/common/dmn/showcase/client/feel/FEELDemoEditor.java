@@ -109,7 +109,7 @@ public class FEELDemoEditor {
         try {
 
             final StringBuilder str = new StringBuilder();
-            for (final Candidate candidate : feelLanguageService.getCandidates(expression, position)) {
+            for (final Candidate candidate : feelLanguageService.getCandidates(expression, emptyList(), position)) {
                 str.append(candidate.getLabel());
                 str.append(": ");
                 str.append(candidate.getKind().toString());

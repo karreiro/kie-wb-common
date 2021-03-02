@@ -16,7 +16,10 @@
 
 package org.kie.workbench.common.dmn.client.widgets.codecompletion;
 
+import java.util.List;
+
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONBoolean;
 import com.google.gwt.json.client.JSONNumber;
@@ -25,6 +28,8 @@ import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 import elemental2.core.JsRegExp;
 import jsinterop.base.Js;
+import org.kie.workbench.common.dmn.client.widgets.codecompletion.feel.Candidate;
+import org.kie.workbench.common.dmn.client.widgets.codecompletion.feel.FEELLanguageService.Position;
 import org.uberfire.client.views.pfly.monaco.jsinterop.MonacoLanguages.ProvideCompletionItemsFunction;
 
 import static org.kie.workbench.common.dmn.client.widgets.codecompletion.MonacoFEELInitializer.FEEL_RESERVED_KEYWORDS;
@@ -36,6 +41,7 @@ public class MonacoPropertiesFactory {
     private static final String INSERT_TEXT_RULES_KEY = "insertTextRules";
     private static final String LABEL_KEY = "label";
     private static final String INSERT_TEXT_KEY = "insertText";
+    private static final String SORT_TEXT_KEY = "sortText";
     private static final String KIND_KEY = "kind";
 
     /*
@@ -139,7 +145,7 @@ public class MonacoPropertiesFactory {
      * This method returns a JavaScript object with properties specified here:
      * https://microsoft.github.io/monaco-editor/api/interfaces/monaco.languages.completionitemprovider.html
      */
-    public JavaScriptObject getCompletionItemProvider(final MonacoFEELVariableSuggestions variableSuggestions) {
+    public JavaScriptObject getCompletionItemProvider(final MonacoFEELSuggestions variableSuggestions) {
         return makeJavaScriptObject("provideCompletionItems", makeJSONObject(getProvideCompletionItemsFunction(variableSuggestions)));
     }
 
@@ -147,10 +153,12 @@ public class MonacoPropertiesFactory {
      * This method returns a JavaScript object with properties specified here:
      * https://microsoft.github.io/monaco-editor/api/interfaces/monaco.languages.completionlist.html
      */
-    ProvideCompletionItemsFunction getProvideCompletionItemsFunction(final MonacoFEELVariableSuggestions variableSuggestions) {
+    ProvideCompletionItemsFunction getProvideCompletionItemsFunction(final MonacoFEELSuggestions monacoFEELSuggestions) {
         return (model, position) -> {
             final JSONObject suggestions = makeJSONObject();
-            suggestions.put("suggestions", getSuggestions(variableSuggestions));
+            final String expression = model.getValue();
+            final Position lspPosition = new Position(position.getLineNumber(), position.getColumn());
+            suggestions.put("suggestions", getSuggestions(monacoFEELSuggestions, expression, lspPosition));
             return suggestions.getJavaScriptObject();
         };
     }
@@ -189,13 +197,17 @@ public class MonacoPropertiesFactory {
         return root;
     }
 
-    JSONArray getSuggestions(final MonacoFEELVariableSuggestions variableSuggestions) {
+    JSONArray getSuggestions(final MonacoFEELSuggestions monacoFEELSuggestions,
+                             final String expression,
+                             final Position position) {
 
         final JSONArray suggestionTypes = makeJSONArray();
 
-        populateKeywordSuggestions(suggestionTypes);
-        populateVariableSuggestions(variableSuggestions, suggestionTypes);
-        populateFunctionSuggestions(suggestionTypes);
+        pushAll(suggestionTypes, monacoFEELSuggestions.getCandidates(expression, position));
+
+//        populateKeywordSuggestions(suggestionTypes);
+//        populateVariableSuggestions(monacoFEELSuggestions, suggestionTypes);
+//        populateFunctionSuggestions(suggestionTypes);
 
         return suggestionTypes;
     }
@@ -204,11 +216,11 @@ public class MonacoPropertiesFactory {
         FEEL_RESERVED_KEYWORDS.forEach(reservedKeyword -> push(suggestionArray, getKeywordSuggestion(reservedKeyword)));
     }
 
-    private void populateVariableSuggestions(final MonacoFEELVariableSuggestions variableSuggestions,
+    private void populateVariableSuggestions(final MonacoFEELSuggestions variableSuggestions,
                                              final JSONArray suggestionArray) {
-        variableSuggestions
-                .getSuggestions()
-                .forEach(variable -> push(suggestionArray, getVariableSuggestion(variable)));
+//        variableSuggestions
+//                .getSuggestions()
+//                .forEach(variable -> push(suggestionArray, getVariableSuggestion(variable)));
     }
 
     private void populateFunctionSuggestions(final JSONArray suggestionTypes) {
@@ -369,6 +381,22 @@ public class MonacoPropertiesFactory {
         return suggestion;
     }
 
+    JSONValue getSuggestion(final Candidate candidate,
+                            final Integer sortIndex) {
+
+        final JSONObject suggestion = makeJSONObject();
+        final int completionItemKindFunction = candidate.getKind().getValue();
+        final int completionItemInsertTextRuleInsertAsSnippet = 4;
+
+        suggestion.put(KIND_KEY, makeJSONNumber(completionItemKindFunction));
+        suggestion.put(INSERT_TEXT_RULES_KEY, makeJSONNumber(completionItemInsertTextRuleInsertAsSnippet));
+        suggestion.put(LABEL_KEY, makeJSONString(candidate.getLabel()));
+        suggestion.put(INSERT_TEXT_KEY, makeJSONString(candidate.getInsertText()));
+        suggestion.put(SORT_TEXT_KEY, makeJSONString(NumberFormat.getFormat("#0000").format(sortIndex)));
+
+        return suggestion;
+    }
+
     JSONValue getFunctionSuggestion(final String label,
                                     final String insertText) {
 
@@ -448,6 +476,14 @@ public class MonacoPropertiesFactory {
 
     JSONObject makeJSONObject() {
         return new JSONObject();
+    }
+
+    private void pushAll(final JSONArray jsArray,
+                         final List<Candidate> candidates) {
+        for (int i = 0; i < candidates.size(); i++) {
+            final Candidate candidate = candidates.get(i);
+            push(jsArray, getSuggestion(candidate, i));
+        }
     }
 
     void push(final JSONArray jsonArray,

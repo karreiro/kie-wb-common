@@ -88,20 +88,37 @@ public class FEELLanguageService {
                 LBRACK, LE, LINE_COMMENT, LPAREN, LT, MUL, NOTEQUAL, NULL, POW, QUOTE, RARROW, RBRACE,
                 RBRACK, RPAREN, StringLiteral, SUB, WS).collect(Collectors.toCollection(HashSet::new));
 
+    private final List<FunctionOverrideVariation> functions = new ArrayList<>();
+
     public List<Candidate> getCandidates(final String text,
+                                         final List<Variable> variables,
                                          final Position position) {
 
         final FEEL_1_1Parser parser = getParser(text);
         final ParseTree parseTree = parser.expression();
+        final BaseNode astNode = getASTNode(parseTree);
+        final Type type = getType(astNode, position);
+
         final List<Candidate> candidateKeyword = getFeelKeywords(parseTree, parser, position);
-        final List<Candidate> candidateFunctions = getCandidateFunctions(parseTree, position);
+        final List<Candidate> candidateVariables = getCandidateVariables(type, variables);
+        final List<Candidate> candidateFunctions = getCandidateFunctions(type);
 
         final List<Candidate> keywords = new ArrayList<>();
 
         keywords.addAll(candidateFunctions);
+        keywords.addAll(candidateVariables);
         keywords.addAll(candidateKeyword);
 
         return keywords;
+    }
+
+    private List<Candidate> getCandidateVariables(final Type type,
+                                                  final List<Variable> variables) {
+        return variables
+                .stream()
+                .filter(v -> v.getType().conformsTo(type))
+                .map(v -> new Candidate(v.getName(), CompletionItemKind.Variable))
+                .collect(Collectors.toList());
     }
 
     private List<Candidate> getFeelKeywords(final ParseTree parseTree, final FEEL_1_1Parser parser, final Position position) {
@@ -132,25 +149,28 @@ public class FEELLanguageService {
         return typeStack.size() == 0 ? BuiltInType.UNKNOWN : typeStack.get(typeStack.size() - 1);
     }
 
-    private List<Candidate> getCandidateFunctions(final ParseTree parseTree,
-                                                  final Position position) {
+    private List<Candidate> getCandidateFunctions(final Type type) {
 
         final List<Candidate> functions = new ArrayList<>();
-        final BaseNode astNode = getASTNode(parseTree);
-        final Type type = getType(astNode, position);
 
-        for (FunctionOverrideVariation function : getFunctionOverrideVariations()) {
+        for (final FunctionOverrideVariation function : getFunctions()) {
             if (type.isAssignableValue(BuiltInType.UNKNOWN) || Objects.equals(function.getReturnType(), type)) {
 
                 final FunctionDefinitionStrings definitionStrings = function.toHumanReadableStrings();
                 final String humanReadable = definitionStrings.getHumanReadable();
                 final String template = definitionStrings.getTemplate();
-                final Candidate candidate = new Candidate(humanReadable, template, CompletionItemKind.Function);
 
-                functions.add(candidate);
+                functions.add(new Candidate(humanReadable, template, CompletionItemKind.Function));
             }
         }
 
+        return functions;
+    }
+
+    private List<FunctionOverrideVariation> getFunctions() {
+        if (functions.isEmpty()) {
+            functions.addAll(getFunctionOverrideVariations());
+        }
         return functions;
     }
 

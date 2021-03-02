@@ -32,6 +32,7 @@ import org.kie.dmn.feel.lang.types.BuiltInType;
 import org.kie.dmn.feel.parser.feel11.FEEL_1_1Parser;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.kie.workbench.common.dmn.client.widgets.codecompletion.feel.FEELLanguageService.Position;
 import static org.mockito.Mockito.doReturn;
@@ -59,7 +60,7 @@ public class FEELLanguageServiceTest {
         final Position position = new Position(1, expression.indexOf("|"));
         final String expressionToParse = expression.replace("|", "");
 
-        final List<Candidate> actualCandidates = service.getCandidates(expressionToParse, position);
+        final List<Candidate> actualCandidates = service.getCandidates(expressionToParse, emptyList(), position);
 
         assertCandidate("abs(duration)", "abs($1)", CompletionItemKind.Function, actualCandidates.get(0));
         assertCandidate("abs(number)", "abs($1)", CompletionItemKind.Function, actualCandidates.get(1));
@@ -79,7 +80,7 @@ public class FEELLanguageServiceTest {
         final Position position = new Position(1, expression.indexOf("|"));
         final String expressionToParse = expression.replace("|", "");
 
-        final List<Candidate> actualCandidates = service.getCandidates(expressionToParse, position);
+        final List<Candidate> actualCandidates = service.getCandidates(expressionToParse, emptyList(), position);
 
         assertCandidate("string(from)", "string($1)", CompletionItemKind.Function, actualCandidates.get(0));
         assertCandidate("not", CompletionItemKind.Keyword, actualCandidates.get(1));

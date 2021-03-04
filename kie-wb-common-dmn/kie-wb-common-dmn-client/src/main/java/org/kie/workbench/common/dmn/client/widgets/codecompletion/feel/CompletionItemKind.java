@@ -46,9 +46,9 @@ public enum CompletionItemKind {
     Issue(26),
     Snippet(27);
 
-    private int value;
+    private final int value;
 
-    CompletionItemKind(int value) {
+    CompletionItemKind(final int value) {
         this.value = value;
     }
 

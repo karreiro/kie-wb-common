@@ -129,7 +129,9 @@ public class FEELLanguageService {
                 .collect(Collectors.toList());
     }
 
-    private List<Candidate> getFeelKeywords(final ParseTree parseTree, final FEEL_1_1Parser parser, final Position position) {
+    private List<Candidate> getFeelKeywords(final ParseTree parseTree,
+                                            final FEEL_1_1Parser parser,
+                                            final Position position) {
 
         final CodeCompletionCore core = new CodeCompletionCore(parser, null, IGNORED_TOKENS);
         final int caretIndex = computeTokenIndex(parseTree, position);
@@ -242,7 +244,8 @@ public class FEELLanguageService {
         int line;
         int column;
 
-        public Position(final int line, final int column) {
+        public Position(final int line,
+                        final int column) {
             this.line = line;
             this.column = column;
         }

@@ -55,6 +55,15 @@
   padding-left: 1.7em;
 }
 
+.expression-container .table-component table tr th:last-child {
+  flex-grow: 1 !important;
+}
+
+.expression-container .table-component table tr.table-row > td:last-child {
+  flex-grow: 1 !important;
+  width: initial !important;
+}
+
 .expression-container .table-component table th:not(:first-child) {
   text-align: center;
   background-color: #def3ff;

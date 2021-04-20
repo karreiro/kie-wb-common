@@ -55,14 +55,14 @@
   padding-left: 1.7em;
 }
 
-.expression-container .table-component table tr th:last-child {
+/* .expression-container .table-component table tr th:last-child {
   flex-grow: 1 !important;
 }
 
 .expression-container .table-component table tr.table-row > td:last-child {
   flex-grow: 1 !important;
   width: initial !important;
-}
+} */
 
 .expression-container .table-component table th:not(:first-child) {
   text-align: center;
@@ -129,8 +129,8 @@
 
 .expression-container .table-component table tbody tr.table-row,
 .expression-container .table-component table tbody td.data-cell {
-  width: 100%;
-  overflow-y: hidden;
+  /* width: 100%;
+  overflow-y: hidden; */
 }
 
 .expression-container .table-component table tbody td.data-cell.has-resizer .logic-type-selector.logic-type-selected {

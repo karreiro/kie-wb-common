@@ -34,9 +34,89 @@ import {
 export const App: React.FunctionComponent = () => {
   //This definition comes directly from the decision node
   const selectedExpression: ExpressionProps = {
+    uid: "id1",
+    logicType: "Context",
     name: "Expression Name",
-    dataType: DataType.Undefined,
-  };
+    dataType: "<Undefined>",
+    contextEntries: [
+      {
+        entryInfo: {
+          name: "ContextEntry-1",
+          dataType: "<Undefined>",
+        },
+        entryExpression: {
+          uid: "id2",
+          name: "Expression Name",
+          dataType: "<Undefined>",
+          logicType: "Literal expression",
+          content: "Literal expression 1",
+        },
+        editInfoPopoverLabel: "Edit Context Entry",
+      },
+      {
+        entryInfo: {
+          name: "ContextEntry-2",
+          dataType: "<Undefined>",
+        },
+        entryExpression: {
+          uid: "id4",
+          name: "Expression Name",
+          dataType: "<Undefined>",
+          logicType: "Literal expression",
+          content: "Literal expression 2",
+        },
+        editInfoPopoverLabel: "Edit Context Entry",
+      },
+      {
+        entryInfo: {
+          name: "ContextEntry-3",
+          dataType: "<Undefined>",
+        },
+        entryExpression: {
+          uid: "id5",
+          logicType: "Context",
+          contextEntries: [
+            {
+              entryInfo: {
+                name: "ContextEntry-1",
+                dataType: "<Undefined>",
+              },
+              entryExpression: {},
+              editInfoPopoverLabel: "Edit Context Entry",
+            },
+          ],
+          result: {
+            uid: "id7",
+          },
+        },
+        editInfoPopoverLabel: "Edit Context Entry",
+      },
+    ],
+    result: {
+      uid: "id3",
+      logicType: "Context",
+      contextEntries: [
+        {
+          entryInfo: {
+            name: "ContextEntry-1",
+            dataType: "<Undefined>",
+          },
+          entryExpression: {
+            uid: "id8",
+            name: "Expression Name",
+            dataType: "<Undefined>",
+            logicType: "Literal expression",
+            content: "Literal expression 3",
+          },
+          editInfoPopoverLabel: "Edit Context Entry",
+        },
+      ],
+      result: {
+        uid: "id9",
+        logicType: "<Undefined>",
+      },
+    },
+  } as ExpressionProps;
 
   const [updatedExpression, setUpdatedExpression] = useState(selectedExpression);
 

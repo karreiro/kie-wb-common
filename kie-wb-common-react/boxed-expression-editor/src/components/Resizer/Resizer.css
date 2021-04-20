@@ -22,3 +22,7 @@
     */
   height: 100% !important;
 }
+
+.expression-container .pf-c-drawer__splitter::after {
+  border: none;
+}

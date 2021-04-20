@@ -57,7 +57,7 @@
 
 .expression-container .table-component table th:not(:first-child) {
   text-align: center;
-  background-color: #DEF3FF;
+  background-color: #def3ff;
 }
 
 .expression-container .table-component table th.no-clickable-cell:first-of-type .header-cell,
@@ -83,7 +83,7 @@
 
 .expression-container .table-component table thead th,
 .expression-container .table-component table tbody td {
-  border: 1px solid #CCC;
+  border: 1px solid #ccc;
 }
 
 /** Table Body rules */
@@ -125,7 +125,7 @@
 }
 
 .expression-container .table-component table tbody td.data-cell.has-resizer .logic-type-selector.logic-type-selected {
-  padding: .5em 1.2em .5em .5em;
+  padding: 0.5em 1.2em 0.5em 0.5em;
 }
 
 /** Drawer for resizing columns */
@@ -135,9 +135,7 @@
 }
 
 .expression-container .table-component table .pf-c-drawer {
-  --pf-c-drawer__splitter--after--BorderLeftWidth: var(
-    --pf-global--BorderWidth--sm
-  );
+  --pf-c-drawer__splitter--after--BorderLeftWidth: var(--pf-global--BorderWidth--sm);
   position: absolute;
   min-width: 0.625rem;
   right: 0;
@@ -153,13 +151,13 @@
   background-color: lightgray;
 }
 
-.expression-container .table-component table .pf-c-drawer.drawer-on-body > .pf-c-drawer__splitter > .pf-c-drawer__splitter-handle {
+.expression-container
+  .table-component
+  table
+  .pf-c-drawer.drawer-on-body
+  > .pf-c-drawer__splitter
+  > .pf-c-drawer__splitter-handle {
   z-index: 1;
-}
-
-.expression-container .table-component table .pf-c-drawer.drawer-on-body > .pf-c-drawer__splitter::after {
-  border-width: 1px;
-  background-color: white;
 }
 
 /** Text-area used as a cell */

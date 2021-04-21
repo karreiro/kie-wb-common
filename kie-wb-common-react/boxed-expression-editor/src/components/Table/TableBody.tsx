@@ -99,10 +99,12 @@ export const TableBody: React.FunctionComponent<TableBodyProps> = ({
               role="cell"
               key={childIndex}
               className="row-remainder-content"
-              style={{
-                width: tableInstance.allColumns[childIndex + 1].width,
-                minWidth: tableInstance.allColumns[childIndex + 1].minWidth,
-              }}
+              style={
+                {
+                  // width: tableInstance.allColumns[childIndex + 1].width,
+                  // minWidth: tableInstance.allColumns[childIndex + 1].minWidth,
+                }
+              }
             >
               {child}
             </Td>

@@ -14,5 +14,20 @@
  * limitations under the License.
  */
 
-export * from "./Resizer";
-export * from "./ResizerSupervisor";
+import "./Resizer.css";
+import * as React from "react";
+import { useEffect } from "react";
+
+export interface ResizerSupervisorProps {
+  children?: React.ReactElement;
+}
+
+export const ResizerSupervisor: React.FunctionComponent<ResizerSupervisorProps> = ({ children }) => {
+  useEffect(() => {
+    const cells = document.querySelectorAll(".react-resizable");
+
+    cells.forEach((e) => ((e as HTMLElement).style.width = "40px"));
+  }, []);
+
+  return <div>{children}</div>;
+};

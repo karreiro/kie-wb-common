@@ -133,7 +133,7 @@ export const ContextExpression: React.FunctionComponent<ContextProps> = ({
   }, [isHeadless]);
 
   const onHorizontalResizeStop = useCallback((width) => {
-    console.log(">>>>>" + width);
+    // console.log(">>>>>" + width);
   }, []);
 
   useEffect(() => {
@@ -169,7 +169,7 @@ export const ContextExpression: React.FunctionComponent<ContextProps> = ({
         getRowKey={useCallback(getEntryKey, [])}
         resetRowCustomFunction={useCallback(resetEntry, [])}
       >
-        <Resizer width={200} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
+        <Resizer width={300} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
           <div className="context-result">{`<result>`}</div>
         </Resizer>
         <ContextEntryExpression expression={resultExpression} onUpdatingRecursiveExpression={setResultExpression} />

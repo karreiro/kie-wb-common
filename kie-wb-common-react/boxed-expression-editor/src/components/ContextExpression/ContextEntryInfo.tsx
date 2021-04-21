@@ -60,12 +60,12 @@ export const ContextEntryInfo: React.FunctionComponent<ContextEntryInfoProps> = 
   );
 
   const onHorizontalResizeStop = useCallback((width) => {
-    console.log(">>>>>" + width);
+    // console.log(">>>>>" + width);
   }, []);
 
   return (
     <div className="entry-info">
-      <Resizer width={200} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
+      <Resizer width={300} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
         <EditExpressionMenu
           title={editInfoPopoverLabel}
           selectedExpressionName={entryName}

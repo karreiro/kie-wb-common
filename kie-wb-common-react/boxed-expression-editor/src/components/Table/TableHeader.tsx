@@ -112,7 +112,7 @@ export const TableHeader: React.FunctionComponent<TableHeaderProps> = ({
   );
 
   const onHorizontalResizeStop = useCallback((width) => {
-    console.log(">>>>>" + width);
+    // console.log(">>>>>" + width);
   }, []);
 
   const renderResizableHeaderCell = useCallback(
@@ -123,7 +123,7 @@ export const TableHeader: React.FunctionComponent<TableHeaderProps> = ({
         className={`resizable-column ${!column.dataType ? "no-clickable-cell" : null}`}
         key={`${getColumnKey(column)}-${columnIndex}`}
       >
-        <Resizer width={200} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
+        <Resizer width={300} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
           <div className="header-cell" data-ouia-component-type="expression-column-header">
             {column.dataType ? (
               <EditExpressionMenu

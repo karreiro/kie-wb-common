@@ -65,11 +65,11 @@ export const ContextEntryExpression: React.FunctionComponent<ContextEntryExpress
   }, [onExpressionResetting, onUpdatingRecursiveExpression]);
 
   const onHorizontalResizeStop = useCallback((width) => {
-    console.log(">>>>>" + width);
+    // console.log(">>>>>" + width);
   }, []);
 
   return (
-    <Resizer width={200} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
+    <Resizer width={300} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
       <div className="entry-expression" ref={expressionContainerRef}>
         <LogicTypeSelector
           isHeadless={true}

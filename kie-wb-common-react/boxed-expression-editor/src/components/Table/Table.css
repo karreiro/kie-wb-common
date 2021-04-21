@@ -33,7 +33,7 @@
 .expression-container .table-component table th {
   min-height: 55px;
   position: relative;
-  padding: 0.7em;
+  padding: 0.7em 0;
   border-style: ridge;
   -webkit-touch-callout: none;
   -webkit-user-select: none;

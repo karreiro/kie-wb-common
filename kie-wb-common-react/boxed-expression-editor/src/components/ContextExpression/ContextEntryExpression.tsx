@@ -19,6 +19,7 @@ import * as React from "react";
 import { useCallback, useEffect, useRef } from "react";
 import { LogicTypeSelector } from "../LogicTypeSelector";
 import * as _ from "lodash";
+import { Resizer } from "../Resizer";
 
 export interface ContextEntryExpressionProps {
   /** The expression wrapped by the entry */
@@ -63,16 +64,22 @@ export const ContextEntryExpression: React.FunctionComponent<ContextEntryExpress
     onUpdatingRecursiveExpression(_.omit(entryExpression.current, "isHeadless"));
   }, [onExpressionResetting, onUpdatingRecursiveExpression]);
 
+  const onHorizontalResizeStop = useCallback((width) => {
+    console.log(">>>>>" + width);
+  }, []);
+
   return (
-    <div className="entry-expression" ref={expressionContainerRef}>
-      <LogicTypeSelector
-        isHeadless={true}
-        onUpdatingRecursiveExpression={onUpdatingRecursiveExpression}
-        selectedExpression={entryExpression.current}
-        onLogicTypeUpdating={onLogicTypeUpdating}
-        onLogicTypeResetting={onLogicTypeResetting}
-        getPlacementRef={getLogicTypeSelectorRef}
-      />
-    </div>
+    <Resizer width={200} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
+      <div className="entry-expression" ref={expressionContainerRef}>
+        <LogicTypeSelector
+          isHeadless={true}
+          onUpdatingRecursiveExpression={onUpdatingRecursiveExpression}
+          selectedExpression={entryExpression.current}
+          onLogicTypeUpdating={onLogicTypeUpdating}
+          onLogicTypeResetting={onLogicTypeResetting}
+          getPlacementRef={getLogicTypeSelectorRef}
+        />
+      </div>
+    </Resizer>
   );
 };

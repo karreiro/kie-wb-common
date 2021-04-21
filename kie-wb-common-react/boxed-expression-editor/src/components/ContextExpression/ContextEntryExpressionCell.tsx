@@ -20,7 +20,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { CellProps, ContextEntries, ExpressionProps } from "../../api";
 import { DataRecord } from "react-table";
 import { ContextEntryExpression } from "./ContextEntryExpression";
-import { Resizer } from "../Resizer";
+// import { Resizer } from "../Resizer";
 
 export interface ContextEntryExpressionCellProps extends CellProps {
   data: ContextEntries;
@@ -54,19 +54,19 @@ export const ContextEntryExpressionCell: React.FunctionComponent<ContextEntryExp
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onHorizontalResizeStop = useCallback((width) => {
-    console.log(">>>>>" + width);
-  }, []);
+  // const onHorizontalResizeStop = useCallback((width) => {
+  //   console.log(">>>>>" + width);
+  // }, []);
 
   return (
-    <Resizer width={200} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
-      <div className="context-entry-expression-cell">
-        <ContextEntryExpression
-          expression={entryExpression.current}
-          onUpdatingRecursiveExpression={onUpdatingRecursiveExpression}
-          onExpressionResetting={contextEntry.onExpressionResetting}
-        />
-      </div>
-    </Resizer>
+    // <Resizer width={200} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
+    <div className="context-entry-expression-cell">
+      <ContextEntryExpression
+        expression={entryExpression.current}
+        onUpdatingRecursiveExpression={onUpdatingRecursiveExpression}
+        onExpressionResetting={contextEntry.onExpressionResetting}
+      />
+    </div>
+    // </Resizer>
   );
 };

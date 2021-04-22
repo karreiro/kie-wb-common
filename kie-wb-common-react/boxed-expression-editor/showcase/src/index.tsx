@@ -113,7 +113,20 @@ export const App: React.FunctionComponent = () => {
       ],
       result: {
         uid: "id9",
-        logicType: "<Undefined>",
+        logicType: "Context",
+        contextEntries: [
+          {
+            entryInfo: {
+              name: "ContextEntry-1",
+              dataType: "<Undefined>",
+            },
+            entryExpression: {},
+            editInfoPopoverLabel: "Edit Context Entry",
+          },
+        ],
+        result: {
+          uid: "id3",
+        },
       },
     },
   } as ExpressionProps;

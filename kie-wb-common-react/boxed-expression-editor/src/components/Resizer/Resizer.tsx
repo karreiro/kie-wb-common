@@ -16,8 +16,9 @@
 
 import "./Resizer.css";
 import * as React from "react";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState, useLayoutEffect } from "react";
 import { ResizableBox } from "react-resizable";
+import { v4 as uuid } from "uuid";
 
 export interface ResizerProps {
   width: number;
@@ -43,15 +44,28 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
   width,
 }) => {
   const targetHeight = height === "100%" ? 0 : height;
-
   const resizerHandler = useMemo(() => <div className="pf-c-drawer">{DRAWER_SPLITTER_ELEMENT}</div>, []);
-
   const onResizeStop = useCallback((e, data) => onHorizontalResizeStop(data.size.width), [onHorizontalResizeStop]);
+  const id = useMemo(() => `uuid-${uuid()}`, []);
+  const [w, setW] = useState(300);
+
+  useLayoutEffect(() => {
+    console.log("=>>>>>>>>>>>>>>>>>>>>>>>> " + id);
+    function listener(event: CustomEvent) {
+      const width = event.detail.width;
+      setW(width);
+    }
+
+    document.addEventListener(id, listener);
+    return () => {
+      document.removeEventListener(id, listener);
+    };
+  }, [id]);
 
   return (
     <ResizableBox
-      className={`${height === "100%" ? "height-based-on-content" : ""}`}
-      width={width}
+      className={`${height === "100%" ? "height-based-on-content" : ""} ${id}`}
+      width={w}
       height={targetHeight}
       minConstraints={[minWidth, minHeight]}
       axis="x"

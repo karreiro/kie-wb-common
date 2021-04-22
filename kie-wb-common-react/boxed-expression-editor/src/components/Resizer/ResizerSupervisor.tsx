@@ -25,11 +25,17 @@ export interface ResizerSupervisorProps {
 
 export const ResizerSupervisor: React.FunctionComponent<ResizerSupervisorProps> = ({ children }) => {
   useEffect(() => {
+    const cells: HTMLElement[] = _.reverse([].slice.call(document.querySelectorAll(".react-resizable")));
+
     function setCellWidth(cell: HTMLElement, width: number) {
+      const a = getId(cell);
+      document.dispatchEvent(new CustomEvent(a, { detail: { width } }));
       cell.style.width = width + "px";
     }
 
-    const cells: HTMLElement[] = _.reverse([].slice.call(document.querySelectorAll(".react-resizable")));
+    function getId(cell: HTMLElement): string {
+      return _.first([].slice.call(cell.classList).filter((c: string) => c.match(/uuid-/g))) || "";
+    }
 
     cells.forEach((cell) => {
       const isFirstCell = cells.indexOf(cell) === cells.length - 1;

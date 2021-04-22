@@ -17,6 +17,7 @@
 import "./Resizer.css";
 import * as React from "react";
 import { useEffect } from "react";
+import * as _ from "lodash";
 
 export interface ResizerSupervisorProps {
   children?: React.ReactElement;
@@ -24,9 +25,32 @@ export interface ResizerSupervisorProps {
 
 export const ResizerSupervisor: React.FunctionComponent<ResizerSupervisorProps> = ({ children }) => {
   useEffect(() => {
-    const cells = document.querySelectorAll(".react-resizable");
+    function setCellWidth(cell: HTMLElement, width: number) {
+      cell.style.width = width + "px";
+    }
 
-    cells.forEach((e) => ((e as HTMLElement).style.width = "40px"));
+    const cells: HTMLElement[] = _.reverse([].slice.call(document.querySelectorAll(".react-resizable")));
+
+    cells.forEach((cell) => {
+      const isFirstCell = cells.indexOf(cell) === cells.length - 1;
+      if (isFirstCell) {
+        const row = cell.parentElement?.parentElement?.getBoundingClientRect().width || 0;
+        setCellWidth(cell, row - 62);
+        return;
+      }
+
+      const table = cell.querySelector("table");
+      const cellX = cell.getBoundingClientRect().x;
+      const padding = 14;
+      const width = table ? table.getBoundingClientRect().width + padding : 250;
+      const maxWidth = Math.max(
+        ...cells
+          .filter((e) => isFirstCell || cellX === e.getBoundingClientRect().x)
+          .map((e) => e.getBoundingClientRect().width)
+      );
+
+      setCellWidth(cell, maxWidth > width ? maxWidth : width);
+    });
   }, []);
 
   return <div>{children}</div>;

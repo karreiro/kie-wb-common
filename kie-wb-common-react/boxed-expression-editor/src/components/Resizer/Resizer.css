@@ -26,3 +26,15 @@
 .expression-container .pf-c-drawer__splitter::after {
   border: none;
 }
+
+.expression-container .table-component .react-resizable table tr td:last-child .pf-c-drawer,
+.expression-container .table-component .react-resizable table tr th:last-child .pf-c-drawer {
+  display: none;
+}
+
+.expression-container .pf-c-drawer {
+  opacity: 0.3;
+}
+.expression-container .pf-c-drawer .pf-c-drawer__splitter-handle::after {
+  border-left: none;
+}

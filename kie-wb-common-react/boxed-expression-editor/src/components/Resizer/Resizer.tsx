@@ -19,6 +19,7 @@ import * as React from "react";
 import { useCallback, useMemo, useState, useLayoutEffect } from "react";
 import { ResizableBox } from "react-resizable";
 import { v4 as uuid } from "uuid";
+import * as _ from "lodash";
 
 export interface ResizerProps {
   width: number;
@@ -45,12 +46,14 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
 }) => {
   const targetHeight = height === "100%" ? 0 : height;
   const resizerHandler = useMemo(() => <div className="pf-c-drawer">{DRAWER_SPLITTER_ELEMENT}</div>, []);
-  const onResizeStop = useCallback((e, data) => onHorizontalResizeStop(data.size.width), [onHorizontalResizeStop]);
   const id = useMemo(() => `uuid-${uuid()}`, []);
   const [w, setW] = useState(300);
+  const x: HTMLElement[] = [];
+  const [cells, setCells] = useState(x);
+  const [initalW, setInitialW] = useState(0);
 
   useLayoutEffect(() => {
-    console.log("=>>>>>>>>>>>>>>>>>>>>>>>> " + id);
+    // console.log("=>>>>>>>>>>>>>>>>>>>>>>>> " + id);
     function listener(event: CustomEvent) {
       const width = event.detail.width;
       setW(width);
@@ -62,17 +65,65 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
     };
   }, [id]);
 
-  return (
-    <ResizableBox
-      className={`${height === "100%" ? "height-based-on-content" : ""} ${id}`}
-      width={w}
-      height={targetHeight}
-      minConstraints={[minWidth, minHeight]}
-      axis="x"
-      onResizeStop={onResizeStop}
-      handle={resizerHandler}
-    >
-      {children}
-    </ResizableBox>
+  const onResizeStart = useCallback(() => {
+    const c = document.querySelector(`.${id}`);
+    const w = c?.getBoundingClientRect().width || 0;
+    const x = c?.getBoundingClientRect().x || 0;
+    const cells1: HTMLElement[] = [].slice
+      .call(document.querySelectorAll(".react-resizable"))
+      .filter((e: HTMLElement) => {
+        return x === e.getBoundingClientRect().x;
+      });
+
+    console.log(w + " >>> A " + cells1.length);
+    cells1.forEach((r) => {
+      r.setAttribute("data-initial-w", r.style.width);
+    });
+    console.log(x + " >>> B ");
+
+    setCells(cells1);
+    setInitialW(w);
+  }, [id]);
+
+  const onResize = useCallback(
+    (_e, data) => {
+      cells.forEach((c) => {
+        const delta = data.size.width - initalW;
+        const a: string = _.first([].slice.call(c.classList).filter((c: string) => c.match(/uuid-/g))) || "";
+        if (a !== id) {
+          c.style.width = parseInt(c.getAttribute("data-initial-w") || "") + delta + "px";
+        }
+      }, []);
+    },
+    [cells, id, initalW]
+  );
+
+  const onResizeStop = useCallback(
+    (_e, data) => {
+      cells.forEach((c) => {
+        const a: string = _.first([].slice.call(c.classList).filter((c: string) => c.match(/uuid-/g))) || "";
+        document.dispatchEvent(new CustomEvent(a, { detail: { width: data.size.width } }));
+      }, []);
+    },
+    [cells]
+  );
+
+  return useMemo(
+    () => (
+      <ResizableBox
+        className={`${height === "100%" ? "height-based-on-content" : ""} ${id}`}
+        width={w}
+        height={targetHeight}
+        minConstraints={[minWidth, minHeight]}
+        axis="x"
+        onResizeStop={onResizeStop}
+        onResize={onResize}
+        onResizeStart={onResizeStart}
+        handle={resizerHandler}
+      >
+        {children}
+      </ResizableBox>
+    ),
+    [height, id, w, targetHeight, minWidth, minHeight, onResizeStop, onResize, onResizeStart, resizerHandler, children]
   );
 };

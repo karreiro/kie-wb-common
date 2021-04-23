@@ -81,7 +81,39 @@ export const App: React.FunctionComponent = () => {
                 name: "ContextEntry-1",
                 dataType: "<Undefined>",
               },
-              entryExpression: {},
+              entryExpression: {
+                uid: "id1",
+                logicType: "Context",
+                contextEntries: [
+                  {
+                    entryInfo: {
+                      name: "ContextEntry-1",
+                      dataType: "<Undefined>",
+                    },
+                    entryExpression: {
+                      uid: "id3",
+                      logicType: "Context",
+                      contextEntries: [
+                        {
+                          entryInfo: {
+                            name: "ContextEntry-1",
+                            dataType: "<Undefined>",
+                          },
+                          entryExpression: {},
+                          editInfoPopoverLabel: "Edit Context Entry",
+                        },
+                      ],
+                      result: {
+                        uid: "id6",
+                      },
+                    },
+                    editInfoPopoverLabel: "Edit Context Entry",
+                  },
+                ],
+                result: {
+                  uid: "id4",
+                },
+              },
               editInfoPopoverLabel: "Edit Context Entry",
             },
           ],
@@ -147,10 +179,13 @@ export const App: React.FunctionComponent = () => {
 
   return (
     <div className="showcase">
-      <div className="boxed-expression">
+      <div
+        style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", maxHeight: "initial" }}
+        className="boxed-expression"
+      >
         <BoxedExpressionEditor expressionDefinition={expressionDefinition} />
       </div>
-      <div className="updated-json">
+      <div style={{ display: "none" }} className="updated-json">
         <p className="disclaimer">
           ⚠ Currently, JSON gets updated only for literal expression, relation, context, list and invocation logic types
         </p>

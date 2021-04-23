@@ -15,7 +15,7 @@
  */
 
 .expression-container .table-component {
-  overflow-x: auto;
+  overflow: hidden;
 }
 
 .expression-container .table-component table {
@@ -106,7 +106,7 @@
   border-style: ridge;
   padding: 1.1em 0;
   text-align: center;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .expression-container .table-component table tbody td + td {

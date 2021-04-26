@@ -72,7 +72,9 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
     const cells1: HTMLElement[] = [].slice
       .call(document.querySelectorAll(".react-resizable"))
       .filter((e: HTMLElement) => {
-        return x === e.getBoundingClientRect().x;
+        return (
+          x === e.getBoundingClientRect().x || x + w === e.getBoundingClientRect().x + e.getBoundingClientRect().width
+        );
       });
 
     console.log(w + " >>> A " + cells1.length);
@@ -101,11 +103,14 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
   const onResizeStop = useCallback(
     (_e, data) => {
       cells.forEach((c) => {
+        const delta = data.size.width - initalW;
         const a: string = _.first([].slice.call(c.classList).filter((c: string) => c.match(/uuid-/g))) || "";
-        document.dispatchEvent(new CustomEvent(a, { detail: { width: data.size.width } }));
+        document.dispatchEvent(
+          new CustomEvent(a, { detail: { width: parseInt(c.getAttribute("data-initial-w") || "") + delta } })
+        );
       }, []);
     },
-    [cells]
+    [cells, initalW]
   );
 
   return useMemo(

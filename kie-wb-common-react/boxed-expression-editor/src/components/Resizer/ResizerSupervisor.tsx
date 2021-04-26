@@ -16,47 +16,78 @@
 
 import "./Resizer.css";
 import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import * as _ from "lodash";
 
 export interface ResizerSupervisorProps {
   children?: React.ReactElement;
 }
 
+interface Cell {
+  element: HTMLElement;
+  width: number;
+  visited: boolean;
+}
+
 export const ResizerSupervisor: React.FunctionComponent<ResizerSupervisorProps> = ({ children }) => {
   useEffect(() => {
-    const cells: HTMLElement[] = _.reverse([].slice.call(document.querySelectorAll(".react-resizable")));
+    const allCells = fetchResizableCells(document.body);
 
     function setCellWidth(cell: HTMLElement, width: number) {
-      const a = getId(cell);
-      document.dispatchEvent(new CustomEvent(a, { detail: { width } }));
+      const id = getId(cell);
+      document.dispatchEvent(new CustomEvent(id, { detail: { width } }));
       cell.style.width = width + "px";
     }
+
+    // function getCellWidth(_cell: HTMLElement) {
+    //   return 300; // if it doesn't have width already, otherwise use the existing one
+    // }
 
     function getId(cell: HTMLElement): string {
       return _.first([].slice.call(cell.classList).filter((c: string) => c.match(/uuid-/g))) || "";
     }
 
-    cells.forEach((cell) => {
-      const isFirstCell = cells.indexOf(cell) === cells.length - 1;
-      if (isFirstCell) {
-        const row = cell.parentElement?.parentElement?.getBoundingClientRect().width || 0;
-        setCellWidth(cell, row - 62);
+    function fetchResizableCells(parent: HTMLElement): Cell[] {
+      return [].slice.call(parent.querySelectorAll(".react-resizable")).map((c: HTMLElement) => {
+        return {
+          element: c,
+          width: 0,
+          visited: false,
+        };
+      });
+    }
+
+    function updateSize(cell: Cell) {
+      if (cell.visited) {
         return;
       }
 
-      const table = cell.querySelector("table");
-      const cellX = cell.getBoundingClientRect().x;
+      const childCells = fetchResizableCells(cell.element);
+
+      if (childCells.length > 0) {
+        childCells.forEach((elem: Cell) => updateSize(elem));
+      }
+
+      const thead = cell.element.querySelector("thead");
+      const cellX = cell.element.getBoundingClientRect().x;
       const padding = 14;
-      const width = table ? table.getBoundingClientRect().width + padding : 250;
+      const width = thead ? thead.getBoundingClientRect().width + padding : 250;
       const maxWidth = Math.max(
-        ...cells
-          .filter((e) => isFirstCell || cellX === e.getBoundingClientRect().x)
-          .map((e) => e.getBoundingClientRect().width)
+        ...allCells
+          .filter((e) => cellX === e.element.getBoundingClientRect().x)
+          .map((e) => e.element.getBoundingClientRect().width)
       );
 
-      setCellWidth(cell, maxWidth > width ? maxWidth : width);
-    });
+      cell.width = maxWidth > width ? maxWidth : width;
+      // cell.visited = true;
+
+      console.log(cell.element.textContent);
+
+      setCellWidth(cell.element, cell.width);
+    }
+
+    allCells.forEach((cell: Cell) => updateSize(cell));
+    allCells.forEach((cell: Cell) => updateSize(cell));
   }, []);
 
   return <div>{children}</div>;

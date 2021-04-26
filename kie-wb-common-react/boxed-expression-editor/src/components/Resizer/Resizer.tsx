@@ -21,6 +21,35 @@ import { ResizableBox } from "react-resizable";
 import { v4 as uuid } from "uuid";
 import * as _ from "lodash";
 
+class Column {
+  public constructor(public start: number, public end: number) {}
+  includes(col: Column): boolean {
+    return this.start <= col.start && this.end >= col.end;
+  }
+
+  getX() {
+    return this.start;
+  }
+}
+
+class Cell {
+  public constructor(public column: Column, public cell: HTMLElement, public isLastCell?: boolean) {}
+
+  asLastCell() {
+    this.isLastCell = true;
+  }
+
+  isLast() {
+    const elems = this.cell.querySelectorAll(".pf-c-drawer");
+
+    if (elems.length > 0) {
+      const dip = window.getComputedStyle(elems[elems.length - 1]).display;
+      return dip === "none";
+    }
+    return false;
+  }
+}
+
 export interface ResizerProps {
   width: number;
   height: number | "100%";
@@ -48,7 +77,7 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
   const resizerHandler = useMemo(() => <div className="pf-c-drawer">{DRAWER_SPLITTER_ELEMENT}</div>, []);
   const id = useMemo(() => `uuid-${uuid()}`, []);
   const [w, setW] = useState(300);
-  const x: HTMLElement[] = [];
+  const x: Cell[] = [];
   const [cells, setCells] = useState(x);
   const [initalW, setInitialW] = useState(0);
 
@@ -67,23 +96,68 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
 
   const onResizeStart = useCallback(() => {
     const c = document.querySelector(`.${id}`);
-    const w = c?.getBoundingClientRect().width || 0;
-    const x = c?.getBoundingClientRect().x || 0;
-    const cells1: HTMLElement[] = [].slice
-      .call(document.querySelectorAll(".react-resizable"))
-      .filter((e: HTMLElement) => {
-        return (
-          x === e.getBoundingClientRect().x || x + w === e.getBoundingClientRect().x + e.getBoundingClientRect().width
-        );
-      });
+    const rect = c?.getBoundingClientRect();
+    const w = rect?.width || 0;
+    const x = rect?.x || 0;
+    const y = rect?.y || 0;
 
-    console.log(w + " >>> A " + cells1.length);
-    cells1.forEach((r) => {
-      r.setAttribute("data-initial-w", r.style.width);
+    const domCells: HTMLElement[] = [].slice.call(document.querySelectorAll(".react-resizable"));
+    const columns: number[] = [];
+
+    const tableCells: Cell[] = domCells.map((dc) => {
+      const rect = dc.getBoundingClientRect();
+      if (!columns.includes(rect.x)) {
+        columns.push(rect.x);
+      }
+      const current: Cell = new Cell(new Column(rect.x, rect.x + rect.width), dc);
+      return current;
     });
-    console.log(x + " >>> B ");
 
-    setCells(cells1);
+    const currentColumn = new Column(x, w + x);
+    // const currentColumn = columns.indexOf(x);
+    // const currentRow = rows.indexOf(y);
+
+    // const rowCells = tableCells.filter((d: Cell) => d.row === c.row) // cache it
+    // if (rowCells  )
+    // if (currentColumn > columns.length - 1) {
+
+    // }
+
+    const applicableCells: Cell[] = tableCells.filter((c: Cell) => {
+      if (c.column.includes(currentColumn)) {
+        return true;
+      }
+      if (currentColumn.includes(c.column) && c.isLast()) {
+        return true;
+      }
+      return false;
+    });
+
+    // const applicableRows: Cell[] = tableCells.filter((c: Cell) => {
+    //   if (c.row === currentRow) {
+    //     return true;
+    //   }
+    // });
+
+    // const applicableCells = applicableCols.concat(applicableRows);
+
+    // applicableCells.forEach((e) => console.log(e.cell.textContent));
+
+    // const cells1: HTMLElement[] = [].slice
+    //   .call(document.querySelectorAll(".react-resizable"))
+    //   .filter((e: HTMLElement) => {
+    //     return (
+    //       x === e.getBoundingClientRect().x || x + w === e.getBoundingClientRect().x + e.getBoundingClientRect().width
+    //     );
+    //   });
+
+    // console.log(w + " >>> A " + cells1.length);
+    applicableCells.forEach((r) => {
+      r.cell.setAttribute("data-initial-w", r.cell.style.width);
+    });
+    // console.log(x + " >>> B ");
+
+    setCells(applicableCells);
     setInitialW(w);
   }, [id]);
 
@@ -91,9 +165,9 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
     (_e, data) => {
       cells.forEach((c) => {
         const delta = data.size.width - initalW;
-        const a: string = _.first([].slice.call(c.classList).filter((c: string) => c.match(/uuid-/g))) || "";
+        const a: string = _.first([].slice.call(c.cell.classList).filter((c: string) => c.match(/uuid-/g))) || "";
         if (a !== id) {
-          c.style.width = parseInt(c.getAttribute("data-initial-w") || "") + delta + "px";
+          c.cell.style.width = parseInt(c.cell.getAttribute("data-initial-w") || "") + delta + "px";
         }
       }, []);
     },
@@ -104,9 +178,9 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
     (_e, data) => {
       cells.forEach((c) => {
         const delta = data.size.width - initalW;
-        const a: string = _.first([].slice.call(c.classList).filter((c: string) => c.match(/uuid-/g))) || "";
+        const a: string = _.first([].slice.call(c.cell.classList).filter((c: string) => c.match(/uuid-/g))) || "";
         document.dispatchEvent(
-          new CustomEvent(a, { detail: { width: parseInt(c.getAttribute("data-initial-w") || "") + delta } })
+          new CustomEvent(a, { detail: { width: parseInt(c.cell.getAttribute("data-initial-w") || "") + delta } })
         );
       }, []);
     },

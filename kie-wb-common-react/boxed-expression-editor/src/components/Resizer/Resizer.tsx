@@ -20,35 +20,7 @@ import { useCallback, useMemo, useState, useLayoutEffect } from "react";
 import { ResizableBox } from "react-resizable";
 import { v4 as uuid } from "uuid";
 import * as _ from "lodash";
-
-class Column {
-  public constructor(public start: number, public end: number) {}
-  includes(col: Column): boolean {
-    return this.start <= col.start && this.end >= col.end;
-  }
-
-  getX() {
-    return this.start;
-  }
-}
-
-class Cell {
-  public constructor(public column: Column, public cell: HTMLElement, public isLastCell?: boolean) {}
-
-  asLastCell() {
-    this.isLastCell = true;
-  }
-
-  isLast() {
-    const elems = this.cell.querySelectorAll(".pf-c-drawer");
-
-    if (elems.length > 0) {
-      const dip = window.getComputedStyle(elems[elems.length - 1]).display;
-      return dip === "none";
-    }
-    return false;
-  }
-}
+import { Cell, DOMSession } from "./dom";
 
 export interface ResizerProps {
   width: number;
@@ -82,7 +54,6 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
   const [initalW, setInitialW] = useState(0);
 
   useLayoutEffect(() => {
-    // console.log("=>>>>>>>>>>>>>>>>>>>>>>>> " + id);
     function listener(event: CustomEvent) {
       const width = event.detail.width;
       setW(width);
@@ -95,72 +66,48 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
   }, [id]);
 
   const onResizeStart = useCallback(() => {
-    const c = document.querySelector(`.${id}`);
-    const rect = c?.getBoundingClientRect();
-    const w = rect?.width || 0;
-    const x = rect?.x || 0;
-    const y = rect?.y || 0;
+    const applicableCells: Cell[] = [];
+    const allCells = new DOMSession().getCells();
+    const currentCell = allCells.find((c) => c.getId() === id)!;
+    const initialWidth = currentCell.getRect().width;
+    const parent = currentCell.element.closest("table");
 
-    const domCells: HTMLElement[] = [].slice.call(document.querySelectorAll(".react-resizable"));
-    const columns: number[] = [];
+    let someLast = false;
 
-    const tableCells: Cell[] = domCells.map((dc) => {
-      const rect = dc.getBoundingClientRect();
-      if (!columns.includes(rect.x)) {
-        columns.push(rect.x);
+    if (currentCell.isLastColumn()) {
+      allCells
+        .filter((cell) => cell.isLastColumn())
+        .forEach((cell) => {
+          applicableCells.push(cell);
+        });
+    } else {
+      allCells.forEach((cell) => {
+        const cellContainsCurrent =
+          cell.getRect().x <= currentCell.getRect().x && cell.getRect().right >= currentCell.getRect().right;
+
+        if ((parent?.contains(cell.element) || cell.element?.contains(currentCell.element)) && cellContainsCurrent) {
+          applicableCells.push(cell);
+          if (cell.isLastColumn()) {
+            someLast = true;
+          }
+        }
+      });
+
+      if (someLast) {
+        allCells
+          .filter((cell) => cell.isLastColumn() && !parent?.contains(cell.element))
+          .forEach((cell) => {
+            applicableCells.push(cell);
+          });
       }
-      const current: Cell = new Cell(new Column(rect.x, rect.x + rect.width), dc);
-      return current;
+    }
+
+    applicableCells.forEach((cell) => {
+      cell.element.setAttribute("data-initial-w", cell.element.style.width);
     });
-
-    const currentColumn = new Column(x, w + x);
-    // const currentColumn = columns.indexOf(x);
-    // const currentRow = rows.indexOf(y);
-
-    // const rowCells = tableCells.filter((d: Cell) => d.row === c.row) // cache it
-    // if (rowCells  )
-    // if (currentColumn > columns.length - 1) {
-
-    // }
-
-    const parent = c!.closest("table");
-
-    const applicableCells: Cell[] = tableCells.filter((ccc: Cell) => {
-      if ((parent?.contains(ccc.cell) || ccc.cell?.contains(c)) && ccc.column.includes(currentColumn)) {
-        return true;
-      }
-      if (currentColumn.includes(ccc.column) && ccc.isLast()) {
-        return true;
-      }
-      return false;
-    });
-
-    // const applicableRows: Cell[] = tableCells.filter((c: Cell) => {
-    //   if (c.row === currentRow) {
-    //     return true;
-    //   }
-    // });
-
-    // const applicableCells = applicableCols.concat(applicableRows);
-
-    // applicableCells.forEach((e) => console.log(e.cell.textContent));
-
-    // const cells1: HTMLElement[] = [].slice
-    //   .call(document.querySelectorAll(".react-resizable"))
-    //   .filter((e: HTMLElement) => {
-    //     return (
-    //       x === e.getBoundingClientRect().x || x + w === e.getBoundingClientRect().x + e.getBoundingClientRect().width
-    //     );
-    //   });
-
-    // console.log(w + " >>> A " + cells1.length);
-    applicableCells.forEach((r) => {
-      r.cell.setAttribute("data-initial-w", r.cell.style.width);
-    });
-    // console.log(x + " >>> B ");
 
     setCells(applicableCells);
-    setInitialW(w);
+    setInitialW(initialWidth);
   }, [id]);
 
   const onResize = useCallback(
@@ -168,9 +115,8 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
       const width = data.size.width < 100 ? 100 : data.size.width;
       cells.forEach((c) => {
         const delta = width - initalW;
-        const a: string = _.first([].slice.call(c.cell.classList).filter((c: string) => c.match(/uuid-/g))) || "";
-        if (a !== id) {
-          c.cell.style.width = parseInt(c.cell.getAttribute("data-initial-w") || "") + delta + "px";
+        if (c.getId() !== id) {
+          c.element.style.width = parseInt(c.element.getAttribute("data-initial-w") || "") + delta + "px";
         }
       }, []);
     },
@@ -182,9 +128,10 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
       cells.forEach((c) => {
         const width = data.size.width < 100 ? 100 : data.size.width;
         const delta = width - initalW;
-        const a: string = _.first([].slice.call(c.cell.classList).filter((c: string) => c.match(/uuid-/g))) || "";
         document.dispatchEvent(
-          new CustomEvent(a, { detail: { width: parseInt(c.cell.getAttribute("data-initial-w") || "") + delta } })
+          new CustomEvent(c.getId(), {
+            detail: { width: parseInt(c.element.getAttribute("data-initial-w") || "") + delta },
+          })
         );
       }, []);
     },

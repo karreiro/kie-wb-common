@@ -17,11 +17,12 @@
 import * as _ from "lodash";
 
 export class Cell {
-  private static DEFAULT_WIDTH = 250;
+  private static DEFAULT_WIDTH = 250; // TODO pick width from React
   private static PADDING = 14; // TODO: we could get it via JS, performance reasons we don't
 
   private id: string | undefined;
-  private lastColumn: boolean | undefined = undefined;
+  private lastColumn: boolean | undefined;
+  private rect: DOMRect | undefined;
 
   constructor(public element: HTMLElement, public children: Cell[], public depth: number) {}
 
@@ -30,6 +31,13 @@ export class Cell {
       this.id = _.first([].slice.call(this.element.classList).filter((c: string) => c.match(/uuid-/g))) || "";
     }
     return this.id;
+  }
+
+  getRect(): DOMRect {
+    if (this.rect === undefined) {
+      this.rect = this.element.getBoundingClientRect();
+    }
+    return this.rect;
   }
 
   isLastColumn(): boolean {

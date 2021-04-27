@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Cell } from "./Cell";
+import { Cell } from "./";
 
 export class DOMSession {
   private static CELL_CSS_SELCTOR = ".react-resizable";

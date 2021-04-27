@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { DOMSession } from "./DOMSession";
-import { Cell } from "./Cell";
+import { DOMSession, Cell } from "./";
 
 /**
  * [TODO]
@@ -50,13 +49,12 @@ class SupervisorExecution {
   execute() {
     const cells = this.domSession.getCells();
 
-    // const p1 = performance.now();
-    // for (let index = 0; index < 10; index++) {
-    cells.sort((c1, c2) => c2.depth - c1.depth).forEach(this.updateSize);
-    cells.sort((c1, c2) => c1.depth - c2.depth).forEach(this.updateLastColumns);
-    // }
-    // const p2 = performance.now();
-    // console.log("🤡🤡" + (p2 - p1) + "ms");
-    console.log("🤡🤡");
+    const p1 = performance.now();
+    for (let index = 0; index < 10; index++) {
+      cells.sort((c1, c2) => c2.depth - c1.depth).forEach(this.updateSize);
+      cells.sort((c1, c2) => c1.depth - c2.depth).forEach(this.updateLastColumns);
+    }
+    const p2 = performance.now();
+    console.log(p2 - p1 + "ms");
   }
 }

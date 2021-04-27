@@ -117,13 +117,17 @@ class SupervisorExecution {
     }
   }
 
+  updateLastColumns(cell: Cell) {
+    cell.refreshWidthAsLastColumn();
+  }
+
   execute() {
     const cells = this.domSession.getCells();
 
     // const p1 = performance.now();
     // for (let index = 0; index < 10; index++) {
-    cells.sort((c1, c2) => c2.depth - c1.depth).forEach((cell) => this.updateSize(cell));
-    cells.sort((c1, c2) => c1.depth - c2.depth).forEach((cell) => cell.refreshWidthAsLastColumn());
+    cells.sort((c1, c2) => c2.depth - c1.depth).forEach(this.updateSize);
+    cells.sort((c1, c2) => c1.depth - c2.depth).forEach(this.updateLastColumns);
     // }
     // const p2 = performance.now();
     // console.log("🤡🤡" + (p2 - p1) + "ms");

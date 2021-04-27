@@ -123,11 +123,13 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
 
     // }
 
-    const applicableCells: Cell[] = tableCells.filter((c: Cell) => {
-      if (c.column.includes(currentColumn)) {
+    const parent = c!.closest("table");
+
+    const applicableCells: Cell[] = tableCells.filter((ccc: Cell) => {
+      if ((parent?.contains(ccc.cell) || ccc.cell?.contains(c)) && ccc.column.includes(currentColumn)) {
         return true;
       }
-      if (currentColumn.includes(c.column) && c.isLast()) {
+      if (currentColumn.includes(ccc.column) && ccc.isLast()) {
         return true;
       }
       return false;
@@ -163,8 +165,9 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
 
   const onResize = useCallback(
     (_e, data) => {
+      const width = data.size.width < 100 ? 100 : data.size.width;
       cells.forEach((c) => {
-        const delta = data.size.width - initalW;
+        const delta = width - initalW;
         const a: string = _.first([].slice.call(c.cell.classList).filter((c: string) => c.match(/uuid-/g))) || "";
         if (a !== id) {
           c.cell.style.width = parseInt(c.cell.getAttribute("data-initial-w") || "") + delta + "px";
@@ -177,7 +180,8 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
   const onResizeStop = useCallback(
     (_e, data) => {
       cells.forEach((c) => {
-        const delta = data.size.width - initalW;
+        const width = data.size.width < 100 ? 100 : data.size.width;
+        const delta = width - initalW;
         const a: string = _.first([].slice.call(c.cell.classList).filter((c: string) => c.match(/uuid-/g))) || "";
         document.dispatchEvent(
           new CustomEvent(a, { detail: { width: parseInt(c.cell.getAttribute("data-initial-w") || "") + delta } })
@@ -193,7 +197,7 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
         className={`${height === "100%" ? "height-based-on-content" : ""} ${id}`}
         width={w}
         height={targetHeight}
-        minConstraints={[minWidth, minHeight]}
+        minConstraints={[100, minHeight]}
         axis="x"
         onResizeStop={onResizeStop}
         onResize={onResize}
@@ -203,6 +207,6 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
         {children}
       </ResizableBox>
     ),
-    [height, id, w, targetHeight, minWidth, minHeight, onResizeStop, onResize, onResizeStart, resizerHandler, children]
+    [height, id, w, targetHeight, minHeight, onResizeStop, onResize, onResizeStart, resizerHandler, children]
   );
 };

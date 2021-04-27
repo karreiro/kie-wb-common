@@ -131,6 +131,7 @@
 .expression-container .table-component table tbody td.data-cell {
   /* width: 100%;
   overflow-y: hidden; */
+  min-width: 100px;
 }
 
 .expression-container .table-component table tbody td.data-cell.has-resizer .logic-type-selector.logic-type-selected {

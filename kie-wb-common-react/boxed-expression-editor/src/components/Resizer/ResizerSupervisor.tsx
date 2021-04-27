@@ -17,7 +17,7 @@
 import "./Resizer.css";
 import * as React from "react";
 import { useEffect } from "react";
-import { applyDOMSupervisor } from "./ResizerSupervisorDOM";
+import { applyDOMSupervisor } from "./dom/ResizerSupervisorDOM";
 
 export interface ResizerSupervisorProps {
   children?: React.ReactElement;
@@ -25,6 +25,5 @@ export interface ResizerSupervisorProps {
 
 export const ResizerSupervisor: React.FunctionComponent<ResizerSupervisorProps> = ({ children }) => {
   useEffect(() => applyDOMSupervisor(), []);
-
   return <div>{children}</div>;
 };

@@ -46,34 +46,6 @@ export const App: React.FunctionComponent = () => {
         },
         entryExpression: {
           uid: "id2",
-          name: "Expression Name",
-          dataType: "<Undefined>",
-          logicType: "Literal expression",
-          content: "Literal expression 1",
-        },
-        editInfoPopoverLabel: "Edit Context Entry",
-      },
-      {
-        entryInfo: {
-          name: "ContextEntry-2",
-          dataType: "<Undefined>",
-        },
-        entryExpression: {
-          uid: "id4",
-          name: "Expression Name",
-          dataType: "<Undefined>",
-          logicType: "Literal expression",
-          content: "Literal expression 2",
-        },
-        editInfoPopoverLabel: "Edit Context Entry",
-      },
-      {
-        entryInfo: {
-          name: "ContextEntry-3",
-          dataType: "<Undefined>",
-        },
-        entryExpression: {
-          uid: "id5",
           logicType: "Context",
           contextEntries: [
             {
@@ -81,47 +53,13 @@ export const App: React.FunctionComponent = () => {
                 name: "ContextEntry-1",
                 dataType: "<Undefined>",
               },
-              entryExpression: {
-                uid: "id1",
-                logicType: "Context",
-                contextEntries: [
-                  {
-                    entryInfo: {
-                      name: "ContextEntry-1",
-                      dataType: "<Undefined>",
-                    },
-                    entryExpression: {
-                      uid: "id3",
-                      logicType: "Context",
-                      contextEntries: [
-                        {
-                          entryInfo: {
-                            name: "ContextEntry-1",
-                            dataType: "<Undefined>",
-                          },
-                          entryExpression: {},
-                          editInfoPopoverLabel: "Edit Context Entry",
-                        },
-                      ],
-                      result: {
-                        uid: "id6",
-                      },
-                    },
-                    editInfoPopoverLabel: "Edit Context Entry",
-                  },
-                ],
-                result: {
-                  uid: "id4",
-                },
-              },
-              editInfoPopoverLabel: "Edit Context Entry",
+              entryExpression: {},
             },
           ],
           result: {
-            uid: "id7",
+            uid: "id9",
           },
         },
-        editInfoPopoverLabel: "Edit Context Entry",
       },
     ],
     result: {
@@ -134,31 +72,40 @@ export const App: React.FunctionComponent = () => {
             dataType: "<Undefined>",
           },
           entryExpression: {
-            uid: "id8",
-            name: "Expression Name",
-            dataType: "<Undefined>",
-            logicType: "Literal expression",
-            content: "Literal expression 3",
+            uid: "id4",
+            logicType: "Context",
+            contextEntries: [
+              {
+                entryInfo: {
+                  name: "ContextEntry-1",
+                  dataType: "<Undefined>",
+                },
+                entryExpression: {
+                  uid: "id6",
+                  logicType: "Context",
+                  contextEntries: [
+                    {
+                      entryInfo: {
+                        name: "ContextEntry-1",
+                        dataType: "<Undefined>",
+                      },
+                      entryExpression: {},
+                    },
+                  ],
+                  result: {
+                    uid: "id11",
+                  },
+                },
+              },
+            ],
+            result: {
+              uid: "id7",
+            },
           },
-          editInfoPopoverLabel: "Edit Context Entry",
         },
       ],
       result: {
-        uid: "id9",
-        logicType: "Context",
-        contextEntries: [
-          {
-            entryInfo: {
-              name: "ContextEntry-1",
-              dataType: "<Undefined>",
-            },
-            entryExpression: {},
-            editInfoPopoverLabel: "Edit Context Entry",
-          },
-        ],
-        result: {
-          uid: "id3",
-        },
+        uid: "id5",
       },
     },
   } as ExpressionProps;

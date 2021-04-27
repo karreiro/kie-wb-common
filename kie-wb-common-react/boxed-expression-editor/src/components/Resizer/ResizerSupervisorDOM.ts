@@ -15,13 +15,76 @@
  */
 
 import * as _ from "lodash";
-import { element } from "prop-types";
 
-interface Cell {
-  element: HTMLElement;
-  children: Cell[];
-  depth: number;
-  visited?: boolean;
+class Cell {
+  private static DEFAULT_WIDTH = 250;
+  private static DRAGGBLE_ELEMENT = ".pf-c-drawer";
+  private static PADDING = 14; // TODO: we could get it via JS, performance reasons we don't
+
+  private id: string | undefined;
+  private visited = false;
+  private lastColumn: boolean | undefined = undefined;
+
+  constructor(public element: HTMLElement, public children: Cell[], public depth: number) {}
+
+  getId() {
+    if (this.id === undefined) {
+      this.id = _.first([].slice.call(this.element.classList).filter((c: string) => c.match(/uuid-/g))) || "";
+    }
+    return this.id;
+  }
+
+  isVisited() {
+    return this.visited;
+  }
+
+  isLastColumn() {
+    if (this.lastColumn === undefined) {
+      const parent = this.element.closest("tr");
+      const isLast = parent?.lastChild == this.element.closest("th, td");
+      this.lastColumn = isLast;
+    }
+    return this.lastColumn;
+  }
+
+  setWidth(width: number) {
+    const cellWidth = width < 100 ? 100 : width;
+
+    // propagate to React state
+    document.dispatchEvent(new CustomEvent(this.getId(), { detail: { width: cellWidth } }));
+
+    // set on element to the "live" resize
+    this.element.style.width = cellWidth + "px";
+  }
+
+  refreshWidthAsParent() {
+    this.setWidth(this.fetchChildWidth() + Cell.PADDING);
+  }
+
+  refreshWidthAsLastColumn() {
+    if (!this.isLastColumn()) {
+      return;
+    }
+
+    const parentRect = this.element.closest("tr")?.getBoundingClientRect();
+    if (parentRect === undefined) {
+      return;
+    }
+
+    const cellRect = this.element.getBoundingClientRect();
+    const width = parentRect.right - cellRect.x - 15;
+
+    this.setWidth(width + Cell.PADDING);
+  }
+
+  /**
+   * [TODO]
+   * We cannot calculate as css styles may change
+   */
+  private fetchChildWidth() {
+    const thead = this.element.querySelector("thead");
+    return thead?.getBoundingClientRect().width || Cell.DEFAULT_WIDTH;
+  }
 }
 
 /**
@@ -44,8 +107,26 @@ class SupervisorExecution {
     this.domSession = new DOMSession();
   }
 
+  updateSize(cell: Cell) {
+    if (cell.isVisited()) {
+      return;
+    }
+
+    if (cell.children.length > 0) {
+      cell.refreshWidthAsParent();
+    }
+  }
+
   execute() {
-    this.domSession.getCells();
+    const cells = this.domSession.getCells();
+
+    // const p1 = performance.now();
+    // for (let index = 0; index < 10; index++) {
+    cells.sort((c1, c2) => c2.depth - c1.depth).forEach((cell) => this.updateSize(cell));
+    cells.sort((c1, c2) => c1.depth - c2.depth).forEach((cell) => cell.refreshWidthAsLastColumn());
+    // }
+    // const p2 = performance.now();
+    // console.log("🤡🤡" + (p2 - p1) + "ms");
     console.log("🤡🤡");
   }
 }
@@ -53,115 +134,44 @@ class SupervisorExecution {
 class DOMSession {
   private static CELL_CSS_SELCTOR = ".react-resizable";
 
-  private allCells: Cell[] = [];
+  private cells: Cell[] | undefined;
 
   getCells() {
-    // if (this.cells === undefined) {
-    //   this.cells = this.fetchCells(document.body);
-    // }
-    // return this.cells;
+    if (this.cells === undefined) {
+      this.cells = this.buildCells();
+    }
+    return this.cells;
+  }
 
+  private buildCells() {
+    const cells: Cell[] = [];
     this.fetchCellElements(document.body).forEach((cellElement) => {
-      this.buildCell(cellElement, 0);
+      this.buildCell(cellElement, cells, 0);
     });
+    return cells;
+  }
 
-    this.allCells.forEach((a) => {
-      let s = "  ";
-      for (let i = 0; i < a.depth; i++) {
-        s += "    ";
-      }
-      console.log(s + a.element.textContent);
-    });
+  private buildCell(htmlElement: HTMLElement, cells: Cell[], depthLevel: number): Cell {
+    const exitingElement = cells.find((c) => c.element === htmlElement);
+    if (exitingElement) {
+      return exitingElement;
+    }
+
+    const cell = new Cell(
+      htmlElement,
+      this.fetchCellElements(htmlElement)
+        .map((child) => this.buildCell(child, cells, depthLevel + 1))
+        .filter((c) => c.depth == depthLevel + 1),
+      depthLevel
+    );
+
+    cells.push(cell);
+
+    return cell;
   }
 
   private fetchCellElements(parent: HTMLElement): HTMLElement[] {
     const htmlElements = parent.querySelectorAll(DOMSession.CELL_CSS_SELCTOR);
     return [].slice.call(htmlElements);
-  }
-
-  private buildCell(htmlElement: HTMLElement, depthLevel: number): Cell {
-    const exitingElement = this.allCells.find((c) => c.element === htmlElement);
-    if (exitingElement) {
-      return exitingElement;
-    }
-
-    const cell: Cell = {
-      element: htmlElement,
-      children: this.fetchCellElements(htmlElement)
-        .map((child) => this.buildCell(child, depthLevel + 1))
-        .filter((c) => c.depth == depthLevel + 1),
-      depth: depthLevel,
-    };
-
-    this.allCells.push(cell);
-
-    return cell;
-  }
-}
-
-//////////////////////////////
-//////////////////////////////
-//////////////////////////////
-//////////////////////////////
-//////////////////////////////
-//////////////////////////////
-//////////////////////////////
-//////////////////////////////
-//////////////////////////////
-//////////////////////////////
-//////////////////////////////
-//////////////////////////////
-//////////////////////////////
-//////////////////////////////
-
-function old() {
-  const allCells = fetchResizableCells(document.body);
-
-  function setCellWidth(cell: HTMLElement, rawWidth: number) {
-    const width = rawWidth < 100 ? 100 : rawWidth;
-    const id = getId(cell);
-    document.dispatchEvent(new CustomEvent(id, { detail: { width } }));
-    cell.style.width = width + "px";
-  }
-
-  // function getCellWidth(_cell: HTMLElement) {
-  //   return 300; // if it doesn't have width already, otherwise use the existing one
-  // }
-
-  function getId(cell: HTMLElement): string {
-    return _.first([].slice.call(cell.classList).filter((c: string) => c.match(/uuid-/g))) || "";
-  }
-
-  function fetchResizableCells(parent: HTMLElement): Cell[] {
-    return [].slice.call(parent.querySelectorAll(".react-resizable")).map((c: HTMLElement) => {
-      return {
-        element: c,
-        width: 0,
-        visited: false,
-      };
-    });
-  }
-
-  function updateSize(cell: Cell) {
-    // if (cell.visited) {
-    //   return;
-    // }
-    // const childCells = fetchResizableCells(cell.element);
-    // if (childCells.length > 0) {
-    //   childCells.forEach((elem: Cell) => updateSize(elem));
-    // }
-    // const thead = cell.element.querySelector("thead");
-    // const cellX = cell.element.getBoundingClientRect().x;
-    // const padding = 14;
-    // const width = thead ? thead.getBoundingClientRect().width + padding : 250;
-    // const maxWidth = Math.max(
-    //   ...allCells
-    //     .filter((e) => cellX === e.element.getBoundingClientRect().x)
-    //     .map((e) => e.element.getBoundingClientRect().width)
-    // );
-    // cell.width = maxWidth > width ? maxWidth : width;
-    // // cell.visited = true;
-    // console.log(cell.element.textContent);
-    // setCellWidth(cell.element, cell.width);
   }
 }

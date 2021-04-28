@@ -46,19 +46,18 @@ export const App: React.FunctionComponent = () => {
         },
         entryExpression: {
           uid: "id3",
-          isHeadless: true,
-          logicType: "Relation",
-          columns: [
+          logicType: "Invocation",
+          bindingEntries: [
             {
-              name: "column-1",
-              dataType: "<Undefined>",
-            },
-            {
-              name: "column-2",
-              dataType: "<Undefined>",
+              entryInfo: {
+                name: "p-1",
+                dataType: "<Undefined>",
+              },
+              entryExpression: {},
+              editInfoPopoverLabel: "Edit Parameter",
             },
           ],
-          rows: [["", ""]],
+          invokedFunction: "",
         },
         editInfoPopoverLabel: "Edit Context Entry",
       },

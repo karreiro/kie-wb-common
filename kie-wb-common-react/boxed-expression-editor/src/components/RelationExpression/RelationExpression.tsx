@@ -75,7 +75,6 @@ export const RelationExpression: React.FunctionComponent<RelationProps> = (relat
             label: column.name,
             accessor: column.name,
             dataType: column.dataType,
-            ...(column.width ? { width: column.width } : {}),
           } as Column)
       ),
     []
@@ -118,7 +117,7 @@ export const RelationExpression: React.FunctionComponent<RelationProps> = (relat
       tableColumns.current = _.map(columns, (columnInstance: ColumnInstance) => ({
         name: columnInstance.accessor,
         dataType: columnInstance.dataType,
-        width: columnInstance.width,
+        // width: columnInstance.width,
       }));
       spreadRelationExpressionDefinition();
     },

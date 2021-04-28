@@ -59,29 +59,23 @@ export const ContextEntryInfo: React.FunctionComponent<ContextEntryInfoProps> = 
     [onContextEntryUpdate]
   );
 
-  const onHorizontalResizeStop = useCallback((width) => {
-    // console.log(">>>>>" + width);
-  }, []);
-
   return (
     <div className="entry-info">
-      <Resizer width={300} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
-        <EditExpressionMenu
-          title={editInfoPopoverLabel}
-          selectedExpressionName={entryName}
-          selectedDataType={entryDataType}
-          onExpressionUpdate={onEntryNameOrDataTypeUpdate}
-        >
-          <div className="entry-definition">
-            <p className="entry-name pf-u-text-truncate" title={entryName}>
-              {entryName}
-            </p>
-            <p className="entry-data-type pf-u-text-truncate" title={entryDataType}>
-              ({entryDataType})
-            </p>
-          </div>
-        </EditExpressionMenu>
-      </Resizer>
+      <EditExpressionMenu
+        title={editInfoPopoverLabel}
+        selectedExpressionName={entryName}
+        selectedDataType={entryDataType}
+        onExpressionUpdate={onEntryNameOrDataTypeUpdate}
+      >
+        <div className="entry-definition">
+          <p className="entry-name pf-u-text-truncate" title={entryName}>
+            {entryName}
+          </p>
+          <p className="entry-data-type pf-u-text-truncate" title={entryDataType}>
+            ({entryDataType})
+          </p>
+        </div>
+      </EditExpressionMenu>
     </div>
   );
 };

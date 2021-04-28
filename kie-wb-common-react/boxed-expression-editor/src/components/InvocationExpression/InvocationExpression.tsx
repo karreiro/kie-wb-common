@@ -128,14 +128,12 @@ export const InvocationExpression: React.FunctionComponent<InvocationProps> = ({
             {
               accessor: "entryInfo",
               disableHandlerOnHeader: true,
-              canResizeOnCell: true,
               width: infoWidth.current,
               minWidth: DEFAULT_ENTRY_INFO_MIN_WIDTH,
             },
             {
               accessor: "entryExpression",
               disableHandlerOnHeader: true,
-              canResizeOnCell: true,
               width: expressionWidth.current,
               minWidth: DEFAULT_ENTRY_EXPRESSION_MIN_WIDTH,
             },

@@ -19,7 +19,7 @@ import { useCallback, useMemo } from "react";
 import { Tbody, Td, Tr } from "@patternfly/react-table";
 import { TableHeaderVisibility } from "../../api";
 import { Cell, Column, Row, TableInstance } from "react-table";
-import { DRAWER_SPLITTER_ELEMENT } from "../Resizer";
+import { DRAWER_SPLITTER_ELEMENT, Resizer } from "../Resizer";
 
 export interface TableBodyProps {
   /** Table instance */
@@ -41,36 +41,47 @@ export const TableBody: React.FunctionComponent<TableBodyProps> = ({
   getRowKey,
   getColumnKey,
 }) => {
-  const renderCellResizer = useCallback(
-    (cell: Cell) => (
-      <div
-        className="pf-c-drawer drawer-on-body"
-        {...(cell.column.canResizeOnCell ? cell.column.getResizerProps() : {})}
-      >
-        {DRAWER_SPLITTER_ELEMENT}
-      </div>
-    ),
-    []
-  );
+  // const renderCellResizer = useCallback(
+  //   (cell: Cell) => (
+  //     <div
+  //       className="pf-c-drawer drawer-on-body"
+  //       {...(cell.column.getResizerProps ? cell.column.getResizerProps() : {})}
+  //     >
+  //       {DRAWER_SPLITTER_ELEMENT}
+  //     </div>
+  //   ),
+  //   []
+  // );
+
+  const onHorizontalResizeStop = useCallback((width) => {
+    // console.log(">>>>>" + width);
+  }, []);
 
   const renderCell = useCallback(
     (cellIndex: number, cell: Cell, rowIndex: number) => {
       const cellType = cellIndex === 0 ? "counter-cell" : "data-cell";
-      const canResize = cell.column.canResizeOnCell ? "has-resizer" : "";
+      // const canResize = "has-resizer";
+      const cellTemplate =
+        cellIndex === 0 ? (
+          <>{rowIndex + 1}</>
+        ) : (
+          <Resizer width={300} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
+            <>{cell.render("Cell")}</>
+          </Resizer>
+        );
       return (
         <Td
           {...(cellIndex === 0 ? {} : cell.getCellProps())}
           {...tableInstance.getTdProps(cellIndex, rowIndex)}
           key={`${getColumnKey(cell.column)}-${cellIndex}`}
           data-ouia-component-id={"expression-column-" + cellIndex}
-          className={`${cellType} ${canResize}`}
+          className={`${cellType}`}
         >
-          {cellIndex === 0 ? rowIndex + 1 : cell.render("Cell")}
-          {cell.column.canResizeOnCell ? renderCellResizer(cell) : null}
+          {cellTemplate}
         </Td>
       );
     },
-    [getColumnKey, renderCellResizer, tableInstance]
+    [getColumnKey, onHorizontalResizeStop, tableInstance]
   );
 
   const renderBodyRow = useCallback(

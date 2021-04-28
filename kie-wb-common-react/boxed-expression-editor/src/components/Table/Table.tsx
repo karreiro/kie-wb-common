@@ -139,8 +139,8 @@ export const Table: React.FunctionComponent<TableProps> = ({
   );
 
   const defaultColumn = {
-    minWidth: 150,
-    width: 150,
+    // minWidth: 150,
+    width: "initial",
     Cell: useCallback((cellRef) => {
       const column = cellRef.column as ColumnInstance;
       if (column.isCountColumn) {

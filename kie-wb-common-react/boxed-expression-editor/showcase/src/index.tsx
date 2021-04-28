@@ -45,25 +45,37 @@ export const App: React.FunctionComponent = () => {
           dataType: "<Undefined>",
         },
         entryExpression: {
-          uid: "id3",
-          logicType: "Invocation",
-          bindingEntries: [
+          uid: "id2",
+          logicType: "Relation",
+          isHeadless: true,
+          columns: [
             {
-              entryInfo: {
-                name: "p-1",
-                dataType: "<Undefined>",
-              },
-              entryExpression: {},
-              editInfoPopoverLabel: "Edit Parameter",
+              name: "column-1",
+              dataType: "<Undefined>",
+              width: 471,
+            },
+            {
+              name: "column-2",
+              dataType: "<Undefined>",
+              width: 137,
+            },
+            {
+              name: "column-3",
+              dataType: "<Undefined>",
+              width: 272,
+            },
+            {
+              name: "column-4",
+              dataType: "<Undefined>",
+              width: 385,
             },
           ],
-          invokedFunction: "",
+          rows: [["", "", "", ""]],
         },
-        editInfoPopoverLabel: "Edit Context Entry",
       },
     ],
     result: {
-      uid: "id4",
+      uid: "id3",
       logicType: "Context",
       contextEntries: [
         {
@@ -71,14 +83,29 @@ export const App: React.FunctionComponent = () => {
             name: "ContextEntry-1",
             dataType: "<Undefined>",
           },
-          entryExpression: {},
-          editInfoPopoverLabel: "Edit Context Entry",
+          entryExpression: {
+            uid: "id6",
+            logicType: "Context",
+            contextEntries: [
+              {
+                entryInfo: {
+                  name: "ContextEntry-1",
+                  dataType: "<Undefined>",
+                },
+                entryExpression: {},
+              },
+            ],
+            result: {
+              uid: "id9",
+            },
+          },
         },
       ],
       result: {
-        uid: "id2",
+        uid: "id7",
       },
     },
+    entryExpressionWidth: 1493,
   } as ExpressionProps;
 
   const [updatedExpression, setUpdatedExpression] = useState(selectedExpression);

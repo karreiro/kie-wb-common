@@ -22,3 +22,29 @@
     */
   height: 100% !important;
 }
+
+.expression-container .pf-c-drawer__splitter::after {
+  border: none;
+}
+
+.expression-container
+  .table-component
+  .react-resizable
+  table
+  tr
+  td:last-child
+  > .context-entry-expression-cell
+  > .react-resizable
+  > .pf-c-drawer,
+.expression-container .table-component .react-resizable table tr td:last-child > .react-resizable > .pf-c-drawer,
+.expression-container .table-component .react-resizable table tr th:last-child > .react-resizable > .pf-c-drawer {
+  display: none;
+}
+
+.expression-container .pf-c-drawer {
+  opacity: 0.3;
+  width: 5px;
+}
+.expression-container .pf-c-drawer .pf-c-drawer__splitter-handle::after {
+  border-left: none;
+}

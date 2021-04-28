@@ -34,9 +34,53 @@ import {
 export const App: React.FunctionComponent = () => {
   //This definition comes directly from the decision node
   const selectedExpression: ExpressionProps = {
+    uid: "id1",
+    logicType: "Context",
     name: "Expression Name",
-    dataType: DataType.Undefined,
-  };
+    dataType: "<Undefined>",
+    contextEntries: [
+      {
+        entryInfo: {
+          name: "ContextEntry-1",
+          dataType: "<Undefined>",
+        },
+        entryExpression: {
+          uid: "id3",
+          isHeadless: true,
+          logicType: "Relation",
+          columns: [
+            {
+              name: "column-1",
+              dataType: "<Undefined>",
+            },
+            {
+              name: "column-2",
+              dataType: "<Undefined>",
+            },
+          ],
+          rows: [["", ""]],
+        },
+        editInfoPopoverLabel: "Edit Context Entry",
+      },
+    ],
+    result: {
+      uid: "id4",
+      logicType: "Context",
+      contextEntries: [
+        {
+          entryInfo: {
+            name: "ContextEntry-1",
+            dataType: "<Undefined>",
+          },
+          entryExpression: {},
+          editInfoPopoverLabel: "Edit Context Entry",
+        },
+      ],
+      result: {
+        uid: "id2",
+      },
+    },
+  } as ExpressionProps;
 
   const [updatedExpression, setUpdatedExpression] = useState(selectedExpression);
 

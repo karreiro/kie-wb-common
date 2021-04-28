@@ -38,6 +38,7 @@ import { ContextEntryExpressionCell } from "./ContextEntryExpressionCell";
 import * as _ from "lodash";
 import { ContextEntryExpression } from "./ContextEntryExpression";
 import { ContextEntryInfoCell } from "./ContextEntryInfoCell";
+import { Resizer } from "../Resizer";
 
 const DEFAULT_CONTEXT_ENTRY_NAME = "ContextEntry-1";
 const DEFAULT_CONTEXT_ENTRY_DATA_TYPE = DataType.Undefined;
@@ -71,15 +72,15 @@ export const ContextExpression: React.FunctionComponent<ContextProps> = ({
           label: "Name",
           accessor: "entryInfo",
           disableHandlerOnHeader: true,
-          width: infoWidth,
-          minWidth: DEFAULT_ENTRY_INFO_MIN_WIDTH,
+          width: "initial",
+          // minWidth: DEFAULT_ENTRY_INFO_MIN_WIDTH,
         },
         {
           label: "Value",
           accessor: "entryExpression",
           disableHandlerOnHeader: true,
-          width: expressionWidth,
-          minWidth: DEFAULT_ENTRY_EXPRESSION_MIN_WIDTH,
+          width: "initial",
+          // minWidth: DEFAULT_ENTRY_EXPRESSION_MIN_WIDTH,
         },
       ],
     },
@@ -131,6 +132,10 @@ export const ContextExpression: React.FunctionComponent<ContextProps> = ({
     return isHeadless ? TableHeaderVisibility.LastLevel : TableHeaderVisibility.Full;
   }, [isHeadless]);
 
+  const onHorizontalResizeStop = useCallback((width) => {
+    // console.log(">>>>>" + width);
+  }, []);
+
   useEffect(() => {
     const [expressionColumn] = columns;
     const updatedDefinition: ContextProps = {
@@ -164,7 +169,9 @@ export const ContextExpression: React.FunctionComponent<ContextProps> = ({
         getRowKey={useCallback(getEntryKey, [])}
         resetRowCustomFunction={useCallback(resetEntry, [])}
       >
-        <div className="context-result">{`<result>`}</div>
+        <Resizer width={300} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
+          <div className="context-result">{`<result>`}</div>
+        </Resizer>
         <ContextEntryExpression expression={resultExpression} onUpdatingRecursiveExpression={setResultExpression} />
       </Table>
     </div>

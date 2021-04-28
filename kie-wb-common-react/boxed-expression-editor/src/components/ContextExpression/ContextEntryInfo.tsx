@@ -19,6 +19,7 @@ import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
 import { EditExpressionMenu } from "../EditExpressionMenu";
 import { DataType } from "../../api";
+import { Resizer } from "../Resizer";
 
 export interface ContextEntryInfoProps {
   /** Context Entry info name */
@@ -58,23 +59,29 @@ export const ContextEntryInfo: React.FunctionComponent<ContextEntryInfoProps> = 
     [onContextEntryUpdate]
   );
 
+  const onHorizontalResizeStop = useCallback((width) => {
+    // console.log(">>>>>" + width);
+  }, []);
+
   return (
     <div className="entry-info">
-      <EditExpressionMenu
-        title={editInfoPopoverLabel}
-        selectedExpressionName={entryName}
-        selectedDataType={entryDataType}
-        onExpressionUpdate={onEntryNameOrDataTypeUpdate}
-      >
-        <div className="entry-definition">
-          <p className="entry-name pf-u-text-truncate" title={entryName}>
-            {entryName}
-          </p>
-          <p className="entry-data-type pf-u-text-truncate" title={entryDataType}>
-            ({entryDataType})
-          </p>
-        </div>
-      </EditExpressionMenu>
+      <Resizer width={300} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
+        <EditExpressionMenu
+          title={editInfoPopoverLabel}
+          selectedExpressionName={entryName}
+          selectedDataType={entryDataType}
+          onExpressionUpdate={onEntryNameOrDataTypeUpdate}
+        >
+          <div className="entry-definition">
+            <p className="entry-name pf-u-text-truncate" title={entryName}>
+              {entryName}
+            </p>
+            <p className="entry-data-type pf-u-text-truncate" title={entryDataType}>
+              ({entryDataType})
+            </p>
+          </div>
+        </EditExpressionMenu>
+      </Resizer>
     </div>
   );
 };

@@ -21,7 +21,8 @@ import * as _ from "lodash";
 import { Column, ColumnInstance, DataRecord, HeaderGroup, TableInstance } from "react-table";
 import { EditExpressionMenu } from "../EditExpressionMenu";
 import { DataType, TableHeaderVisibility } from "../../api";
-import { DRAWER_SPLITTER_ELEMENT } from "../Resizer";
+// import { DRAWER_SPLITTER_ELEMENT } from "../Resizer";
+import { Resizer } from "../Resizer";
 
 export interface TableHeaderProps {
   /** Table instance */
@@ -85,19 +86,25 @@ export const TableHeader: React.FunctionComponent<TableHeaderProps> = ({
     [onColumnsUpdate, tableColumns, updateColumnNameInRows]
   );
 
+  const onHorizontalResizeStop = useCallback((width) => {
+    // console.log(">>>>>" + width);
+  }, []);
+
   const renderCountColumn = useCallback(
     (column: ColumnInstance, columnIndex: number) => (
       <Th
         {...column.getHeaderProps()}
-        className="fixed-column no-clickable-cell"
+        className="resizable-column no-clickable-cell"
         key={`${getColumnKey(column)}-${columnIndex}`}
       >
-        <div className="header-cell" data-ouia-component-type="expression-column-header">
-          {column.label}
-        </div>
+        <Resizer width={300} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
+          <div className="header-cell" data-ouia-component-type="expression-column-header">
+            {column.label}
+          </div>
+        </Resizer>
       </Th>
     ),
-    [getColumnKey]
+    [getColumnKey, onHorizontalResizeStop]
   );
 
   const renderHeaderCellInfo = useCallback(
@@ -118,30 +125,33 @@ export const TableHeader: React.FunctionComponent<TableHeaderProps> = ({
         className={`resizable-column ${!column.dataType ? "no-clickable-cell" : null}`}
         key={`${getColumnKey(column)}-${columnIndex}`}
       >
-        <div className="header-cell" data-ouia-component-type="expression-column-header">
-          {column.dataType ? (
-            <EditExpressionMenu
-              title={editColumnLabel}
-              selectedExpressionName={column.label}
-              selectedDataType={column.dataType}
-              onExpressionUpdate={onColumnNameOrDataTypeUpdate(columnIndex)}
-              key={`${getColumnKey(column)}-${columnIndex}`}
-            >
-              {renderHeaderCellInfo(column)}
-            </EditExpressionMenu>
-          ) : (
-            renderHeaderCellInfo(column)
-          )}
-          <div
-            className={`pf-c-drawer ${!column.canResize ? "resizer-disabled" : ""}`}
-            {...(column.canResize ? column.getResizerProps() : {})}
-          >
-            {DRAWER_SPLITTER_ELEMENT}
+        <Resizer width={300} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
+          <div className="header-cell" data-ouia-component-type="expression-column-header">
+            {column.dataType ? (
+              <EditExpressionMenu
+                title={editColumnLabel}
+                selectedExpressionName={column.label}
+                selectedDataType={column.dataType}
+                onExpressionUpdate={onColumnNameOrDataTypeUpdate(columnIndex)}
+                key={`${getColumnKey(column)}-${columnIndex}`}
+              >
+                {renderHeaderCellInfo(column)}
+              </EditExpressionMenu>
+            ) : (
+              renderHeaderCellInfo(column)
+            )}
           </div>
-        </div>
+        </Resizer>
       </Th>
     ),
-    [editColumnLabel, getColumnKey, onColumnNameOrDataTypeUpdate, renderHeaderCellInfo, tableInstance]
+    [
+      editColumnLabel,
+      getColumnKey,
+      onColumnNameOrDataTypeUpdate,
+      onHorizontalResizeStop,
+      renderHeaderCellInfo,
+      tableInstance,
+    ]
   );
 
   const renderColumn = useCallback(

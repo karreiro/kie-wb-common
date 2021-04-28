@@ -69,14 +69,14 @@ export const ContextExpression: React.FunctionComponent<ContextProps> = ({
       disableHandlerOnHeader: true,
       columns: [
         {
-          label: "Name",
+          // label: "Name",
           accessor: "entryInfo",
           disableHandlerOnHeader: true,
           width: "initial",
           // minWidth: DEFAULT_ENTRY_INFO_MIN_WIDTH,
         },
         {
-          label: "Value",
+          // label: "Value",
           accessor: "entryExpression",
           disableHandlerOnHeader: true,
           width: "initial",
@@ -129,7 +129,7 @@ export const ContextExpression: React.FunctionComponent<ContextProps> = ({
   );
 
   const getHeaderVisibility = useCallback(() => {
-    return isHeadless ? TableHeaderVisibility.LastLevel : TableHeaderVisibility.Full;
+    return isHeadless ? TableHeaderVisibility.None : TableHeaderVisibility.SecondToLastLevel;
   }, [isHeadless]);
 
   const onHorizontalResizeStop = useCallback((width) => {

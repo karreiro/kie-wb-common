@@ -84,7 +84,7 @@ export class Cell {
    * We cannot calculate as css styles may change
    */
   private fetchChildWidth() {
-    const thead = this.element.querySelector("thead");
+    const thead = this.element.querySelector("thead, tbody");
     return thead?.getBoundingClientRect().width || Cell.DEFAULT_WIDTH;
   }
 }

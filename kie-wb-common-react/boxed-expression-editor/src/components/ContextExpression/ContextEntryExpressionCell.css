@@ -15,5 +15,8 @@
  */
 
 .context-entry-expression-cell .entry-expression .literal-expression {
-  width: 100%
+  width: 100%;
+}
+.context-entry-expression-cell {
+  /* background-color: pink; */
 }

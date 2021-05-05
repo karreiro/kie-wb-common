@@ -33,10 +33,214 @@ import {
 
 export const App: React.FunctionComponent = () => {
   //This definition comes directly from the decision node
+  // const selectedExpression: ExpressionProps = {
+  //   uid: "id1",
+  //   logicType: "Context",
+  //   name: "Expression Name",
+  //   dataType: "<Undefined>",
+  //   contextEntries: [
+  //     {
+  //       entryInfo: {
+  //         name: "ContextEntry-1",
+  //         dataType: "<Undefined>",
+  //       },
+  //       entryExpression: {
+  //         uid: "id2",
+  //         logicType: "Relation",
+  //         isHeadless: true,
+  //         columns: [
+  //           {
+  //             name: "column-1",
+  //             dataType: "<Undefined>",
+  //             width: 106,
+  //           },
+  //           {
+  //             name: "column-5",
+  //             dataType: "<Undefined>",
+  //             width: 379,
+  //           },
+  //           {
+  //             name: "column-8",
+  //             dataType: "<Undefined>",
+  //             width: 124,
+  //           },
+  //           {
+  //             name: "column-2",
+  //             dataType: "<Undefined>",
+  //             width: 181,
+  //           },
+  //           {
+  //             name: "column-7",
+  //             dataType: "<Undefined>",
+  //           },
+  //           {
+  //             name: "column-6",
+  //             dataType: "<Undefined>",
+  //             width: 133,
+  //           },
+  //           {
+  //             name: "column-3",
+  //             dataType: "<Undefined>",
+  //             width: 100,
+  //           },
+  //           {
+  //             name: "column-4",
+  //             dataType: "<Undefined>",
+  //             width: 213,
+  //           },
+  //         ],
+  //         rows: [
+  //           ["", "", "", "", "", "", "", ""],
+  //           ["", "", "", "", "", "", "", ""],
+  //         ],
+  //       },
+  //     },
+  //   ],
+  //   result: {
+  //     uid: "id3",
+  //     logicType: "Context",
+  //     contextEntries: [
+  //       {
+  //         entryInfo: {
+  //           name: "ContextEntry-1",
+  //           dataType: "<Undefined>",
+  //         },
+  //         entryExpression: {
+  //           uid: "id6",
+  //           logicType: "Context",
+  //           contextEntries: [
+  //             {
+  //               entryInfo: {
+  //                 name: "ContextEntry-1",
+  //                 dataType: "<Undefined>",
+  //               },
+  //               entryExpression: {},
+  //             },
+  //           ],
+  //           result: {
+  //             uid: "id9",
+  //           },
+  //         },
+  //       },
+  //     ],
+  //     result: {
+  //       uid: "id7",
+  //     },
+  //   },
+  // } as ExpressionProps;
+
   const selectedExpression: ExpressionProps = {
+    uid: "id1",
+    logicType: "Context",
     name: "Expression Name",
-    dataType: DataType.Undefined,
-  };
+    dataType: "<Undefined>",
+    contextEntries: [
+      {
+        entryInfo: {
+          name: "ContextEntry-1",
+          dataType: "<Undefined>",
+        },
+        entryExpression: {
+          uid: "id2",
+          logicType: "Relation",
+          isHeadless: true,
+          columns: [
+            {
+              name: "column-1",
+              dataType: "<Undefined>",
+              width: 106,
+            },
+            {
+              name: "column-5",
+              dataType: "<Undefined>",
+              width: 379,
+            },
+            {
+              name: "column-8",
+              dataType: "<Undefined>",
+              width: 124,
+            },
+            {
+              name: "column-2",
+              dataType: "<Undefined>",
+              width: 181,
+            },
+            {
+              name: "column-7",
+              dataType: "<Undefined>",
+            },
+            {
+              name: "column-6",
+              dataType: "<Undefined>",
+              width: 133,
+            },
+            {
+              name: "column-3",
+              dataType: "<Undefined>",
+              width: 100,
+            },
+            {
+              name: "column-4",
+              dataType: "<Undefined>",
+              width: 798,
+            },
+          ],
+          rows: [
+            ["", "", "", "", "", "", "", ""],
+            ["", "", "", "", "", "", "", ""],
+          ],
+        },
+      },
+    ],
+    result: {
+      uid: "id3",
+      logicType: "Context",
+      contextEntries: [
+        {
+          entryInfo: {
+            name: "ContextEntry-1",
+            dataType: "<Undefined>",
+          },
+          entryExpression: {
+            uid: "id6",
+            logicType: "Context",
+            contextEntries: [
+              {
+                entryInfo: {
+                  name: "ContextEntry-1",
+                  dataType: "<Undefined>",
+                },
+                entryExpression: {
+                  uid: "id1",
+                  isHeadless: true,
+                  logicType: "Relation",
+                  columns: [
+                    {
+                      name: "column-1",
+                      dataType: "<Undefined>",
+                      width: 845,
+                    },
+                    {
+                      name: "column-2",
+                      dataType: "<Undefined>",
+                      width: 468,
+                    },
+                  ],
+                  rows: [["", ""]],
+                },
+              },
+            ],
+            result: {
+              uid: "id9",
+            },
+          },
+        },
+      ],
+      result: {
+        uid: "id7",
+      },
+    },
+  } as ExpressionProps;
 
   const [updatedExpression, setUpdatedExpression] = useState(selectedExpression);
 

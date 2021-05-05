@@ -14,5 +14,7 @@
  * limitations under the License.
  */
 
-export * from "./Resizer";
-export * from "./ResizerSupervisor";
+export * from "./Cell";
+export * from "./DOMSession";
+export * from "./ResizerSupervisorDOM";
+export * from "./Throttling";

@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+.expression-container .invocation-expression {
+  width: 100%;
+}
+
 .expression-container .invocation-expression .function-definition-container,
 .expression-container .invocation-expression .function-definition-container .function-definition,
 /** Increasing width and height for the .header-cell-info which contains .function-definition-container */
@@ -28,7 +32,7 @@
 
 .expression-container .invocation-expression .function-definition-container .function-definition {
   border: none;
-  background-color: #DEF3FF;
+  background-color: #def3ff;
   font-family: monospace;
   padding: 0.25em;
 }

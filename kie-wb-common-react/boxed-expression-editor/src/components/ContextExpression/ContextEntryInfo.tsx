@@ -19,6 +19,7 @@ import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
 import { EditExpressionMenu } from "../EditExpressionMenu";
 import { DataType } from "../../api";
+import { Resizer } from "../Resizer";
 
 export interface ContextEntryInfoProps {
   /** Context Entry info name */

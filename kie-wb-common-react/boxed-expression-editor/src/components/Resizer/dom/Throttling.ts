@@ -14,5 +14,27 @@
  * limitations under the License.
  */
 
-export * from "./Resizer";
-export * from "./ResizerSupervisor";
+import { find } from "lodash";
+
+export class Throttling {
+  private static instance: Throttling;
+  private latestCall = 0;
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  private constructor() {}
+
+  static run(fn: () => void): void {
+    const instance = this.getInstance();
+
+    window.clearTimeout(instance.latestCall);
+
+    instance.latestCall = window.setTimeout(fn, 100);
+  }
+
+  private static getInstance(): Throttling {
+    if (!Throttling.instance) {
+      Throttling.instance = new Throttling();
+    }
+    return Throttling.instance;
+  }
+}

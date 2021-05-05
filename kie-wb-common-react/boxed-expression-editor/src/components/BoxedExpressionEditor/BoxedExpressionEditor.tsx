@@ -28,6 +28,7 @@ import {
 } from "../../i18n";
 import { BoxedExpressionGlobalContext } from "../../context";
 import * as _ from "lodash";
+import { ResizerSupervisor } from "../Resizer";
 
 export interface BoxedExpressionEditorProps {
   /** All expression properties used to define it */
@@ -50,9 +51,11 @@ const BoxedExpressionEditor: (props: BoxedExpressionEditorProps) => JSX.Element 
       <BoxedExpressionGlobalContext.Provider
         value={{ boxedExpressionEditorRef, currentlyOpenedHandlerCallback, setCurrentlyOpenedHandlerCallback }}
       >
-        <div className="boxed-expression-editor" ref={boxedExpressionEditorRef}>
-          <ExpressionContainer {...props.expressionDefinition} />
-        </div>
+        <ResizerSupervisor>
+          <div className="boxed-expression-editor" ref={boxedExpressionEditorRef}>
+            <ExpressionContainer {...props.expressionDefinition} />
+          </div>
+        </ResizerSupervisor>
       </BoxedExpressionGlobalContext.Provider>
     </I18nDictionariesProvider>
   );

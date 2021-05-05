@@ -69,6 +69,7 @@ export const InvocationExpression: React.FunctionComponent<InvocationProps> = ({
 
   const functionDefinition = useRef<string>(invokedFunction);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const infoWidth = useRef<number>(entryInfoWidth);
 
   const expressionWidth = useRef<number>(entryExpressionWidth);
@@ -101,6 +102,7 @@ export const InvocationExpression: React.FunctionComponent<InvocationProps> = ({
     spreadInvocationExpressionDefinition();
   }, [spreadInvocationExpressionDefinition]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onHorizontalResizeStop = useCallback((width) => {
     // console.log(">>>>>" + width);
   }, []);

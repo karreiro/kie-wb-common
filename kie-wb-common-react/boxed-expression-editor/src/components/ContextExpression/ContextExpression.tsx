@@ -132,7 +132,8 @@ export const ContextExpression: React.FunctionComponent<ContextProps> = ({
     return isHeadless ? TableHeaderVisibility.None : TableHeaderVisibility.SecondToLastLevel;
   }, [isHeadless]);
 
-  const onHorizontalResizeStop = useCallback((width) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const onHorizontalResizeStop = useCallback((width: number) => {
     // console.log(">>>>>" + width);
   }, []);
 

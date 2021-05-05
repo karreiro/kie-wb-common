@@ -85,6 +85,6 @@ export class Cell {
    */
   private fetchChildWidth() {
     const thead = this.element.querySelector("thead, tbody");
-    return thead?.getBoundingClientRect().width || Cell.DEFAULT_WIDTH;
+    return parseInt(thead?.getBoundingClientRect().width + "") || Cell.DEFAULT_WIDTH;
   }
 }

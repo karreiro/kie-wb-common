@@ -64,7 +64,8 @@ export const ContextEntryExpression: React.FunctionComponent<ContextEntryExpress
     onUpdatingRecursiveExpression(_.omit(entryExpression.current, "isHeadless"));
   }, [onExpressionResetting, onUpdatingRecursiveExpression]);
 
-  const onHorizontalResizeStop = useCallback((width) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const onHorizontalResizeStop = useCallback((width: number) => {
     // console.log(">>>>>" + width);
   }, []);
 

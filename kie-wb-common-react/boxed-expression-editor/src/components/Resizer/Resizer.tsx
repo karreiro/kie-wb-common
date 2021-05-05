@@ -19,7 +19,7 @@ import * as React from "react";
 import { useCallback, useMemo, useState, useLayoutEffect } from "react";
 import { ResizableBox } from "react-resizable";
 import { v4 as uuid } from "uuid";
-import * as _ from "lodash";
+// import * as _ from "lodash";
 import { Cell, DOMSession } from "./dom";
 
 export interface ResizerProps {
@@ -41,6 +41,7 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
   children,
   height,
   minHeight = 0,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   minWidth,
   onHorizontalResizeStop,
   width,

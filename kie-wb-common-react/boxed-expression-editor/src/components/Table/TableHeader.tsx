@@ -114,8 +114,9 @@ export const TableHeader: React.FunctionComponent<TableHeaderProps> = ({
   const onHorizontalResizeStop = useCallback(
     (column, width) => {
       onColumnsUpdate(
-        tableColumns.current.map((col: any) => {
-          if (column.label === col.label) {
+        tableColumns.current.map((col) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          if (column.label === (col as any).label) {
             // console.log(width + " ====> ", { ...col, width });
             return { ...col, width };
           } else {
@@ -168,7 +169,14 @@ export const TableHeader: React.FunctionComponent<TableHeaderProps> = ({
         </Th>
       );
     },
-    [editColumnLabel, getColumnKey, onColumnNameOrDataTypeUpdate, renderHeaderCellInfo, tableInstance]
+    [
+      editColumnLabel,
+      getColumnKey,
+      onColumnNameOrDataTypeUpdate,
+      onHorizontalResizeStop,
+      renderHeaderCellInfo,
+      tableInstance,
+    ]
   );
 
   const renderColumn = useCallback(

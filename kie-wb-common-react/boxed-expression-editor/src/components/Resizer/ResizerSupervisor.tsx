@@ -16,16 +16,16 @@
 
 import "./Resizer.css";
 import * as React from "react";
-import { useEffect, useContext } from "react";
+import { useEffect } from "react";
 import { applyDOMSupervisor } from "./dom";
-import { BoxedExpressionGlobalContext } from "../../context";
+// import { BoxedExpressiownGlobalContext } from "../../context";
 
 export interface ResizerSupervisorProps {
   children?: React.ReactElement;
 }
 
 export const ResizerSupervisor: React.FunctionComponent<ResizerSupervisorProps> = ({ children }) => {
-  const globalContext = useContext(BoxedExpressionGlobalContext);
-  useEffect(() => applyDOMSupervisor(), [globalContext]);
+  // const globalContext = useContext(BoxedExpressionGlobalContext);
+  useEffect(() => applyDOMSupervisor(), []);
   return <div>{children}</div>;
 };

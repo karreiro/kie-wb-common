@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import { find } from "lodash";
-
 export class Throttling {
   private static instance: Throttling;
   private latestCall = 0;
@@ -24,11 +22,18 @@ export class Throttling {
   private constructor() {}
 
   static run(fn: () => void): void {
+    this.clearTimeout();
+    this.setTimeout(fn);
+  }
+
+  private static setTimeout(fn: () => void): void {
+    this.getInstance().latestCall = window.setTimeout(fn, 100);
+  }
+
+  private static clearTimeout() {
     const instance = this.getInstance();
-
     window.clearTimeout(instance.latestCall);
-
-    instance.latestCall = window.setTimeout(fn, 100);
+    instance.latestCall = 0;
   }
 
   private static getInstance(): Throttling {

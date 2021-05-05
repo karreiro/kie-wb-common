@@ -42,8 +42,10 @@ export const TableBody: React.FunctionComponent<TableBodyProps> = ({
   headerVisibility = TableHeaderVisibility.Full,
   getRowKey,
   getColumnKey,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onColumnsUpdate,
 }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onHorizontalResizeStop = useCallback((width) => {
     // onColumnsUpdate({})
   }, []);
@@ -126,7 +128,7 @@ export const TableBody: React.FunctionComponent<TableBodyProps> = ({
         })}
       </Tr>
     ),
-    [children, tableInstance.allColumns]
+    [children]
   );
 
   return (

@@ -22,7 +22,7 @@ import "./index.css";
 import {
   BoxedExpressionEditor,
   ContextProps,
-  DataType,
+  // DataType,
   ExpressionContainerProps,
   ExpressionProps,
   InvocationProps,

@@ -20,9 +20,10 @@ export class Cell {
   private static DEFAULT_WIDTH = 250; // TODO pick width from React
   private static PADDING = 14; // TODO: we could get it via JS, performance reasons we don't
 
-  private id: string | undefined;
-  private lastColumn: boolean | undefined;
-  private rect: DOMRect | undefined;
+  private id?: string;
+  private lastColumn?: boolean;
+  private rect?: DOMRect;
+  private parentRow?: HTMLTableRowElement | null;
 
   constructor(public element: HTMLElement, public children: Cell[], public depth: number) {}
 
@@ -42,9 +43,7 @@ export class Cell {
 
   isLastColumn(): boolean {
     if (this.lastColumn === undefined) {
-      const parent = this.element.closest("tr");
-      const isLast = parent?.lastChild == this.element.closest("th, td");
-      this.lastColumn = isLast;
+      this.lastColumn = this.getParentRow()?.lastChild == this.element.closest("th, td");
     }
     return this.lastColumn;
   }
@@ -68,7 +67,8 @@ export class Cell {
       return;
     }
 
-    const parentRect = this.element.closest("tr")?.getBoundingClientRect();
+    const parentRect = this.getParentRow()?.getBoundingClientRect();
+
     if (parentRect === undefined) {
       return;
     }
@@ -79,12 +79,20 @@ export class Cell {
     this.setWidth(width);
   }
 
+  private getParentRow() {
+    if (this.parentRow === undefined) {
+      this.parentRow = this.element.closest("tr");
+    }
+    return this.element.closest("tr");
+  }
+
   /**
    * [TODO]
    * We cannot calculate as css styles may change
    */
   private fetchChildWidth() {
     const thead = this.element.querySelector("thead, tbody");
-    return parseInt(thead?.getBoundingClientRect().width + "") || Cell.DEFAULT_WIDTH;
+    const size = thead?.getBoundingClientRect().width;
+    return size ? parseInt(size + "") : Cell.DEFAULT_WIDTH;
   }
 }

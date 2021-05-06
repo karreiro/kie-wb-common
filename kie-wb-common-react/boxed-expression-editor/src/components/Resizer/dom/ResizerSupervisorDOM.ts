@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { DOMSession, Cell, Throttling } from "./";
+import { DOMSession, Cell } from "./";
 
 /**
  * [TODO]
@@ -26,10 +26,7 @@ import { DOMSession, Cell, Throttling } from "./";
  * the component.
  */
 export const applyDOMSupervisor = (): void => {
-  Throttling.run(() => {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>");
-    new SupervisorExecution().execute();
-  });
+  new SupervisorExecution().execute();
 };
 
 class SupervisorExecution {
@@ -54,11 +51,27 @@ class SupervisorExecution {
     const cells = this.domSession.getCells();
 
     const p1 = performance.now();
-    for (let index = 0; index < 10; index++) {
-      cells.sort((c1, c2) => c2.depth - c1.depth).forEach(this.updateSize);
-      cells.sort((c1, c2) => c1.depth - c2.depth).forEach(this.updateLastColumns);
-    }
+    // for (let index = 0; index < 10; index++) {
+    // const p00 = performance.now();
+    cells.sort((c1, c2) => c2.depth - c1.depth).forEach(this.updateSize);
+    // const p01 = performance.now();
+    // console.log("UpdateSize: " + (p01 - p00) + "ms");
+
+    // const p02 = performance.now();
+    cells.sort((c1, c2) => c1.depth - c2.depth).forEach(this.updateLastColumns);
+    // const p03 = performance.now();
+    // console.log("UpdateLastColumns: " + (p03 - p02) + "ms");
+    // }
+
+    console.log(
+      JSON.stringify(
+        cells.map((c) => {
+          return { n: c.element.textContent, width: c.element.style.width };
+        })
+      )
+    );
+
     const p2 = performance.now();
-    console.log(p2 - p1 + "ms");
+    console.log("All: " + (p2 - p1) + "ms");
   }
 }

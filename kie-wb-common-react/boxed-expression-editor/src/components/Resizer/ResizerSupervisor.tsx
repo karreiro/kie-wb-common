@@ -16,16 +16,41 @@
 
 import "./Resizer.css";
 import * as React from "react";
-import { useEffect } from "react";
-import { applyDOMSupervisor } from "./dom";
-// import { BoxedExpressiownGlobalContext } from "../../context";
+import { useLayoutEffect, useEffect } from "react";
+import { applyDOMSupervisor, Throttling } from "./dom";
+import { ExpressionProps } from "../../api";
+import { useMemo } from "react";
+// import { BoxedExpressionGlobalContext } from "../../context";
 
 export interface ResizerSupervisorProps {
+  selectedExpression?: ExpressionProps;
   children?: React.ReactElement;
 }
 
-export const ResizerSupervisor: React.FunctionComponent<ResizerSupervisorProps> = ({ children }) => {
+export const ResizerSupervisor: React.FunctionComponent<ResizerSupervisorProps> = (props) => {
   // const globalContext = useContext(BoxedExpressionGlobalContext);
-  useEffect(() => applyDOMSupervisor(), []);
-  return <div>{children}</div>;
+  useEffect(() => {
+    Throttling.run(() => {
+      // applyDOMSupervisor();
+    });
+  }, [props.selectedExpression]);
+
+  useLayoutEffect(() => {
+    applyDOMSupervisor();
+
+    setTimeout(applyDOMSupervisor, 1000);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    function listener(_: CustomEvent) {
+      Throttling.run(() => {
+        applyDOMSupervisor();
+      });
+    }
+
+    document.addEventListener("supervisor", listener);
+    return () => {
+      document.removeEventListener("supervisor", listener);
+    };
+  }, []); // TODO: use state instead of custom events
+
+  return useMemo(() => <div>{props.children}</div>, [props]);
 };

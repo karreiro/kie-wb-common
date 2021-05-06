@@ -33,7 +33,6 @@ export class Throttling {
   private static clearTimeout() {
     const instance = this.getInstance();
     window.clearTimeout(instance.latestCall);
-    instance.latestCall = 0;
   }
 
   private static getInstance(): Throttling {

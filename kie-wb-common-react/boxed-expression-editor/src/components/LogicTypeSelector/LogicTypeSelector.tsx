@@ -145,6 +145,11 @@ export const LogicTypeSelector: React.FunctionComponent<LogicTypeSelectorProps> 
       setLogicTypeSelected(true);
       const selectedLogicType = itemId as LogicType;
       setBla({ opacity: 0 });
+      // document.dispatchEvent(
+      //   new CustomEvent("supervisor", {
+      //     detail: {},
+      //   })
+      // );
       window.setTimeout(() => {
         // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>");
         setBla({ opacity: 1 });

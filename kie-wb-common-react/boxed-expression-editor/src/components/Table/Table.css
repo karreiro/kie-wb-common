@@ -97,7 +97,7 @@
 
 /** Table Body rules */
 
-.expression-container .table-component table tbody tr {
+.expression-container .table-component table tr {
   display: flex;
   border: 0;
 }

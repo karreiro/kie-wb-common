@@ -16,10 +16,11 @@
 
 import "./Resizer.css";
 import * as React from "react";
-import { useLayoutEffect, useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { applyDOMSupervisor, Throttling } from "./dom";
 import { ExpressionProps } from "../../api";
 import { useMemo } from "react";
+import { useState } from "react";
 // import { BoxedExpressionGlobalContext } from "../../context";
 
 export interface ResizerSupervisorProps {
@@ -29,28 +30,40 @@ export interface ResizerSupervisorProps {
 
 export const ResizerSupervisor: React.FunctionComponent<ResizerSupervisorProps> = (props) => {
   // const globalContext = useContext(BoxedExpressionGlobalContext);
-  useEffect(() => {
-    Throttling.run(() => {
-      // applyDOMSupervisor();
-    });
-  }, [props.selectedExpression]);
+
+  // useState(props.selectedExpression)
+
+  const [def, setDef] = useState("");
+
+  // useEffect(() => {
+  //   console.log(">>>> " + JSON.stringify(props.selectedExpression));
+  //   setU(JSON.stringify(props.selectedExpression));
+  // }, [props.selectedExpression]);
+
+  // useEffect(() => {
+  //   Throttling.run(() => {
+  //     applyDOMSupervisor();
+  //   });
+  // }, [u]);
 
   useLayoutEffect(() => {
     applyDOMSupervisor();
 
-    setTimeout(applyDOMSupervisor, 1000);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    function listener(_: CustomEvent) {
-      Throttling.run(() => {
+    function listener(e: CustomEvent) {
+      const newDef = JSON.stringify(e.detail.definition);
+
+      setDef(newDef);
+      if (def !== newDef) {
         applyDOMSupervisor();
-      });
+      }
     }
 
     document.addEventListener("supervisor", listener);
     return () => {
       document.removeEventListener("supervisor", listener);
     };
-  }, []); // TODO: use state instead of custom events
+  }, [def]); // TODO: use state instead of custom events
 
   return useMemo(() => <div>{props.children}</div>, [props]);
 };

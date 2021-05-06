@@ -49,4 +49,6 @@
   border-left: none;
   position: absolute;
   left: -1px;
+  top: 50%;
+  transform: translateY(-50%);
 }

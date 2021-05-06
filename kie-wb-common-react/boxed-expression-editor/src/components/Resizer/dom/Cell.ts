@@ -83,7 +83,7 @@ export class Cell {
     if (this.parentRow === undefined) {
       this.parentRow = this.element.closest("tr");
     }
-    return this.element.closest("tr");
+    return this.parentRow;
   }
 
   /**

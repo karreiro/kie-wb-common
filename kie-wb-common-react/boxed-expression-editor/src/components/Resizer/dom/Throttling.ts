@@ -27,7 +27,7 @@ export class Throttling {
   }
 
   private static setTimeout(fn: () => void): void {
-    this.getInstance().latestCall = window.setTimeout(fn, 100);
+    this.getInstance().latestCall = window.setTimeout(fn, 500);
   }
 
   private static clearTimeout() {

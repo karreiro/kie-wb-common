@@ -47,4 +47,6 @@
 }
 .expression-container .pf-c-drawer .pf-c-drawer__splitter-handle::after {
   border-left: none;
+  position: absolute;
+  left: -1px;
 }

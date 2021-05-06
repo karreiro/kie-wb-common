@@ -63,13 +63,13 @@ class SupervisorExecution {
     // console.log("UpdateLastColumns: " + (p03 - p02) + "ms");
     // }
 
-    console.log(
-      JSON.stringify(
-        cells.map((c) => {
-          return { n: c.element.textContent, width: c.element.style.width };
-        })
-      )
-    );
+    // console.log(
+    //   JSON.stringify(
+    //     cells.map((c) => {
+    //       return { n: c.element.textContent, width: c.element.style.width };
+    //     })
+    //   )
+    // );
 
     const p2 = performance.now();
     console.log("All: " + (p2 - p1) + "ms");

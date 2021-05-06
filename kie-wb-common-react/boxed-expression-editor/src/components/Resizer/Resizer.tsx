@@ -94,7 +94,7 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
     const applicableCells: Cell[] = [];
     const allCells = new DOMSession().getCells();
     const currentCell = allCells.find((c) => c.getId() === id)!;
-    const initialWidth = currentCell.getRect().width;
+    const initialWidth = Math.round(currentCell.getRect().width);
     const parent = currentCell.element.closest("table");
 
     let someLast = false;

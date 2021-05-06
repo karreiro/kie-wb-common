@@ -116,8 +116,8 @@ export const TableHeader: React.FunctionComponent<TableHeaderProps> = ({
       onColumnsUpdate(
         tableColumns.current.map((col) => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          if (column.label === (col as any).label) {
-            // console.log(width + " ====> ", { ...col, width });
+          if (column.label === (col as any).label && col.width !== width) {
+            console.log(width + " ====> ", { ...col, width });
             return { ...col, width };
           } else {
             // console.log(" ----> ", col);

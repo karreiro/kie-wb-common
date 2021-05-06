@@ -17,7 +17,7 @@
 import "./Resizer.css";
 import * as React from "react";
 import { useLayoutEffect } from "react";
-import { applyDOMSupervisor, Throttling } from "./dom";
+import { applyDOMSupervisor } from "./dom";
 import { ExpressionProps } from "../../api";
 import { useMemo } from "react";
 import { useState } from "react";

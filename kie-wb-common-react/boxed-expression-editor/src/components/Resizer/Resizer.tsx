@@ -19,7 +19,7 @@ import * as React from "react";
 import { useCallback, useMemo, useState, useLayoutEffect } from "react";
 import { ResizableBox } from "react-resizable";
 import { v4 as uuid } from "uuid";
-// import * as _ from "lodash";
+import * as _ from "lodash";
 import { Cell, DOMSession } from "./dom";
 
 export interface ResizerProps {
@@ -55,10 +55,6 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
   const [initalW, setInitialW] = useState(0);
   const [lastPos, setLastPos] = useState(-1);
 
-  const widthCached = useCallback(() => {
-    return w;
-  }, [w]);
-
   useLayoutEffect(() => {
     function listener(event: CustomEvent) {
       const width = parseInt(event.detail.width + "");
@@ -66,14 +62,14 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
 
       // console.log("- event >>> " + width + "  >>  " + w.width);
 
-      // if (width !== widthCached()) {
+      // if (width !== w) {
       //   setW(width || 100);
       //   // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + id + " - " + w + " - " + width);
 
       // }
 
       setW(width);
-      onHorizontalResizeStop(widthCached());
+      onHorizontalResizeStop(width);
 
       // setW(width);
       // TODO triggers only if the size is different
@@ -88,7 +84,7 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
     return () => {
       document.removeEventListener(id, listener);
     };
-  }, [id, onHorizontalResizeStop, widthCached]);
+  }, [id, onHorizontalResizeStop, w]);
 
   const onResizeStart = useCallback(() => {
     const applicableCells: Cell[] = [];
@@ -130,8 +126,7 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
     applicableCells.forEach((cell) => {
       cell.element.setAttribute("data-initial-w", cell.element.style.width);
     });
-
-    setCells(applicableCells);
+    setCells(_.uniqBy(applicableCells, (c) => c.getId()));
     setInitialW(initialWidth);
   }, [id]);
 
@@ -158,6 +153,7 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
       cells.forEach((c) => {
         const delta = width - initalW;
         c.setWidth(parseInt(parseInt(c.element.getAttribute("data-initial-w") || "") + delta + ""));
+        // console.log(c.element);
       });
 
       document.dispatchEvent(
@@ -178,7 +174,7 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
     return (
       <ResizableBox
         className={`${height === "100%" ? "height-based-on-content" : ""} ${id}`}
-        width={widthCached()}
+        width={w}
         height={targetHeight}
         minConstraints={[100, minHeight]}
         axis="x"

@@ -28,6 +28,8 @@ import {
 } from "../../i18n";
 import { BoxedExpressionGlobalContext } from "../../context";
 import * as _ from "lodash";
+import { ResizerSupervisor } from "../Resizer";
+import { useMemo } from "react";
 
 export interface BoxedExpressionEditorProps {
   /** All expression properties used to define it */
@@ -40,21 +42,27 @@ const BoxedExpressionEditor: (props: BoxedExpressionEditorProps) => JSX.Element 
   const [currentlyOpenedHandlerCallback, setCurrentlyOpenedHandlerCallback] = useState(() => _.identity);
   const boxedExpressionEditorRef = useRef<HTMLDivElement>(null);
 
-  return (
-    <I18nDictionariesProvider
-      defaults={boxedExpressionEditorI18nDefaults}
-      dictionaries={boxedExpressionEditorDictionaries}
-      initialLocale={navigator.language}
-      ctx={BoxedExpressionEditorI18nContext}
-    >
-      <BoxedExpressionGlobalContext.Provider
-        value={{ boxedExpressionEditorRef, currentlyOpenedHandlerCallback, setCurrentlyOpenedHandlerCallback }}
+  return useMemo(
+    () => (
+      <I18nDictionariesProvider
+        defaults={boxedExpressionEditorI18nDefaults}
+        dictionaries={boxedExpressionEditorDictionaries}
+        initialLocale={navigator.language}
+        ctx={BoxedExpressionEditorI18nContext}
       >
-        <div className="boxed-expression-editor" ref={boxedExpressionEditorRef}>
-          <ExpressionContainer {...props.expressionDefinition} />
-        </div>
-      </BoxedExpressionGlobalContext.Provider>
-    </I18nDictionariesProvider>
+        <BoxedExpressionGlobalContext.Provider
+          value={{ boxedExpressionEditorRef, currentlyOpenedHandlerCallback, setCurrentlyOpenedHandlerCallback }}
+        >
+          <ResizerSupervisor {...props.expressionDefinition}>
+            <div className="boxed-expression-editor" ref={boxedExpressionEditorRef}>
+              <ExpressionContainer {...props.expressionDefinition} />
+            </div>
+          </ResizerSupervisor>
+        </BoxedExpressionGlobalContext.Provider>
+      </I18nDictionariesProvider>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [props.expressionDefinition]
   );
 };
 

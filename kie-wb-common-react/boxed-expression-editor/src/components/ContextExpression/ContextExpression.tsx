@@ -38,6 +38,8 @@ import { ContextEntryExpressionCell } from "./ContextEntryExpressionCell";
 import * as _ from "lodash";
 import { ContextEntryExpression } from "./ContextEntryExpression";
 import { ContextEntryInfoCell } from "./ContextEntryInfoCell";
+import { Resizer } from "../Resizer";
+import { useMemo } from "react";
 
 const DEFAULT_CONTEXT_ENTRY_NAME = "ContextEntry-1";
 const DEFAULT_CONTEXT_ENTRY_DATA_TYPE = DataType.Undefined;
@@ -68,14 +70,12 @@ export const ContextExpression: React.FunctionComponent<ContextProps> = ({
       disableHandlerOnHeader: true,
       columns: [
         {
-          label: "Name",
           accessor: "entryInfo",
           disableHandlerOnHeader: true,
           width: infoWidth,
           minWidth: DEFAULT_ENTRY_INFO_MIN_WIDTH,
         },
         {
-          label: "Value",
           accessor: "entryExpression",
           disableHandlerOnHeader: true,
           width: expressionWidth,
@@ -100,17 +100,17 @@ export const ContextExpression: React.FunctionComponent<ContextProps> = ({
 
   const onColumnsUpdate = useCallback(
     ([expressionColumn]: [ColumnInstance]) => {
-      onUpdatingNameAndDataType?.(expressionColumn.label, expressionColumn.dataType);
-      setExpressionWidth(_.find(expressionColumn.columns, { accessor: "entryExpression" })?.width as number);
-      setInfoWidth(_.find(expressionColumn.columns, { accessor: "entryInfo" })?.width as number);
-      setColumns(([prevExpressionColumn]) => [
-        {
-          ...prevExpressionColumn,
-          label: expressionColumn.label,
-          accessor: expressionColumn.accessor,
-          dataType: expressionColumn.dataType,
-        },
-      ]);
+      // onUpdatingNameAndDataType?.(expressionColumn.label, expressionColumn.dataType);
+      // // setExpressionWidth(_.find(expressionColumn.columns, { accessor: "entryExpression" })?.width as number);
+      // // setInfoWidth(_.find(expressionColumn.columns, { accessor: "entryInfo" })?.width as number);
+      // // setInfoWidth(500);
+      // setColumns(([prevExpressionColumn]) => [
+      //   {
+      //     ...prevExpressionColumn,
+      //     label: expressionColumn.label,
+      //     accessor: expressionColumn.accessor,
+      //   },
+      // ]);
     },
     [onUpdatingNameAndDataType]
   );
@@ -128,7 +128,7 @@ export const ContextExpression: React.FunctionComponent<ContextProps> = ({
   );
 
   const getHeaderVisibility = useCallback(() => {
-    return isHeadless ? TableHeaderVisibility.LastLevel : TableHeaderVisibility.Full;
+    return isHeadless ? TableHeaderVisibility.None : TableHeaderVisibility.SecondToLastLevel;
   }, [isHeadless]);
 
   useEffect(() => {
@@ -140,33 +140,87 @@ export const ContextExpression: React.FunctionComponent<ContextProps> = ({
       dataType: expressionColumn.dataType,
       contextEntries: rows as ContextEntries,
       result: _.omit(resultExpression, "isHeadless"),
-      ...(infoWidth > DEFAULT_ENTRY_INFO_MIN_WIDTH ? { entryInfoWidth: infoWidth } : {}),
-      ...(expressionWidth > DEFAULT_ENTRY_EXPRESSION_MIN_WIDTH ? { entryExpressionWidth: expressionWidth } : {}),
+      entryInfoWidth: infoWidth,
+      entryExpressionWidth: expressionWidth,
     };
-    isHeadless
-      ? onUpdatingRecursiveExpression?.(_.omit(updatedDefinition, ["name", "dataType"]))
-      : window.beeApi?.broadcastContextExpressionDefinition?.(updatedDefinition);
+
+    if (isHeadless) {
+      // console.log("-> 1", updatedDefinition);
+      onUpdatingRecursiveExpression?.(_.omit(updatedDefinition, ["name", "dataType"]));
+    } else {
+      // console.log("-> 2", updatedDefinition);
+      document.dispatchEvent(
+        new CustomEvent("supervisor", {
+          detail: { definition: updatedDefinition },
+        })
+      );
+      window.beeApi?.broadcastContextExpressionDefinition?.(updatedDefinition);
+    }
   }, [columns, isHeadless, onUpdatingRecursiveExpression, rows, resultExpression, infoWidth, expressionWidth, uid]);
 
-  return (
-    <div className={`context-expression ${uid}`}>
-      <Table
-        tableId={uid}
-        headerLevels={1}
-        headerVisibility={getHeaderVisibility()}
-        defaultCell={{ entryInfo: ContextEntryInfoCell, entryExpression: ContextEntryExpressionCell }}
-        columns={columns}
-        rows={rows as DataRecord[]}
-        onColumnsUpdate={onColumnsUpdate}
-        onRowAdding={onRowAdding}
-        onRowsUpdate={setRows}
-        handlerConfiguration={getHandlerConfiguration(i18n, i18n.contextEntry)}
-        getRowKey={useCallback(getEntryKey, [])}
-        resetRowCustomFunction={useCallback(resetEntry, [])}
-      >
-        <div className="context-result">{`<result>`}</div>
-        <ContextEntryExpression expression={resultExpression} onUpdatingRecursiveExpression={setResultExpression} />
-      </Table>
-    </div>
+  const getRowKeyCallback = useCallback(getEntryKey, []);
+  const resetEntryCallback = useCallback(resetEntry, []);
+  const setInfoWidthCallback = useCallback((width) => {
+    console.log("resize");
+    setInfoWidth(Math.max(width, DEFAULT_ENTRY_INFO_MIN_WIDTH));
+  }, []);
+  const setExpressionWidthCallback = useCallback(
+    (width) => setExpressionWidth(Math.max(width, DEFAULT_ENTRY_EXPRESSION_MIN_WIDTH)),
+    []
+  );
+
+  return useMemo(
+    () => (
+      <div className={`context-expression ${uid}`}>
+        <Table
+          tableId={uid}
+          headerLevels={1}
+          headerVisibility={getHeaderVisibility()}
+          defaultCell={{ entryInfo: ContextEntryInfoCell, entryExpression: ContextEntryExpressionCell }}
+          columns={columns}
+          rows={rows as DataRecord[]}
+          onColumnsUpdate={onColumnsUpdate}
+          onRowAdding={onRowAdding}
+          onRowsUpdate={setRows}
+          handlerConfiguration={getHandlerConfiguration(i18n, i18n.contextEntry)}
+          getRowKey={getRowKeyCallback}
+          resetRowCustomFunction={resetEntryCallback}
+        >
+          <Resizer
+            width={infoWidth}
+            height="100%"
+            minWidth={DEFAULT_ENTRY_INFO_MIN_WIDTH}
+            onHorizontalResizeStop={setInfoWidthCallback}
+          >
+            <div className="context-result">{`<result>`}</div>
+          </Resizer>
+          <Resizer
+            width={expressionWidth}
+            height="100%"
+            minWidth={DEFAULT_ENTRY_EXPRESSION_MIN_WIDTH}
+            onHorizontalResizeStop={setExpressionWidthCallback}
+          >
+            <ContextEntryExpression expression={resultExpression} onUpdatingRecursiveExpression={setResultExpression} />
+          </Resizer>
+        </Table>
+      </div>
+    ),
+    [
+      uid,
+      getHeaderVisibility,
+      columns,
+      rows,
+      onColumnsUpdate,
+      onRowAdding,
+      i18n,
+      getRowKeyCallback,
+      resetEntryCallback,
+      infoWidth,
+      expressionWidth,
+      setInfoWidthCallback,
+      setResultExpression,
+      setExpressionWidthCallback,
+      resultExpression,
+    ]
   );
 };

@@ -145,6 +145,8 @@ export const App: React.FunctionComponent = () => {
       },
     ],
     invokedFunction: "",
+    entryInfoWidth: 151,
+    entryExpressionWidth: 388,
   } as ExpressionProps;
 
   const [updatedExpression, setUpdatedExpression] = useState(selectedExpression);

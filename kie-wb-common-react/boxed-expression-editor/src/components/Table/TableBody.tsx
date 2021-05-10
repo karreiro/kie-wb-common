@@ -61,7 +61,9 @@ export const TableBody: React.FunctionComponent<TableBodyProps> = ({
       const cellWidth = column?.width;
       const width = typeof cellWidth === "number" ? cellWidth : 250;
       const onHorizontalResizeStop = (width: number) => {
-        column?.setWidth(width);
+        if (column?.setWidth) {
+          column?.setWidth(width);
+        }
         // console.log("......", column);
         // column?.setWidth(width);
         // if (onColumnsUpdate) {

@@ -74,9 +74,11 @@ export class Cell {
     }
 
     const cellRect = this.element.getBoundingClientRect();
-    const width = Math.round(parentRect.right) - Math.round(cellRect.x) - 15;
+    const width = Math.round(parentRect.right) - Math.round(cellRect.x) - 1;
 
-    this.setWidth(width + 14);
+    // console.log(parentRect.right, this.getParentRow());
+
+    this.setWidth(width);
   }
 
   private getParentRow() {
@@ -93,6 +95,6 @@ export class Cell {
   private fetchChildWidth() {
     const thead = this.element.querySelector("thead, tbody");
     const size = thead?.getBoundingClientRect().width;
-    return Math.round(size ? parseInt(size + "") : Cell.DEFAULT_WIDTH) + 14;
+    return Math.round(size ? parseInt(size + "") : Cell.DEFAULT_WIDTH);
   }
 }

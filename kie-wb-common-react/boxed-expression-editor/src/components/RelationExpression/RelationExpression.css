@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
-.relation-expression {
+.expression-container .relation-expression {
   width: 100%;
+}
+
+.expression-container .relation-expression table {
+  /* margin-left: -14px; */
+}
+
+.expression-container .relation-expression table thead tr,
+.expression-container .relation-expression table tbody tr {
+  /* width: calc(100% - 14px); */
 }

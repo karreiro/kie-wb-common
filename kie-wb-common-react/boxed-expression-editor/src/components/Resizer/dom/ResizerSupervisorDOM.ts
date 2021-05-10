@@ -50,7 +50,7 @@ class SupervisorExecution {
     // console.log("dom supervisor");
     const cells = this.domSession.getCells();
 
-    // const p1 = performance.now();
+    const p1 = performance.now();
     // for (let index = 0; index < 10; index++) {
     // const p00 = performance.now();
     cells.sort((c1, c2) => c2.depth - c1.depth).forEach(this.updateSize);
@@ -71,7 +71,7 @@ class SupervisorExecution {
     //   )
     // );
 
-    // const p2 = performance.now();
-    // console.log("All: " + (p2 - p1) + "ms");
+    const p2 = performance.now();
+    console.log("All: " + (p2 - p1) + "ms");
   }
 }

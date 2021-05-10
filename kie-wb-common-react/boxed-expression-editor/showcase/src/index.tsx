@@ -131,12 +131,20 @@ export const App: React.FunctionComponent = () => {
 
   const selectedExpression: ExpressionProps = {
     uid: "id1",
-    logicType: "List",
-    items: [
+    logicType: "Invocation",
+    name: "Expression Name",
+    dataType: "<Undefined>",
+    bindingEntries: [
       {
-        logicType: "Literal expression",
+        entryInfo: {
+          name: "p-1",
+          dataType: "<Undefined>",
+        },
+        entryExpression: {},
+        editInfoPopoverLabel: "Edit Parameter",
       },
     ],
+    invokedFunction: "",
   } as ExpressionProps;
 
   const [updatedExpression, setUpdatedExpression] = useState(selectedExpression);

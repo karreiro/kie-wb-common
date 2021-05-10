@@ -34,7 +34,7 @@ import { useBoxedExpressionEditorI18n } from "../../i18n";
 import { ColumnInstance, DataRecord } from "react-table";
 import { ContextEntryExpressionCell, ContextEntryInfoCell } from "../ContextExpression";
 import * as _ from "lodash";
-import { Resizer } from "../Resizer";
+import { setWith } from "lodash";
 
 const DEFAULT_PARAMETER_NAME = "p-1";
 const DEFAULT_PARAMETER_DATA_TYPE = DataType.Undefined;
@@ -70,9 +70,8 @@ export const InvocationExpression: React.FunctionComponent<InvocationProps> = ({
   const functionDefinition = useRef<string>(invokedFunction);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const infoWidth = useRef<number>(entryInfoWidth);
-
-  const expressionWidth = useRef<number>(entryExpressionWidth);
+  const [infoWidth, setInfoWidth] = useState(entryInfoWidth);
+  const [expressionWidth, setExpressionWidth] = useState(entryExpressionWidth);
 
   const spreadInvocationExpressionDefinition = useCallback(() => {
     const [expressionColumn] = columns.current;
@@ -84,15 +83,13 @@ export const InvocationExpression: React.FunctionComponent<InvocationProps> = ({
       dataType: expressionColumn.dataType,
       bindingEntries: rows as ContextEntries,
       invokedFunction: functionDefinition.current,
-      // ...(infoWidth.current > DEFAULT_ENTRY_INFO_MIN_WIDTH ? { entryInfoWidth: infoWidth.current } : {}),
-      ...(expressionWidth.current > DEFAULT_ENTRY_EXPRESSION_MIN_WIDTH
-        ? { entryExpressionWidth: expressionWidth.current }
-        : {}),
+      entryInfoWidth: infoWidth,
+      entryExpressionWidth: expressionWidth,
     };
     isHeadless
       ? onUpdatingRecursiveExpression?.(_.omit(updatedDefinition, ["name", "dataType"]))
       : window.beeApi?.broadcastInvocationExpressionDefinition?.(updatedDefinition);
-  }, [functionDefinition, isHeadless, logicType, onUpdatingRecursiveExpression, rows, uid]);
+  }, [expressionWidth, infoWidth, isHeadless, logicType, onUpdatingRecursiveExpression, rows, uid]);
 
   const onFunctionDefinitionChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     functionDefinition.current = e.target.value;
@@ -102,27 +99,20 @@ export const InvocationExpression: React.FunctionComponent<InvocationProps> = ({
     spreadInvocationExpressionDefinition();
   }, [spreadInvocationExpressionDefinition]);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const onHorizontalResizeStop = useCallback((width) => {
-    // console.log(">>>>>" + width);
-  }, []);
-
   const headerCellElement = (
-    <Resizer width={200} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
-      <div className="function-definition-container">
-        <input
-          className="function-definition pf-u-text-truncate"
-          type="text"
-          placeholder={i18n.enterFunction}
-          onChange={onFunctionDefinitionChange}
-          onBlur={onFunctionDefinitionBlur}
-          defaultValue={functionDefinition.current}
-        />
-      </div>
-    </Resizer>
+    <div className="function-definition-container">
+      <input
+        className="function-definition pf-u-text-truncate"
+        type="text"
+        placeholder={i18n.enterFunction}
+        onChange={onFunctionDefinitionChange}
+        onBlur={onFunctionDefinitionBlur}
+        defaultValue={functionDefinition.current}
+      />
+    </div>
   );
 
-  const columns = useRef<ColumnInstance[]>([
+  const columns = useRef([
     {
       label: name,
       accessor: name,
@@ -137,30 +127,34 @@ export const InvocationExpression: React.FunctionComponent<InvocationProps> = ({
             {
               accessor: "entryInfo",
               disableHandlerOnHeader: true,
-              width: "inital",
-              // minWidth: DEFAULT_ENTRY_INFO_MIN_WIDTH,
+              width: infoWidth,
+              setWidth: setInfoWidth,
+              minWidth: DEFAULT_ENTRY_INFO_MIN_WIDTH,
             },
             {
               accessor: "entryExpression",
               disableHandlerOnHeader: true,
-              width: "inital",
-              // minWidth: DEFAULT_ENTRY_EXPRESSION_MIN_WIDTH,
+              // width: "inital",
+              width: expressionWidth,
+              setWidth: setExpressionWidth,
+              minWidth: DEFAULT_ENTRY_EXPRESSION_MIN_WIDTH,
             },
           ],
         },
       ],
     },
-  ] as ColumnInstance[]);
+  ]);
 
   const onColumnsUpdate = useCallback(
     ([expressionColumn]: [ColumnInstance]) => {
+      console.log(expressionColumn);
       onUpdatingNameAndDataType?.(expressionColumn.label, expressionColumn.dataType);
-      // infoWidth.current = _.find(expressionColumn.columns, { accessor: "entryInfo" })?.width as number;
-      // expressionWidth.current = _.find(expressionColumn.columns, { accessor: "entryExpression" })?.width as number;
-      const [updatedExpressionColumn] = columns.current;
-      updatedExpressionColumn.label = expressionColumn.label;
-      updatedExpressionColumn.accessor = expressionColumn.accessor;
-      updatedExpressionColumn.dataType = expressionColumn.dataType;
+      // // console.log(_.find(expressionColumn.columns, { accessor: "entryInfo" })?.width as number);
+      // // console.log(_.find(expressionColumn.columns, { accessor: "entryExpression" })?.width as number);
+      // const [updatedExpressionColumn] = columns.current;
+      // updatedExpressionColumn.label = expressionColumn.label;
+      // updatedExpressionColumn.accessor = expressionColumn.accessor;
+      // updatedExpressionColumn.dataType = expressionColumn.dataType;
       spreadInvocationExpressionDefinition();
     },
     [onUpdatingNameAndDataType, spreadInvocationExpressionDefinition]
@@ -187,6 +181,11 @@ export const InvocationExpression: React.FunctionComponent<InvocationProps> = ({
     spreadInvocationExpressionDefinition();
   }, [rows, spreadInvocationExpressionDefinition]);
 
+  const setRowsCallback = useCallback((entries) => {
+    console.log("entries ", entries);
+    setRows(entries);
+  }, []);
+
   return (
     <div className={`invocation-expression ${uid}`}>
       <Table
@@ -199,7 +198,7 @@ export const InvocationExpression: React.FunctionComponent<InvocationProps> = ({
         rows={rows as DataRecord[]}
         onColumnsUpdate={onColumnsUpdate}
         onRowAdding={onRowAdding}
-        onRowsUpdate={setRows}
+        onRowsUpdate={setRowsCallback}
         handlerConfiguration={getHandlerConfiguration(i18n, i18n.parameters)}
         getRowKey={useCallback(getEntryKey, [])}
         resetRowCustomFunction={useCallback(resetEntry, [])}

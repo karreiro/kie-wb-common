@@ -16,9 +16,9 @@
 
 import * as React from "react";
 import { useCallback, useMemo } from "react";
-import { Tbody, Td, Tr } from "@patternfly/react-table";
+import { Tbody, Td, Tr, Column } from "@patternfly/react-table";
 import { TableHeaderVisibility } from "../../api";
-import { Cell, Column, Row, TableInstance } from "react-table";
+import { Cell, DataRecord, Row, TableInstance } from "react-table";
 import { Resizer } from "../Resizer";
 
 export interface TableBodyProps {
@@ -33,7 +33,9 @@ export interface TableBodyProps {
   /** Custom function for getting column key prop, and avoid using the column index */
   getColumnKey: (column: Column) => string;
   /** Function to be executed when columns are modified */
-  onColumnsUpdate: (columns: Column[]) => void;
+  onColumnsUpdate?: (columns: Column[]) => void;
+  /** Function to be executed when one or more rows are modified */
+  onRowsUpdate?: (rows: DataRecord[]) => void;
 }
 
 export const TableBody: React.FunctionComponent<TableBodyProps> = ({
@@ -44,6 +46,7 @@ export const TableBody: React.FunctionComponent<TableBodyProps> = ({
   getColumnKey,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onColumnsUpdate,
+  onRowsUpdate,
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onHorizontalResizeStop = useCallback((width) => {
@@ -54,8 +57,20 @@ export const TableBody: React.FunctionComponent<TableBodyProps> = ({
     (cellIndex: number, cell: Cell, rowIndex: number) => {
       const cellType = cellIndex === 0 ? "counter-cell" : "data-cell";
       // const canResize = "has-resizer";
-      const cellWidth = tableInstance.allColumns[cellIndex]?.width;
+      const column = tableInstance.allColumns[cellIndex] as Column;
+      const cellWidth = column?.width;
       const width = typeof cellWidth === "number" ? cellWidth : 250;
+      const onHorizontalResizeStop = (width: number) => {
+        column?.setWidth(width);
+        // console.log("......", column);
+        // column?.setWidth(width);
+        // if (onColumnsUpdate) {
+        //   column.width;
+        //   column.width;
+        //   console.log("________________", column);
+        //   // onColumnsUpdate([a]);
+        // }
+      };
       const cellTemplate =
         cellIndex === 0 ? (
           <>{rowIndex + 1}</>

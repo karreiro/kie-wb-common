@@ -98,7 +98,7 @@ export const RelationExpression: React.FunctionComponent<RelationProps> = (relat
 
   const onSavingRows = useCallback(
     (rows: DataRecord[]) => {
-      console.log("SAVE ROWS");
+      // console.log("SAVE ROWS");
       tableRows.current = _.map(rows, (tableRow: DataRecord) =>
         _.reduce(
           tableColumns.current,

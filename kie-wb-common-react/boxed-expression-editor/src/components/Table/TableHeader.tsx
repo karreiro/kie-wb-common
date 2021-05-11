@@ -21,7 +21,6 @@ import * as _ from "lodash";
 import { Column, ColumnInstance, DataRecord, HeaderGroup, TableInstance } from "react-table";
 import { EditExpressionMenu } from "../EditExpressionMenu";
 import { DataType, TableHeaderVisibility } from "../../api";
-// import { DRAWER_SPLITTER_ELEMENT } from "../Resizer";
 import { Resizer } from "../Resizer";
 
 export interface TableHeaderProps {

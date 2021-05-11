@@ -16,9 +16,9 @@
 
 import * as React from "react";
 import { useCallback, useMemo } from "react";
-import { Tbody, Td, Tr, Column } from "@patternfly/react-table";
+import { Tbody, Td, Tr } from "@patternfly/react-table";
 import { TableHeaderVisibility } from "../../api";
-import { Cell, DataRecord, Row, TableInstance } from "react-table";
+import { Cell, DataRecord, Row, TableInstance, Column } from "react-table";
 import { Resizer } from "../Resizer";
 
 export interface TableBodyProps {
@@ -61,8 +61,9 @@ export const TableBody: React.FunctionComponent<TableBodyProps> = ({
       const cellWidth = column?.width;
       const width = typeof cellWidth === "number" ? cellWidth : 250;
       const onHorizontalResizeStop = (width: number) => {
-        if (column?.setWidth) {
-          column?.setWidth(width);
+        const c = column as any;
+        if (c.setWidth) {
+          c.setWidth(width);
         }
         // console.log("......", column);
         // column?.setWidth(width);

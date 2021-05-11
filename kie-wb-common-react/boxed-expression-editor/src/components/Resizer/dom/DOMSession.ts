@@ -16,9 +16,9 @@
 
 import { Cell } from "./";
 
-export class DOMSession {
-  private static CELL_CSS_SELCTOR = ".react-resizable";
+export const CELL_CSS_SELCTOR = ".react-resizable";
 
+export class DOMSession {
   private cells: Cell[] | undefined;
 
   getCells(): Cell[] {
@@ -56,7 +56,7 @@ export class DOMSession {
   }
 
   private fetchCellElements(parent: HTMLElement): HTMLElement[] {
-    const htmlElements = parent.querySelectorAll(DOMSession.CELL_CSS_SELCTOR);
+    const htmlElements = parent.querySelectorAll(CELL_CSS_SELCTOR);
     return [].slice.call(htmlElements);
   }
 }

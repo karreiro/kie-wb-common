@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { DOMSession, Cell } from "src/components/Resizer/dom";
+import { DOMSession, Cell } from "../dom";
 
 /*
  * =============================================================================

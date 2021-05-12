@@ -46,87 +46,49 @@ export const App: React.FunctionComponent = () => {
         },
         entryExpression: {
           uid: "id2",
-          logicType: "Relation",
-          isHeadless: true,
-          columns: [
+          logicType: "Context",
+          contextEntries: [
             {
-              name: "column-1",
-              dataType: "<Undefined>",
-              width: 106,
-            },
-            {
-              name: "column-5",
-              dataType: "<Undefined>",
-              width: 379,
-            },
-            {
-              name: "column-8",
-              dataType: "<Undefined>",
-              width: 124,
-            },
-            {
-              name: "column-2",
-              dataType: "<Undefined>",
-              width: 181,
-            },
-            {
-              name: "column-7",
-              dataType: "<Undefined>",
-            },
-            {
-              name: "column-6",
-              dataType: "<Undefined>",
-              width: 133,
-            },
-            {
-              name: "column-3",
-              dataType: "<Undefined>",
-              width: 100,
-            },
-            {
-              name: "column-4",
-              dataType: "<Undefined>",
-              width: 213,
+              entryInfo: {
+                name: "ContextEntry-1",
+                dataType: "<Undefined>",
+              },
+              entryExpression: {
+                uid: "id4",
+                logicType: "Context",
+                contextEntries: [
+                  {
+                    entryInfo: {
+                      name: "ContextEntry-1",
+                      dataType: "<Undefined>",
+                    },
+                    entryExpression: {},
+                    editInfoPopoverLabel: "Edit Context Entry",
+                  },
+                ],
+                result: {
+                  uid: "id7",
+                },
+                entryInfoWidth: 257,
+                entryExpressionWidth: 370,
+              },
+              editInfoPopoverLabel: "Edit Context Entry",
             },
           ],
-          rows: [
-            ["", "", "", "", "", "", "", ""],
-            ["", "", "", "", "", "", "", ""],
-          ],
+          result: {
+            uid: "id5",
+          },
+          entryInfoWidth: 713,
+          entryExpressionWidth: 691,
         },
+        editInfoPopoverLabel: "Edit Context Entry",
       },
     ],
     result: {
       uid: "id3",
-      logicType: "Context",
-      contextEntries: [
-        {
-          entryInfo: {
-            name: "ContextEntry-1",
-            dataType: "<Undefined>",
-          },
-          entryExpression: {
-            uid: "id6",
-            logicType: "Context",
-            contextEntries: [
-              {
-                entryInfo: {
-                  name: "ContextEntry-1",
-                  dataType: "<Undefined>",
-                },
-                entryExpression: {},
-              },
-            ],
-            result: {
-              uid: "id9",
-            },
-          },
-        },
-      ],
-      result: {
-        uid: "id7",
-      },
     },
+    entryInfoWidth: 150,
+    entryExpressionWidth: 1468,
   } as ExpressionProps;
 
   // const selectedExpression: ExpressionProps = {

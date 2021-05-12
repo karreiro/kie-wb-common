@@ -40,6 +40,7 @@ import { ContextEntryExpression } from "./ContextEntryExpression";
 import { ContextEntryInfoCell } from "./ContextEntryInfoCell";
 import { Resizer } from "../Resizer";
 import { useMemo } from "react";
+import { notifySupervisor } from "../Resizer/common";
 
 const DEFAULT_CONTEXT_ENTRY_NAME = "ContextEntry-1";
 const DEFAULT_CONTEXT_ENTRY_DATA_TYPE = DataType.Undefined;
@@ -145,15 +146,9 @@ export const ContextExpression: React.FunctionComponent<ContextProps> = ({
     };
 
     if (isHeadless) {
-      // console.log("-> 1", updatedDefinition);
       onUpdatingRecursiveExpression?.(_.omit(updatedDefinition, ["name", "dataType"]));
     } else {
-      // console.log("-> 2", updatedDefinition);
-      document.dispatchEvent(
-        new CustomEvent("supervisor", {
-          detail: { definition: updatedDefinition },
-        })
-      );
+      notifySupervisor({ definition: updatedDefinition });
       window.beeApi?.broadcastContextExpressionDefinition?.(updatedDefinition);
     }
   }, [columns, isHeadless, onUpdatingRecursiveExpression, rows, resultExpression, infoWidth, expressionWidth, uid]);

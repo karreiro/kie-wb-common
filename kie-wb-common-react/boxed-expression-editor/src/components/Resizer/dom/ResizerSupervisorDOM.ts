@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { DOMSession, Cell } from "./";
+import { DOMSession, Cell } from "src/components/Resizer/dom";
 
 /*
  * =============================================================================
@@ -36,21 +36,17 @@ class SupervisorExecution {
     this.domSession = new DOMSession();
   }
 
-  refreshWidthAsParent(cell: Cell) {
-    cell.refreshWidthAsParent();
-  }
-
-  refreshWidthAsLastColumn(cell: Cell) {
-    cell.refreshWidthAsLastColumn();
-  }
-
   execute() {
-    const p1 = performance.now();
     const cells = this.domSession.getCells();
     cells.sort((c1, c2) => c2.depth - c1.depth).forEach(this.refreshWidthAsParent);
     cells.sort((c1, c2) => c1.depth - c2.depth).forEach(this.refreshWidthAsLastColumn);
-    const p2 = performance.now();
+  }
 
-    console.log("All: " + (p2 - p1) + "ms");
+  private refreshWidthAsParent(cell: Cell) {
+    cell.refreshWidthAsParent();
+  }
+
+  private refreshWidthAsLastColumn(cell: Cell) {
+    cell.refreshWidthAsLastColumn();
   }
 }

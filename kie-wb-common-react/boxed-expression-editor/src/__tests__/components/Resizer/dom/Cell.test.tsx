@@ -130,7 +130,7 @@ describe("Cell", () => {
     });
   });
 
-  // === Helper functions ===
+  // === Utility functions ===
 
   function renderLiteralAtRegularColumn() {
     container = render(

@@ -21,11 +21,7 @@ import { ResizableBox } from "react-resizable";
 import { v4 as uuid } from "uuid";
 import * as _ from "lodash";
 import { Cell, DOMSession } from "./dom";
-import {
-  DEFAULT_MIN_WIDTH,
-  notifySupervisor as commonNotifySupervisor,
-  widthValue as commonWidthValue,
-} from "./common";
+import { DEFAULT_MIN_WIDTH, widthValue as commonWidthValue } from "./common";
 import { BoxedExpressionGlobalContext } from "../../context";
 
 export interface ResizerProps {
@@ -91,8 +87,6 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
    */
 
   const widthValue = useCallback(commonWidthValue, []);
-
-  const notifySupervisor = useCallback(commonNotifySupervisor, []);
 
   const getApplicableCells = useCallback((allCells: Cell[], currentCell: Cell) => {
     const applicableCells: Cell[] = [];
@@ -183,8 +177,10 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
       setSupervisorHash("Resizer");
       // notifySupervisor();
     },
-    [cells, initalResizerWidth, notifySupervisor, widthValue]
+    [cells, initalResizerWidth, setSupervisorHash, widthValue]
   );
+
+  console.log("Re-render B " + resizerWidth);
 
   return useMemo(() => {
     return (

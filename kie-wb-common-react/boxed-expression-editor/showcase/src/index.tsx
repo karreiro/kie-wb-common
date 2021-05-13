@@ -44,51 +44,15 @@ export const App: React.FunctionComponent = () => {
           name: "ContextEntry-1",
           dataType: "<Undefined>",
         },
-        entryExpression: {
-          uid: "id2",
-          logicType: "Context",
-          contextEntries: [
-            {
-              entryInfo: {
-                name: "ContextEntry-1",
-                dataType: "<Undefined>",
-              },
-              entryExpression: {
-                uid: "id4",
-                logicType: "Context",
-                contextEntries: [
-                  {
-                    entryInfo: {
-                      name: "ContextEntry-1",
-                      dataType: "<Undefined>",
-                    },
-                    entryExpression: {},
-                    editInfoPopoverLabel: "Edit Context Entry",
-                  },
-                ],
-                result: {
-                  uid: "id7",
-                },
-                entryInfoWidth: 257,
-                entryExpressionWidth: 370,
-              },
-              editInfoPopoverLabel: "Edit Context Entry",
-            },
-          ],
-          result: {
-            uid: "id5",
-          },
-          entryInfoWidth: 713,
-          entryExpressionWidth: 691,
-        },
+        entryExpression: {},
         editInfoPopoverLabel: "Edit Context Entry",
       },
     ],
     result: {
-      uid: "id3",
+      uid: "id9",
     },
-    entryInfoWidth: 150,
-    entryExpressionWidth: 1468,
+    entryInfoWidth: 200,
+    entryExpressionWidth: 370,
   } as ExpressionProps;
 
   // const selectedExpression: ExpressionProps = {

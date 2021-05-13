@@ -57,6 +57,7 @@ export const TableBody: React.FunctionComponent<TableBodyProps> = ({
     (cellIndex: number, cell: Cell, rowIndex: number) => {
       const cellType = cellIndex === 0 ? "counter-cell" : "data-cell";
       // const canResize = "has-resizer";
+      console.log(tableInstance);
       const column = tableInstance.allColumns[cellIndex] as Column;
       const cellWidth = column?.width;
       const width = typeof cellWidth === "number" ? cellWidth : 250;
@@ -64,6 +65,8 @@ export const TableBody: React.FunctionComponent<TableBodyProps> = ({
         const c = column as any;
         if (c.setWidth) {
           c.setWidth(width);
+          tableInstance.allColumns[cellIndex].width = width; // prevent resize on blur bug
+          onColumnsUpdate?.(tableInstance.columns);
         }
         // console.log("......", column);
         // column?.setWidth(width);
@@ -101,7 +104,7 @@ export const TableBody: React.FunctionComponent<TableBodyProps> = ({
         </Td>
       );
     },
-    [getColumnKey, onHorizontalResizeStop, tableInstance]
+    [getColumnKey, tableInstance]
   );
 
   const renderBodyRow = useCallback(

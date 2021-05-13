@@ -22,7 +22,7 @@ import "./index.css";
 import {
   BoxedExpressionEditor,
   ContextProps,
-  DataType,
+  // DataType,
   ExpressionContainerProps,
   ExpressionProps,
   InvocationProps,
@@ -33,10 +33,65 @@ import {
 
 export const App: React.FunctionComponent = () => {
   //This definition comes directly from the decision node
+  // const selectedExpression: ExpressionProps = {
+  //   uid: "id1",
+  //   logicType: "Context",
+  //   name: "Expression Name",
+  //   dataType: "<Undefined>",
+  //   contextEntries: [
+  //     {
+  //       entryInfo: {
+  //         name: "ContextEntry-1",
+  //         dataType: "<Undefined>",
+  //       },
+  //       entryExpression: {},
+  //       editInfoPopoverLabel: "Edit Context Entry",
+  //     },
+  //   ],
+  //   result: {
+  //     uid: "id9",
+  //   },
+  //   entryInfoWidth: 150,
+  //   entryExpressionWidth: 370,
+  // } as ExpressionProps;
+
   const selectedExpression: ExpressionProps = {
-    name: "Expression Name",
-    dataType: DataType.Undefined,
-  };
+    uid: "id1",
+    logicType: "Context",
+    name: "ContextEntry-1",
+    dataType: "<Undefined>",
+    contextEntries: [
+      {
+        entryInfo: {
+          name: "ContextEntry-1",
+          dataType: "<Undefined>",
+        },
+        entryExpression: {
+          uid: "id3",
+          logicType: "List",
+          width: 1027,
+          items: [
+            {
+              uid: "id5",
+              name: "Expression Name",
+              dataType: "<Undefined>",
+              logicType: "Literal expression",
+              content: "",
+            },
+            {
+              logicType: "Literal expression",
+            },
+          ],
+        },
+        editInfoPopoverLabel: "Edit Context Entry",
+      },
+    ],
+    result: {
+      uid: "id4",
+    },
+    entryInfoWidth: 150,
+    entryExpressionWidth: 1103,
+  } as ExpressionProps;
 
   const [updatedExpression, setUpdatedExpression] = useState(selectedExpression);
 

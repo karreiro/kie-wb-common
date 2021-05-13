@@ -14,6 +14,20 @@
  * limitations under the License.
  */
 
-.expression-container .list-expression {
-  width: 100%;
+import "./Resizer.css";
+import * as React from "react";
+import { applyDOMSupervisor } from "./dom";
+import { useEffect, useContext } from "react";
+import { BoxedExpressionGlobalContext } from "../../context";
+
+export interface ResizerSupervisorProps {
+  children?: React.ReactElement;
 }
+
+export const ResizerSupervisor: React.FunctionComponent<ResizerSupervisorProps> = ({ children }) => {
+  const { supervisorHash } = useContext(BoxedExpressionGlobalContext);
+
+  useEffect(applyDOMSupervisor, [supervisorHash]);
+
+  return <div>{children}</div>;
+};

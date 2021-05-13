@@ -18,8 +18,8 @@ import * as React from "react";
 import { useCallback, useMemo } from "react";
 import { Tbody, Td, Tr } from "@patternfly/react-table";
 import { TableHeaderVisibility } from "../../api";
-import { Cell, Column, Row, TableInstance } from "react-table";
-import { DRAWER_SPLITTER_ELEMENT } from "../Resizer";
+import { Cell, DataRecord, Row, TableInstance, Column } from "react-table";
+import { Resizer } from "../Resizer";
 
 export interface TableBodyProps {
   /** Table instance */
@@ -32,6 +32,10 @@ export interface TableBodyProps {
   getRowKey: (row: Row) => string;
   /** Custom function for getting column key prop, and avoid using the column index */
   getColumnKey: (column: Column) => string;
+  /** Function to be executed when columns are modified */
+  onColumnsUpdate?: (columns: Column[]) => void;
+  /** Function to be executed when one or more rows are modified */
+  onRowsUpdate?: (rows: DataRecord[]) => void;
 }
 
 export const TableBody: React.FunctionComponent<TableBodyProps> = ({
@@ -40,50 +44,82 @@ export const TableBody: React.FunctionComponent<TableBodyProps> = ({
   headerVisibility = TableHeaderVisibility.Full,
   getRowKey,
   getColumnKey,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onColumnsUpdate,
+  onRowsUpdate,
 }) => {
-  const renderCellResizer = useCallback(
-    (cell: Cell) => (
-      <div
-        className="pf-c-drawer drawer-on-body"
-        {...(cell.column.canResizeOnCell ? cell.column.getResizerProps() : {})}
-      >
-        {DRAWER_SPLITTER_ELEMENT}
-      </div>
-    ),
-    []
-  );
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const onHorizontalResizeStop = useCallback((width) => {
+    // onColumnsUpdate({})
+  }, []);
 
   const renderCell = useCallback(
     (cellIndex: number, cell: Cell, rowIndex: number) => {
       const cellType = cellIndex === 0 ? "counter-cell" : "data-cell";
-      const canResize = cell.column.canResizeOnCell ? "has-resizer" : "";
+      // const canResize = "has-resizer";
+      const column = tableInstance.allColumns[cellIndex] as Column;
+      const cellWidth = column?.width;
+      const width = typeof cellWidth === "number" ? cellWidth : 250;
+      const onHorizontalResizeStop = (width: number) => {
+        const c = column as any;
+        if (c.setWidth) {
+          c.setWidth(width);
+          tableInstance.allColumns[cellIndex].width = width; // prevent resize on blur bug
+          onColumnsUpdate?.(tableInstance.columns);
+        }
+        // console.log("......", column);
+        // column?.setWidth(width);
+        // if (onColumnsUpdate) {
+        //   column.width;
+        //   column.width;
+        //   console.log("________________", column);
+        //   // onColumnsUpdate([a]);
+        // }
+      };
+      const cellTemplate =
+        cellIndex === 0 ? (
+          <>{rowIndex + 1}</>
+        ) : (
+          <Resizer width={width} height="100%" minWidth={10} onHorizontalResizeStop={onHorizontalResizeStop}>
+            <>{cell.render("Cell")}</>
+          </Resizer>
+        );
+      const tdProps = tableInstance.getTdProps(cellIndex, rowIndex);
+
+      // if (cellIndex !== 0) {
+      //   tdProps.style = { width: "initial", maxWidth: "initial", minWidth: "initial" };
+      // }
+
+      // conso
+
       return (
         <Td
-          {...(cellIndex === 0 ? {} : cell.getCellProps())}
-          {...tableInstance.getTdProps(cellIndex, rowIndex)}
+          {...tdProps}
           key={`${getColumnKey(cell.column)}-${cellIndex}`}
           data-ouia-component-id={"expression-column-" + cellIndex}
-          className={`${cellType} ${canResize}`}
+          className={`${cellType}`}
         >
-          {cellIndex === 0 ? rowIndex + 1 : cell.render("Cell")}
-          {cell.column.canResizeOnCell ? renderCellResizer(cell) : null}
+          {cellTemplate}
         </Td>
       );
     },
-    [getColumnKey, renderCellResizer, tableInstance]
+    [getColumnKey, tableInstance]
   );
 
   const renderBodyRow = useCallback(
-    (row: Row, rowIndex: number) => (
-      <Tr
-        className="table-row"
-        {...row.getRowProps()}
-        key={`${getRowKey(row)}-${rowIndex}`}
-        ouiaId={"expression-row-" + rowIndex}
-      >
-        {row.cells.map((cell: Cell, cellIndex: number) => renderCell(cellIndex, cell, rowIndex))}
-      </Tr>
-    ),
+    (row: Row, rowIndex: number) => {
+      const rowProps = { ...row.getRowProps(), style: {} };
+      return (
+        <Tr
+          className="table-row"
+          {...rowProps}
+          key={`${getRowKey(row)}-${rowIndex}`}
+          ouiaId={"expression-row-" + rowIndex}
+        >
+          {row.cells.map((cell: Cell, cellIndex: number) => renderCell(cellIndex, cell, rowIndex))}
+        </Tr>
+      );
+    },
     [getRowKey, renderCell]
   );
 
@@ -99,10 +135,12 @@ export const TableBody: React.FunctionComponent<TableBodyProps> = ({
               role="cell"
               key={childIndex}
               className="row-remainder-content"
-              style={{
-                width: tableInstance.allColumns[childIndex + 1].width,
-                minWidth: tableInstance.allColumns[childIndex + 1].minWidth,
-              }}
+              style={
+                {
+                  // width: tableInstance.allColumns[childIndex + 1].width,
+                  // minWidth: tableInstance.allColumns[childIndex + 1].minWidth,
+                }
+              }
             >
               {child}
             </Td>
@@ -110,7 +148,7 @@ export const TableBody: React.FunctionComponent<TableBodyProps> = ({
         })}
       </Tr>
     ),
-    [children, tableInstance.allColumns]
+    [children]
   );
 
   return (

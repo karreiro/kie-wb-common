@@ -15,3 +15,4 @@
  */
 
 export * from "./Resizer";
+export * from "./ResizerSupervisor";

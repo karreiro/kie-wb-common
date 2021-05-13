@@ -86,6 +86,7 @@ export const LogicTypeSelector: React.FunctionComponent<LogicTypeSelectorProps> 
   const isLogicTypeSelected = (logicType?: LogicType) => !_.isEmpty(logicType) && logicType !== LogicType.Undefined;
 
   const [logicTypeSelected, setLogicTypeSelected] = useState(isLogicTypeSelected(expression.logicType));
+  const [bla, setBla] = useState({ opacity: 1 });
 
   useEffect(() => {
     setLogicTypeSelected(isLogicTypeSelected(selectedExpression.logicType));
@@ -147,6 +148,16 @@ export const LogicTypeSelector: React.FunctionComponent<LogicTypeSelectorProps> 
     (event: MouseEvent, itemId: string) => {
       setLogicTypeSelected(true);
       const selectedLogicType = itemId as LogicType;
+      setBla({ opacity: 0 });
+      // document.dispatchEvent(
+      //   new CustomEvent("supervisor", {
+      //     detail: {},
+      //   })
+      // );
+      window.setTimeout(() => {
+        // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        setBla({ opacity: 1 });
+      }, 100);
       onLogicTypeUpdating(selectedLogicType);
     },
     [onLogicTypeUpdating]
@@ -200,6 +211,7 @@ export const LogicTypeSelector: React.FunctionComponent<LogicTypeSelectorProps> 
 
   return (
     <div
+      style={bla}
       className={`logic-type-selector ${NO_TABLE_CONTEXT_MENU_CLASS} ${
         logicTypeSelected ? "logic-type-selected" : "logic-type-not-present"
       }`}

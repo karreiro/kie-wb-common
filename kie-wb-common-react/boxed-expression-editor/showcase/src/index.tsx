@@ -33,6 +33,28 @@ import {
 
 export const App: React.FunctionComponent = () => {
   //This definition comes directly from the decision node
+  // const selectedExpression: ExpressionProps = {
+  //   uid: "id1",
+  //   logicType: "Context",
+  //   name: "Expression Name",
+  //   dataType: "<Undefined>",
+  //   contextEntries: [
+  //     {
+  //       entryInfo: {
+  //         name: "ContextEntry-1",
+  //         dataType: "<Undefined>",
+  //       },
+  //       entryExpression: {},
+  //       editInfoPopoverLabel: "Edit Context Entry",
+  //     },
+  //   ],
+  //   result: {
+  //     uid: "id9",
+  //   },
+  //   entryInfoWidth: 150,
+  //   entryExpressionWidth: 370,
+  // } as ExpressionProps;
+
   const selectedExpression: ExpressionProps = {
     uid: "id1",
     logicType: "Context",
@@ -44,72 +66,50 @@ export const App: React.FunctionComponent = () => {
           name: "ContextEntry-1",
           dataType: "<Undefined>",
         },
-        entryExpression: {},
+        entryExpression: {
+          uid: "id4",
+          logicType: "Context",
+          contextEntries: [
+            {
+              entryInfo: {
+                name: "ContextEntry-1",
+                dataType: "<Undefined>",
+              },
+              entryExpression: {},
+              editInfoPopoverLabel: "Edit Context Entry",
+            },
+          ],
+          result: {
+            uid: "id9",
+          },
+          // entryInfoWidth: 150,
+          // entryExpressionWidth: 633,
+        },
         editInfoPopoverLabel: "Edit Context Entry",
       },
     ],
     result: {
-      uid: "id9",
+      uid: "id5",
+      logicType: "Context",
+      contextEntries: [
+        {
+          entryInfo: {
+            name: "ContextEntry-1",
+            dataType: "<Undefined>",
+          },
+          entryExpression: {},
+          editInfoPopoverLabel: "Edit Context Entry",
+        },
+      ],
+      result: {
+        uid: "id7",
+      },
+      // entryInfoWidth: 150,
+      // entryExpressionWidth: 647,
     },
-    entryInfoWidth: 200,
-    entryExpressionWidth: 370,
+    // entryInfoWidth: 150,
+    // entryExpressionWidth: 861,
   } as ExpressionProps;
-
-  // const selectedExpression: ExpressionProps = {
-  //   uid: "id1",
-  //   logicType: "Invocation",
-  //   name: "Expression Name",
-  //   dataType: "<Undefined>",
-  //   bindingEntries: [
-  //     {
-  //       entryInfo: {
-  //         name: "p-1",
-  //         dataType: "<Undefined>",
-  //       },
-  //       entryExpression: {
-  //         uid: "id1",
-  //         logicType: "Context",
-  //         contextEntries: [
-  //           {
-  //             entryInfo: {
-  //               name: "ContextEntry-1",
-  //               dataType: "<Undefined>",
-  //             },
-  //             entryExpression: {
-  //               uid: "id2",
-  //               logicType: "Context",
-  //               contextEntries: [
-  //                 {
-  //                   entryInfo: {
-  //                     name: "ContextEntry-1",
-  //                     dataType: "<Undefined>",
-  //                   },
-  //                   entryExpression: {},
-  //                   editInfoPopoverLabel: "Edit Context Entry",
-  //                 },
-  //               ],
-  //               result: {
-  //                 uid: "id5",
-  //               },
-  //               entryInfoWidth: 150,
-  //               entryExpressionWidth: 370,
-  //             },
-  //             editInfoPopoverLabel: "Edit Context Entry",
-  //           },
-  //         ],
-  //         result: {
-  //           uid: "id3",
-  //         },
-  //         entryInfoWidth: 150,
-  //         entryExpressionWidth: 584,
-  //       },
-  //       editInfoPopoverLabel: "Edit Parameter",
-  //     },
-  //   ],
-  //   invokedFunction: "",
-  //   entryInfoWidth: 151,
-  //   entryExpressionWidth: 798,
-  // } as ExpressionProps;
 
   const [updatedExpression, setUpdatedExpression] = useState(selectedExpression);
 

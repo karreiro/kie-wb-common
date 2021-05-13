@@ -17,4 +17,3 @@
 export * from "./Cell";
 export * from "./DOMSession";
 export * from "./ResizerSupervisorDOM";
-export * from "./Throttling";

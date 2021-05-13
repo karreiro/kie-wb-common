@@ -16,38 +16,18 @@
 
 import "./Resizer.css";
 import * as React from "react";
-import { useLayoutEffect } from "react";
 import { applyDOMSupervisor } from "./dom";
-import { ExpressionProps } from "../../api";
-import { useMemo } from "react";
-import { useState } from "react";
+import { useEffect, useContext } from "react";
+import { BoxedExpressionGlobalContext } from "../../context";
 
 export interface ResizerSupervisorProps {
-  selectedExpression?: ExpressionProps;
   children?: React.ReactElement;
 }
 
-export const ResizerSupervisor: React.FunctionComponent<ResizerSupervisorProps> = (props) => {
-  const [def, setDef] = useState("");
+export const ResizerSupervisor: React.FunctionComponent<ResizerSupervisorProps> = ({ children }) => {
+  const { supervisorHash } = useContext(BoxedExpressionGlobalContext);
 
-  useLayoutEffect(() => {
-    applyDOMSupervisor();
+  useEffect(applyDOMSupervisor, [supervisorHash]);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    function listener(e: CustomEvent) {
-      const newDef = JSON.stringify(e.detail.definition);
-
-      setDef(newDef);
-      if (def !== newDef) {
-        applyDOMSupervisor();
-      }
-    }
-
-    document.addEventListener("supervisor", listener);
-    return () => {
-      document.removeEventListener("supervisor", listener);
-    };
-  }, [def]); // TODO: use state instead of custom events
-
-  return useMemo(() => <div>{props.children}</div>, [props]);
+  return <div>{children}</div>;
 };

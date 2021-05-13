@@ -26,6 +26,7 @@ import {
   notifySupervisor as commonNotifySupervisor,
   widthValue as commonWidthValue,
 } from "./common";
+import { BoxedExpressionGlobalContext } from "../../context";
 
 export interface ResizerProps {
   width: number;
@@ -49,6 +50,7 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
   const [resizerWidth, setResizerWidth] = useState(width);
   const [initalResizerWidth, setInitialResizerWidth] = useState(0);
   const [cells, setCells] = useState<Cell[]>([]);
+  const { setSupervisorHash } = React.useContext(BoxedExpressionGlobalContext);
 
   /*
    * Memos
@@ -178,7 +180,8 @@ export const Resizer: React.FunctionComponent<ResizerProps> = ({
         cell.setWidth(cellInitialWidth + delta);
       });
 
-      notifySupervisor();
+      setSupervisorHash("Resizer");
+      // notifySupervisor();
     },
     [cells, initalResizerWidth, notifySupervisor, widthValue]
   );

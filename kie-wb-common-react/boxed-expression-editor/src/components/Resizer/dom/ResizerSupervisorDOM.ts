@@ -37,9 +37,12 @@ class SupervisorExecution {
   }
 
   execute() {
+    const p1 = performance.now();
     const cells = this.domSession.getCells();
     cells.sort((c1, c2) => c2.depth - c1.depth).forEach(this.refreshWidthAsParent);
     cells.sort((c1, c2) => c1.depth - c2.depth).forEach(this.refreshWidthAsLastColumn);
+    const p2 = performance.now();
+    console.log(`SupervisorExecution: ${p2 - p1}ms`);
   }
 
   private refreshWidthAsParent(cell: Cell) {

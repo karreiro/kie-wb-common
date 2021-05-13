@@ -35,6 +35,7 @@ import { ColumnInstance, DataRecord } from "react-table";
 import { ContextEntryExpressionCell, ContextEntryInfoCell } from "../ContextExpression";
 import * as _ from "lodash";
 import { useMemo } from "react";
+import { BoxedExpressionGlobalContext } from "../../context";
 
 const DEFAULT_PARAMETER_NAME = "p-1";
 const DEFAULT_PARAMETER_DATA_TYPE = DataType.Undefined;
@@ -69,6 +70,7 @@ export const InvocationExpression: React.FunctionComponent<InvocationProps> = ({
   const [infoWidth, setInfoWidth] = useState(entryInfoWidth);
   const [expressionWidth, setExpressionWidth] = useState(entryExpressionWidth);
   const [functionName, setFunctionName] = useState(invokedFunction);
+  const { setSupervisorHash } = React.useContext(BoxedExpressionGlobalContext);
 
   useEffect(() => {
     const [expressionColumn] = columns.current;
@@ -87,11 +89,12 @@ export const InvocationExpression: React.FunctionComponent<InvocationProps> = ({
     if (isHeadless) {
       onUpdatingRecursiveExpression?.(_.omit(updatedDefinition, ["name", "dataType"]));
     } else {
-      document.dispatchEvent(
-        new CustomEvent("supervisor", {
-          detail: { definition: _.omit(updatedDefinition, ["name", "dataType"]) },
-        })
-      );
+      setSupervisorHash("Invocation expression " + JSON.stringify(_.omit(updatedDefinition, ["name", "dataType"])));
+      // document.dispatchEvent(
+      //   new CustomEvent("supervisor", {
+      //     detail: { definition: _.omit(updatedDefinition, ["name", "dataType"]) },
+      //   })
+      // );
       window.beeApi?.broadcastInvocationExpressionDefinition?.(updatedDefinition);
     }
   }, [expressionWidth, functionName, infoWidth, isHeadless, logicType, onUpdatingRecursiveExpression, rows, uid]);

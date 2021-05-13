@@ -41,6 +41,7 @@ import { ContextEntryInfoCell } from "./ContextEntryInfoCell";
 import { Resizer } from "../Resizer";
 import { useMemo } from "react";
 import { notifySupervisor } from "../Resizer/common";
+import { BoxedExpressionGlobalContext } from "../../context";
 
 const DEFAULT_CONTEXT_ENTRY_NAME = "ContextEntry-1";
 const DEFAULT_CONTEXT_ENTRY_DATA_TYPE = DataType.Undefined;
@@ -62,6 +63,7 @@ export const ContextExpression: React.FunctionComponent<ContextProps> = ({
   const [resultExpression, setResultExpression] = useState(result);
   const [infoWidth, setInfoWidth] = useState(entryInfoWidth);
   const [expressionWidth, setExpressionWidth] = useState(entryExpressionWidth);
+  const { setSupervisorHash } = React.useContext(BoxedExpressionGlobalContext);
 
   const [columns, setColumns] = useState([
     {
@@ -148,7 +150,8 @@ export const ContextExpression: React.FunctionComponent<ContextProps> = ({
     if (isHeadless) {
       onUpdatingRecursiveExpression?.(_.omit(updatedDefinition, ["name", "dataType"]));
     } else {
-      notifySupervisor({ definition: updatedDefinition });
+      setSupervisorHash("Context expression " + JSON.stringify(updatedDefinition));
+      // notifySupervisor({ definition: updatedDefinition });
       window.beeApi?.broadcastContextExpressionDefinition?.(updatedDefinition);
     }
   }, [columns, isHeadless, onUpdatingRecursiveExpression, rows, resultExpression, infoWidth, expressionWidth, uid]);
@@ -156,7 +159,7 @@ export const ContextExpression: React.FunctionComponent<ContextProps> = ({
   const getRowKeyCallback = useCallback(getEntryKey, []);
   const resetEntryCallback = useCallback(resetEntry, []);
   const setInfoWidthCallback = useCallback((width) => {
-    console.log("resize");
+    // console.log("resize");
     setInfoWidth(Math.max(width, DEFAULT_ENTRY_INFO_MIN_WIDTH));
   }, []);
   const setExpressionWidthCallback = useCallback(

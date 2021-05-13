@@ -41,6 +41,7 @@ const BoxedExpressionEditor: (props: BoxedExpressionEditorProps) => JSX.Element 
 ) => {
   const [currentlyOpenedHandlerCallback, setCurrentlyOpenedHandlerCallback] = useState(() => _.identity);
   const boxedExpressionEditorRef = useRef<HTMLDivElement>(null);
+  const [supervisorHash, setSupervisorHash] = useState(JSON.stringify(props.expressionDefinition));
 
   return useMemo(
     () => (
@@ -51,9 +52,15 @@ const BoxedExpressionEditor: (props: BoxedExpressionEditorProps) => JSX.Element 
         ctx={BoxedExpressionEditorI18nContext}
       >
         <BoxedExpressionGlobalContext.Provider
-          value={{ boxedExpressionEditorRef, currentlyOpenedHandlerCallback, setCurrentlyOpenedHandlerCallback }}
+          value={{
+            supervisorHash,
+            setSupervisorHash,
+            boxedExpressionEditorRef,
+            currentlyOpenedHandlerCallback,
+            setCurrentlyOpenedHandlerCallback,
+          }}
         >
-          <ResizerSupervisor {...props.expressionDefinition}>
+          <ResizerSupervisor>
             <div className="boxed-expression-editor" ref={boxedExpressionEditorRef}>
               <ExpressionContainer {...props.expressionDefinition} />
             </div>

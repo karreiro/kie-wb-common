@@ -40,8 +40,8 @@ describe("ResizerSupervisorDOM", () => {
   });
 });
 
-jest.mock("src/components/Resizer/dom", () => {
-  const actualResizerDOM = jest.requireActual("src/components/Resizer/dom");
+jest.mock("../components/Resizer/dom", () => {
+  const actualResizerDOM = jest.requireActual("../components/Resizer/dom");
   return {
     ...actualResizerDOM,
     DOMSession: jest.fn(() => ({

@@ -33,6 +33,7 @@ import { useBoxedExpressionEditorI18n } from "../../i18n";
 import { DataRecord, Row } from "react-table";
 import * as _ from "lodash";
 import { Resizer } from "../Resizer";
+import { BoxedExpressionGlobalContext } from "../../context";
 
 const LIST_EXPRESSION_MIN_WIDTH = 430;
 
@@ -80,6 +81,7 @@ export const ListExpression: React.FunctionComponent<ListProps> = ({
 
   const [listItems, setListItems] = useState(initialListOfItems());
   const [listWidth, setListWidth] = useState(width || LIST_EXPRESSION_MIN_WIDTH);
+  const { setSupervisorHash } = React.useContext(BoxedExpressionGlobalContext);
 
   const listTableGetRowKey = useCallback((row: Row) => (row.original as ContextEntryRecord).entryExpression.uid!, []);
 
@@ -101,11 +103,12 @@ export const ListExpression: React.FunctionComponent<ListProps> = ({
     if (isHeadless) {
       onUpdatingRecursiveExpression?.(updatedDefinition);
     } else {
-      document.dispatchEvent(
-        new CustomEvent("supervisor", {
-          detail: { definition: JSON.stringify(updatedDefinition) },
-        })
-      );
+      setSupervisorHash("List expression " + JSON.stringify(updatedDefinition));
+      // document.dispatchEvent(
+      // new CustomEvent("supervisor", {
+      //   detail: { definition: JSON.stringify(updatedDefinition) },
+      // })
+      // );
       window.beeApi?.broadcastListExpressionDefinition?.(updatedDefinition);
     }
   }, [listWidth, listItems, isHeadless, onUpdatingRecursiveExpression, uid]);

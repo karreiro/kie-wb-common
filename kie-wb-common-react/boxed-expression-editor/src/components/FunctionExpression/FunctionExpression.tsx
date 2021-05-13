@@ -51,6 +51,8 @@ export const FunctionExpression: React.FunctionComponent<FunctionProps> = (props
   const functionKind = props.functionKind === undefined ? FunctionKind.Feel : props.functionKind;
   const name = props.name === undefined ? DEFAULT_FIRST_PARAM_NAME : props.name;
 
+  const [width, setWidth] = useState(parametersWidth);
+
   const { i18n } = useBoxedExpressionEditorI18n();
 
   const globalContext = useContext(BoxedExpressionGlobalContext);
@@ -94,7 +96,7 @@ export const FunctionExpression: React.FunctionComponent<FunctionProps> = (props
               headerCellElement,
               accessor: "parameters",
               disableHandlerOnHeader: true,
-              width: width.current,
+              width: width,
               minWidth: DEFAULT_ENTRY_EXPRESSION_MIN_WIDTH,
             },
           ],
@@ -158,7 +160,6 @@ export const FunctionExpression: React.FunctionComponent<FunctionProps> = (props
     [extractContextEntriesFromJavaProps, props]
   );
 
-  const width = useRef<number>(parametersWidth);
   const columns = useRef(evaluateColumns());
   const [selectedFunctionKind, setSelectedFunctionKind] = useState(functionKind);
   const [rows, setRows] = useState(evaluateRows(selectedFunctionKind));
@@ -196,7 +197,7 @@ export const FunctionExpression: React.FunctionComponent<FunctionProps> = (props
         dataType: expressionColumn.dataType,
         functionKind: selectedFunctionKind,
         formalParameters: parameters,
-        ...(width.current > DEFAULT_ENTRY_EXPRESSION_MIN_WIDTH ? { parametersWidth: width.current } : {}),
+        ...(width > DEFAULT_ENTRY_EXPRESSION_MIN_WIDTH ? { parametersWidth: width } : {}),
       },
       selectedFunctionKind
     );
@@ -226,7 +227,10 @@ export const FunctionExpression: React.FunctionComponent<FunctionProps> = (props
   const onColumnsUpdate = useCallback(
     ([expressionColumn]: [ColumnInstance]) => {
       props.onUpdatingNameAndDataType?.(expressionColumn.label as string, expressionColumn.dataType);
-      width.current = _.find(expressionColumn.columns, { accessor: "parameters" })?.width as number;
+      // setWidth(_.find(expressionColumn.columns, { accessor: "parameters" })?.width as number);
+
+      setWidth(expressionColumn.width as number);
+
       const [updatedExpressionColumn] = columns.current;
       updatedExpressionColumn.label = expressionColumn.label;
       updatedExpressionColumn.accessor = expressionColumn.accessor;

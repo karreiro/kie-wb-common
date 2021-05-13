@@ -58,40 +58,19 @@ export const App: React.FunctionComponent = () => {
 
   const selectedExpression: ExpressionProps = {
     uid: "id1",
-    logicType: "Context",
+    logicType: "Function",
     name: "ContextEntry-1",
     dataType: "<Undefined>",
-    contextEntries: [
-      {
-        entryInfo: {
-          name: "ContextEntry-1",
-          dataType: "<Undefined>",
-        },
-        entryExpression: {
-          uid: "id3",
-          logicType: "List",
-          width: 1027,
-          items: [
-            {
-              uid: "id5",
-              name: "Expression Name",
-              dataType: "<Undefined>",
-              logicType: "Literal expression",
-              content: "",
-            },
-            {
-              logicType: "Literal expression",
-            },
-          ],
-        },
-        editInfoPopoverLabel: "Edit Context Entry",
-      },
-    ],
-    result: {
+    functionKind: "FEEL",
+    formalParameters: [],
+    parametersWidth: 921,
+    expression: {
       uid: "id4",
+      name: "Expression Name",
+      dataType: "<Undefined>",
+      logicType: "Literal expression",
+      content: "",
     },
-    entryInfoWidth: 150,
-    entryExpressionWidth: 1103,
   } as ExpressionProps;
 
   const [updatedExpression, setUpdatedExpression] = useState(selectedExpression);

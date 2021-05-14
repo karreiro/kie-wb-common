@@ -1,43 +1,30 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+src/api/Table.ts
 
-exports[`BoxedExpressionEditor tests should render BoxedExpressionEditor component 1`] = `
-<div>
-  <div>
-    <div
-      class="boxed-expression-editor"
-    >
-      <div
-        class="expression-container"
-      >
-        <div
-          class="expression-name-and-logic-type"
-        >
-          <span
-            class="expression-title"
-          >
-            Expression Name
-          </span>
-          <span
-            class="expression-type"
-          >
-            (
-            &lt;Undefined&gt;
-            )
-          </span>
-        </div>
-        <div
-          class="expression-container-box"
-          data-ouia-component-id="expression-container"
-        >
-          <div
-            class="logic-type-selector no-table-context-menu logic-type-not-present"
-            style="opacity: 1;"
-          >
-            Select expression
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-`;
+src/components/ContextExpression/ContextEntryExpressionCell.css
+src/components/ContextExpression/ContextExpression.css
+src/components/ContextExpression/ContextExpression.tsx
+
+src/components/FunctionExpression/FunctionExpression.css
+src/components/FunctionExpression/FunctionExpression.tsx
+
+src/components/InvocationExpression/InvocationExpression.css
+src/components/InvocationExpression/InvocationExpression.tsx
+
+src/components/ListExpression/ListExpression.css
+src/components/ListExpression/ListExpression.tsx
+
+src/components/LiteralExpression/LiteralExpression.css
+src/components/LiteralExpression/LiteralExpression.tsx
+
+src/components/LogicTypeSelector/LogicTypeSelector.css
+src/components/LogicTypeSelector/LogicTypeSelector.tsx
+
+src/components/PopoverMenu/PopoverMenu.tsx
+src/components/RelationExpression/RelationExpression.css
+src/components/RelationExpression/RelationExpression.tsx
+
+src/components/Table/Table.css
+src/components/Table/Table.tsx
+src/components/Table/TableBody.tsx
+src/components/Table/TableHeader.tsx
+src/context/BoxedExpressionGlobalContext.tsx

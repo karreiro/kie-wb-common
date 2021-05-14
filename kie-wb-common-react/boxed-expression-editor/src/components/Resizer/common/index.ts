@@ -16,8 +16,18 @@
 
 export const DEFAULT_MIN_WIDTH = 100;
 
+/*
+ * Returns a valid width value.
+ */
 export const widthValue = (width: number | string | undefined | null): number => {
   return Math.max(Math.round(parseFloat(width + "")), DEFAULT_MIN_WIDTH);
+};
+
+/*
+ * Generates a global supervisor hash for a given object.
+ */
+export const hashfy = (obj = {}): string => {
+  return JSON.stringify(obj);
 };
 
 /*

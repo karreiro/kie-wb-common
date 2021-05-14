@@ -14,5 +14,19 @@
  * limitations under the License.
  */
 
-export * from "./Resizer";
-export * from "./ResizerSupervisor";
+export const DEFAULT_MIN_WIDTH = 100;
+
+export const widthValue = (width: number | string | undefined | null): number => {
+  return Math.max(Math.round(parseFloat(width + "")), DEFAULT_MIN_WIDTH);
+};
+
+/*
+ * Propagate Cell width from DOM to React state.
+ */
+export const notifyCell = (id: string, width: number = DEFAULT_MIN_WIDTH): void => {
+  document.dispatchEvent(
+    new CustomEvent(id, {
+      detail: { width },
+    })
+  );
+};

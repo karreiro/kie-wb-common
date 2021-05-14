@@ -26,7 +26,7 @@ import {
 } from "react-table";
 import { TableComposable } from "@patternfly/react-table";
 import * as React from "react";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useRef, useState, useEffect } from "react";
 import { EditableCell } from "./EditableCell";
 import { TableHeaderVisibility, TableOperation, TableProps } from "../../api";
 import * as _ from "lodash";
@@ -165,8 +165,8 @@ export const Table: React.FunctionComponent<TableProps> = ({
   );
 
   const defaultColumn = {
-    minWidth: 150,
-    width: 150,
+    // minWidth: 150, TODO
+    // width: "initial",
     Cell: useCallback((cellRef) => {
       const column = cellRef.column as ColumnInstance;
       if (column.isCountColumn) {
@@ -243,30 +243,30 @@ export const Table: React.FunctionComponent<TableProps> = ({
     useResizeColumns
   );
 
-  const resizeNestedColumns = (columns: ColumnInstance[], accessor: string, updatedWidth: number) => {
-    const columnIndex = _.findIndex(columns, { accessor });
-    if (columnIndex >= 0) {
-      const updatedColumn = { ...columns[columnIndex] };
-      updatedColumn.width = updatedWidth;
-      columns.splice(columnIndex, 1, updatedColumn);
-    } else {
-      _.forEach(columns, (column) => resizeNestedColumns(column.columns, accessor, updatedWidth));
-    }
-  };
+  // const resizeNestedColumns = (columns: ColumnInstance[], accessor: string, updatedWidth: number) => {
+  //   const columnIndex = _.findIndex(columns, { accessor });
+  //   if (columnIndex >= 0) {
+  //     const updatedColumn = { ...columns[columnIndex] };
+  //     updatedColumn.width = updatedWidth;
+  //     columns.splice(columnIndex, 1, updatedColumn);
+  //   } else {
+  //     _.forEach(columns, (column) => resizeNestedColumns(column.columns, accessor, updatedWidth));
+  //   }
+  // };
 
-  const finishedResizing =
-    tableInstance.state.columnResizing.isResizingColumn === null &&
-    !_.isEmpty(tableInstance.state.columnResizing.columnWidths);
-  useEffect(() => {
-    if (finishedResizing) {
-      _.forEach(tableInstance.state.columnResizing.columnWidths, (updatedColumnWidth, accessor) =>
-        resizeNestedColumns(tableColumns.current as ColumnInstance[], accessor, updatedColumnWidth)
-      );
-      onColumnsUpdateCallback(tableColumns.current);
-    }
-    // Need to consider a change only when resizing is finished (no other dependencies to consider for this useEffect)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [finishedResizing]);
+  // const finishedResizing =
+  //   tableInstance.state.columnResizing.isResizingColumn === null &&
+  //   !_.isEmpty(tableInstance.state.columnResizing.columnWidths);
+  // useEffect(() => {
+  //   if (finishedResizing) {
+  //     _.forEach(tableInstance.state.columnResizing.columnWidths, (updatedColumnWidth, accessor) =>
+  //       resizeNestedColumns(tableColumns.current as ColumnInstance[], accessor, updatedColumnWidth)
+  //     );
+  //     onColumnsUpdateCallback(tableColumns.current);
+  //   }
+  //   // Need to consider a change only when resizing is finished (no other dependencies to consider for this useEffect)
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [finishedResizing]);
 
   return (
     <div className={`table-component ${tableId}`}>
@@ -286,6 +286,8 @@ export const Table: React.FunctionComponent<TableProps> = ({
           tableInstance={tableInstance}
           getRowKey={getRowKey}
           getColumnKey={getColumnKey}
+          onRowsUpdate={onRowsUpdateCallback}
+          onColumnsUpdate={onColumnsUpdateCallback}
           headerVisibility={headerVisibility}
         >
           {children}

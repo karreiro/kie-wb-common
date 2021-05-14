@@ -17,6 +17,7 @@
 import * as React from "react";
 import { Popover } from "@patternfly/react-core";
 import "./PopoverMenu.css";
+import { useMemo } from "react";
 
 export interface PopoverMenuProps {
   /** Optional children element to be considered for triggering the popover */
@@ -47,25 +48,28 @@ export const PopoverMenu: React.FunctionComponent<PopoverMenuProps> = ({
   hasAutoWidth,
   minWidth,
 }: PopoverMenuProps) => {
-  return (
-    <Popover
-      data-ouia-component-id="expression-popover-menu"
-      className={`popover-menu-selector${className ? " " + className : ""}`}
-      hasAutoWidth={hasAutoWidth}
-      minWidth={minWidth}
-      position="bottom"
-      distance={0}
-      id="menu-selector"
-      reference={arrowPlacement}
-      appendTo={appendTo}
-      headerContent={
-        <div className="selector-menu-title" data-ouia-component-id="expression-popover-menu-title">
-          {title}
-        </div>
-      }
-      bodyContent={body}
-    >
-      {children}
-    </Popover>
+  return useMemo(
+    () => (
+      <Popover
+        data-ouia-component-id="expression-popover-menu"
+        className={`popover-menu-selector${className ? " " + className : ""}`}
+        hasAutoWidth={hasAutoWidth}
+        minWidth={minWidth}
+        position="bottom"
+        distance={0}
+        id="menu-selector"
+        reference={arrowPlacement}
+        appendTo={appendTo}
+        headerContent={
+          <div className="selector-menu-title" data-ouia-component-id="expression-popover-menu-title">
+            {title}
+          </div>
+        }
+        bodyContent={body}
+      >
+        {children}
+      </Popover>
+    ),
+    [appendTo, arrowPlacement, body, children, className, hasAutoWidth, title]
   );
 };

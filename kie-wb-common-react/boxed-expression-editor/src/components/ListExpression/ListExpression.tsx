@@ -16,7 +16,7 @@
 
 import "./ListExpression.css";
 import * as React from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ContextEntryRecord,
   ExpressionProps,
@@ -32,7 +32,8 @@ import { Table } from "../Table";
 import { useBoxedExpressionEditorI18n } from "../../i18n";
 import { DataRecord, Row } from "react-table";
 import * as _ from "lodash";
-import { Resizer } from "../Resizer";
+import { hashfy, Resizer } from "../Resizer";
+import { BoxedExpressionGlobalContext } from "../../context";
 
 const LIST_EXPRESSION_MIN_WIDTH = 430;
 
@@ -57,19 +58,22 @@ export const ListExpression: React.FunctionComponent<ListProps> = ({
     },
   ];
 
-  const generateLiteralExpression = () => ({ logicType: LogicType.LiteralExpression } as LiteralExpressionProps);
-
-  const [listItems, setListItems] = useState(
-    _.isEmpty(items)
-      ? [
-          {
-            entryExpression: generateLiteralExpression(),
-          } as DataRecord,
-        ]
-      : _.map(items, (item) => ({ entryExpression: item } as DataRecord))
+  const generateLiteralExpression = useCallback(
+    () => ({ logicType: LogicType.LiteralExpression } as LiteralExpressionProps),
+    []
   );
 
-  const listExpressionWidth = useRef(width);
+  const initialListOfItems = useCallback(() => {
+    if (_.isEmpty(items)) {
+      return [{ entryExpression: generateLiteralExpression() } as DataRecord];
+    } else {
+      return _.map(items, (item) => ({ entryExpression: item } as DataRecord));
+    }
+  }, [generateLiteralExpression, items]);
+
+  const [listItems, setListItems] = useState(initialListOfItems());
+  const [listWidth, setListWidth] = useState(width || LIST_EXPRESSION_MIN_WIDTH);
+  const { setSupervisorHash } = React.useContext(BoxedExpressionGlobalContext);
 
   const listTableGetRowKey = useCallback((row: Row) => (row.original as ContextEntryRecord).entryExpression.uid!, []);
 
@@ -77,55 +81,43 @@ export const ListExpression: React.FunctionComponent<ListProps> = ({
     () => ({
       entryExpression: generateLiteralExpression(),
     }),
-    []
+    [generateLiteralExpression]
   );
 
-  const spreadListExpressionDefinition = useCallback(() => {
+  useEffect(() => {
     const updatedDefinition: ListProps = {
       uid,
-      ...(listExpressionWidth.current !== LIST_EXPRESSION_MIN_WIDTH ? { width: listExpressionWidth.current } : {}),
       logicType: LogicType.List,
+      width: listWidth,
       items: _.map(listItems, (listItem: DataRecord) => listItem.entryExpression as ExpressionProps),
     };
-    isHeadless
-      ? onUpdatingRecursiveExpression?.(updatedDefinition)
-      : window.beeApi?.broadcastListExpressionDefinition?.(updatedDefinition);
-  }, [isHeadless, listItems, onUpdatingRecursiveExpression, uid]);
 
-  const onRowsUpdate = useCallback((rows) => {
-    setListItems(rows);
-  }, []);
+    if (isHeadless) {
+      onUpdatingRecursiveExpression?.(updatedDefinition);
+    } else {
+      setSupervisorHash(hashfy(updatedDefinition));
+      window.beeApi?.broadcastListExpressionDefinition?.(updatedDefinition);
+    }
+  }, [listWidth, listItems, isHeadless, onUpdatingRecursiveExpression, uid, setSupervisorHash]);
 
   const resetRowCustomFunction = useCallback((row: DataRecord) => {
     return { entryExpression: { uid: (row.entryExpression as ExpressionProps).uid } };
   }, []);
 
-  const onHorizontalResizeStop = useCallback(
-    (width) => {
-      listExpressionWidth.current = width;
-      spreadListExpressionDefinition();
-    },
-    [spreadListExpressionDefinition]
-  );
+  const onRowsUpdate = useCallback((rows) => {
+    setListItems(rows);
+  }, []);
 
-  useEffect(() => {
-    /** Everytime the list of items changes, we need to spread expression's updated definition */
-    spreadListExpressionDefinition();
-  }, [listItems, spreadListExpressionDefinition]);
+  const columns = [{ accessor: "list", width: listWidth, setWidth: setListWidth }];
 
-  return (
-    <div className="list-expression">
-      <Resizer
-        width={listExpressionWidth.current}
-        height="100%"
-        minWidth={LIST_EXPRESSION_MIN_WIDTH}
-        onHorizontalResizeStop={onHorizontalResizeStop}
-      >
+  return useMemo(
+    () => (
+      <div className="list-expression">
         <Table
           tableId={uid}
           headerVisibility={TableHeaderVisibility.None}
           defaultCell={{ list: ContextEntryExpressionCell }}
-          columns={[{ accessor: "list", width: "100%" }]}
+          columns={columns}
           rows={listItems as DataRecord[]}
           onRowsUpdate={onRowsUpdate}
           onRowAdding={onRowAdding}
@@ -133,7 +125,8 @@ export const ListExpression: React.FunctionComponent<ListProps> = ({
           getRowKey={listTableGetRowKey}
           resetRowCustomFunction={resetRowCustomFunction}
         />
-      </Resizer>
-    </div>
+      </div>
+    ),
+    [handlerConfiguration, listItems, listTableGetRowKey, onRowAdding, onRowsUpdate, resetRowCustomFunction, uid]
   );
 };
